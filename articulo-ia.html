@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatización con IA | Dev Blog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">Dev<span class="retro-text">Blog_</span></div>
+        <input type="checkbox" id="menu-toggle" class="menu-checkbox">
+        <label for="menu-toggle" class="menu-icon">&#9776;</label>
+        <nav class="nav-menu">
+            <a href="index.html">Inicio</a>
+            <a href="articulo-java.html">Java</a>
+            <a href="articulo-ia.html">IA</a>
+            <a href="articulo-chiptune.html">Chiptune</a>
+        </nav>
+    </header>
+
+    <main class="container reading-container">
+        <a href="index.html" class="back-link">← Volver al inicio</a>
+        
+        <article class="full-post">
+            <span class="tag">Auto IA</span>
+            <h1>Scripts que automatizan tu vida de estudiante</h1>
+            <img src="assets/card-ia.jpg" alt="Automatización y circuitos" class="article-hero-img">
+            
+            <div class="content-body">
+                <p>Como estudiantes de ingeniería de software, perdemos horas haciendo tareas mecánicas: renombrando archivos, organizando PDFs de clases o extrayendo texto de imágenes. La verdadera magia de la IA no es que te haga la tarea, sino que automatice el trabajo sucio.</p>
+                
+                <h3>El Organizador Automático de Descargas</h3>
+                <p>Este es un proyecto open-source que puedes montar hoy mismo. Usando Python y la librería <code>watchdog</code>, puedes crear un script que vigile tu carpeta de descargas y clasifique todo automáticamente. Si le integras la API de OpenAI, el script puede leer tus PDFs, adivinar de qué materia son, y moverlos a la carpeta correcta del cuatrimestre.</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn">Copiar código</button>
+                    </div>
+                    <pre><code>import os
+import shutil
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+
+# Rutas de tus carpetas universitarias
+ruta_descargas = "/Users/tu_usuario/Downloads"
+ruta_materias = "/Users/tu_usuario/Universidad/Cuatri_3"
+
+class Organizador(FileSystemEventHandler):
+    def on_modified(self, event):
+        for nombre_archivo in os.listdir(ruta_descargas):
+            # Lógica simple: mover PDFs a una carpeta específica
+            if nombre_archivo.endswith(".pdf"):
+                origen = f"{ruta_descargas}/{nombre_archivo}"
+                destino = f"{ruta_materias}/Lecturas/{nombre_archivo}"
+                shutil.move(origen, destino)
+                print(f"Movido: {nombre_archivo}")
+
+# Iniciar la vigilancia
+event_handler = Organizador()
+observer = Observer()
+observer.schedule(event_handler, ruta_descargas, recursive=True)
+observer.start()</code></pre>
+                </div>
+
+                <h3>¿Cómo mejorarlo con IA?</h3>
+                <p>En lugar de solo mirar la extensión <code>.pdf</code>, podrías pasarle el nombre del archivo a una API local (como Ollama) o a la API de OpenAI, pedirle que identifique si es de "Álgebra" o "Programación Web", y enviarlo a su subcarpeta correspondiente.</p>
+                
+                <blockquote>
+                    "Automatizar un proceso que te toma 5 minutos al día te ahorrará más de 30 horas al año. Vale la pena programarlo."
+                </blockquote>
+            </div>
+        </article>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo">Dev<span class="retro-text">Blog_</span></div>
+                <p>Documentando el viaje de estudiante a ingeniero de software. Código, música y automatización.</p>
+            </div>
+            
+            <div class="footer-links">
+                <strong>Explorar</strong>
+                <a href="index.html">Inicio</a>
+                <a href="articulo-java.html">Supervivencia Java</a>
+                <a href="articulo-prompts.html">Prompts Web</a>
+                <a href="articulo-ia.html">Auto IA</a>
+                <a href="articulo-chiptune.html">Chiptune</a>
+            </div>
+
+            <div class="footer-social">
+                <strong>Conecta</strong>
+                <a href="#">GitHub</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">Comunidad</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 DevBlog. Proyecto de Aplicaciones Web.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>De C++ a Java | Dev Blog</title>
+    <!-- Mismas fuentes y mismo CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Tu Menú Responsivo Intacto -->
+    <header class="navbar">
+        <div class="logo">Dev<span class="retro-text">Blog_</span></div>
+        <input type="checkbox" id="menu-toggle" class="menu-checkbox">
+        <label for="menu-toggle" class="menu-icon">&#9776;</label>
+        <nav class="nav-menu">
+            <a href="index.html">Inicio</a>
+            <a href="articulo-java.html">Java</a>
+            <a href="articulo-ia.html">IA</a>
+            <a href="articulo-chiptune.html">Chiptune</a>
+        </nav>
+    </header>
+
+    <!-- Contenedor del Artículo (Más angosto para buena lectura) -->
+    <main class="container reading-container">
+        
+        <a href="index.html" class="back-link">← Volver al inicio</a>
+        
+        <article class="full-post">
+            <span class="tag">Guía de Supervivencia</span>
+            <h1>De C++ a Java: Cómo sobrevivir a la Programación Orientada a Objetos</h1>
+            
+            <img src="assets/featured-java.jpg" alt="Código Java y C++" class="article-hero-img">
+            
+            <div class="content-body">
+                <p>Si acabas de terminar tu segundo cuatrimestre sintiéndote un dios de la programación porque lograste dominar los punteros en C++, tengo noticias para ti: el tercer cuatrimestre te presentará a Java y a la Programación Orientada a Objetos (POO).</p>
+                
+                <h3>1. Adiós a la gestión manual de memoria</h3>
+                <p>En C++ estabas acostumbrado a usar <code>new</code> y <code>delete</code> para manejar la memoria. Si se te olvidaba, tenías una fuga de memoria. En Java, conocerás a tu nuevo mejor amigo: el <strong>Garbage Collector</strong> (Recolector de Basura).</p>
+                
+                <h3>2. Todo es un Objeto</h3>
+                <p>A diferencia de C++, donde puedes tener funciones sueltas flotando en tu archivo, en Java todo debe vivir obligatoriamente dentro de una <code>class</code>. Cambiar este chip mental es lo que más cuesta al principio.</p>
+                
+                <blockquote>
+                    "Aprender Java después de C++ no es empezar de cero, es aprender a organizar tu lógica de una forma mucho más estructurada."
+                </blockquote>
+            </div>
+            
+            <!-- Bloque de código para copiar y pegar -->
+            <div class="code-block-wrapper">
+                <div class="code-header">
+                    <span class="code-lang">python</span>
+                    <button class="copy-btn">Copiar código</button>
+                </div>
+                <pre><code>import os
+                import openai
+
+                def generar_prompt_html(tema):
+                    print(f"Generando maquetación web para: {tema}")
+                    # Aquí iría la lógica de automatización
+                    return "Estructura generada con éxito"
+
+                generar_prompt_html("Blog Dev")</code></pre>
+            </div>
+
+        </article>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo">Dev<span class="retro-text">Blog_</span></div>
+                <p>Documentando el viaje de estudiante a ingeniero de software. Código, música y automatización.</p>
+            </div>
+            
+            <div class="footer-links">
+                <strong>Explorar</strong>
+                <a href="index.html">Inicio</a>
+                <a href="articulo-java.html">Supervivencia Java</a>
+                <a href="articulo-prompts.html">Prompts Web</a>
+                <a href="articulo-ia.html">Auto IA</a>
+                <a href="articulo-chiptune.html">Chiptune</a>
+            </div>
+
+            <div class="footer-social">
+                <strong>Conecta</strong>
+                <a href="#">GitHub</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">Comunidad</a>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 DevBlog. Proyecto de Aplicaciones Web.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+
+</body>
+</html>

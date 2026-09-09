@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompts de IA para HTML y CSS | Dev Blog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Menú Responsivo -->
+    <header class="navbar">
+        <div class="logo">Dev<span class="retro-text">Blog_</span></div>
+        <input type="checkbox" id="menu-toggle" class="menu-checkbox">
+        <label for="menu-toggle" class="menu-icon">&#9776;</label>
+        <nav class="nav-menu">
+            <a href="index.html">Inicio</a>
+            <a href="articulo-java.html">Java</a>
+            <a href="articulo-ia.html">IA</a>
+            <a href="articulo-chiptune.html">Chiptune</a>
+        </nav>
+    </header>
+
+    <main class="container reading-container">
+        
+        <a href="index.html" class="back-link">← Volver al inicio</a>
+        
+        <article class="full-post">
+            <span class="tag">HTML/CSS</span>
+            <h1>De cero a Frontend: Prompts para estudiar con IA</h1>
+            
+            <img src="assets/card-html.jpg" alt="IA y desarrollo web" class="article-hero-img">
+            
+            <div class="content-body">
+                <p>Cuando empecé mi tercer cuatrimestre, centrar un `div` parecía brujería. Flexbox y CSS Grid me daban dolores de cabeza, y los tutoriales de 3 horas en YouTube a veces me confundían más. Luego descubrí que la IA no solo sirve para hacer tareas, sino que es el **mejor tutor personal de programación**.</p>
+                
+                <p>Aquí te dejo mis *prompts* (instrucciones) favoritos para que ChatGPT, Gemini o Claude te expliquen el desarrollo web sin morir en el intento.</p>
+
+                <h3>1. El Prompt para entender Flexbox vs Grid</h3>
+                <p>A veces la teoría es aburrida. Usa este prompt para que la IA te lo explique con analogías del mundo real:</p>
+                
+                <!-- Bloque de código para el Prompt -->
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">prompt</span>
+                        <button class="copy-btn">Copiar prompt</button>
+                    </div>
+                    <pre><code>Actúa como un profesor de desarrollo web muy didáctico. 
+Explícame la diferencia exacta entre CSS Flexbox y CSS Grid 
+usando una analogía de la vida real (por ejemplo, organizar 
+cajas en un almacén o mesas en un restaurante). 
+Dame un ejemplo de código súper sencillo para cada uno.</code></pre>
+                </div>
+
+                <h3>2. El Prompt "Encuentra mi error"</h3>
+                <p>¿Pasaste horas buscando por qué tu página se desborda en el celular? No te estreses, pídele a la IA que revise tu código.</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">prompt</span>
+                        <button class="copy-btn">Copiar prompt</button>
+                    </div>
+                    <pre><code>Tengo el siguiente código HTML y CSS. Estoy intentando 
+[escribe lo que quieres lograr, ej: que estas 3 tarjetas 
+se vean en fila], pero no funciona. 
+¿Puedes revisar mi código, decirme dónde está el error 
+y explicarme por qué falló? 
+
+HTML:
+[Pega tu HTML]
+
+CSS:
+[Pega tu CSS]</code></pre>
+                </div>
+
+                <h3>3. El Generador de Maquetación Base</h3>
+                <p>Para no empezar con el síndrome de la hoja en blanco, pide una estructura básica semántica (excelente para el SEO).</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-lang">prompt</span>
+                        <button class="copy-btn">Copiar prompt</button>
+                    </div>
+                    <pre><code>Escribe la estructura base en HTML5 para una página 
+tipo "Blog". Debe incluir etiquetas semánticas como 
+header, nav, main, article, aside y footer. 
+Agrega comentarios en el código explicando para qué 
+sirve cada etiqueta.</code></pre>
+                </div>
+
+                <blockquote>
+                    "El objetivo no es que la IA haga la página por ti, sino que te explique el código línea por línea para que tú puedas hacerlo solo la próxima vez."
+                </blockquote>
+            </div>
+        </article>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo">Dev<span class="retro-text">Blog_</span></div>
+                <p>Documentando el viaje de estudiante a ingeniero de software. Código, música y automatización.</p>
+            </div>
+            
+            <div class="footer-links">
+                <strong>Explorar</strong>
+                <a href="index.html">Inicio</a>
+                <a href="articulo-java.html">Supervivencia Java</a>
+                <a href="articulo-prompts.html">Prompts Web</a>
+                <a href="articulo-ia.html">Auto IA</a>
+                <a href="articulo-chiptune.html">Chiptune</a>
+            </div>
+
+            <div class="footer-social">
+                <strong>Conecta</strong>
+                <a href="#">GitHub</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">Comunidad</a>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 DevBlog. Proyecto de Aplicaciones Web.</p>
+        </div>
+    </footer>
+
+    <!-- Script para que funcione el botón de copiar -->
+    <script src="js/main.js"></script>
+</body>
+</html>
