@@ -29,41 +29,78 @@
         
         <article class="full-post">
             <span class="tag">Guía de Supervivencia</span>
-            <h1>De C++ a Java: Cómo sobrevivir a la Programación Orientada a Objetos</h1>
+            <h1>De C++ a Java: Cómo sobrevivir al cambio de paradigma</h1>
             
-            <img src="assets/featured-java.jpg" alt="Código Java y C++" class="article-hero-img">
+            <img src="assets/featured-java.jpg" alt="Diferencias técnicas entre C++ y Java" class="article-hero-img">
             
             <div class="content-body">
-                <p>Si acabas de terminar tu segundo cuatrimestre sintiéndote un dios de la programación porque lograste dominar los punteros en C++, tengo noticias para ti: el tercer cuatrimestre te presentará a Java y a la Programación Orientada a Objetos (POO).</p>
+                <p>Pasar de C++ a Java es como cambiar de un coche manual (donde controlas cada engranaje de la memoria) a uno automático. Si sobreviviste a los punteros, dominar el ecosistema estricto de Java será tu siguiente gran victoria. Aquí tienes la comparativa definitiva para hacer el "switch" mental.</p>
                 
-                <h3>1. Adiós a la gestión manual de memoria</h3>
-                <p>En C++ estabas acostumbrado a usar <code>new</code> y <code>delete</code> para manejar la memoria. Si se te olvidaba, tenías una fuga de memoria. En Java, conocerás a tu nuevo mejor amigo: el <strong>Garbage Collector</strong> (Recolector de Basura).</p>
+                <h3>El choque de dos mundos</h3>
+                <p>C++ fue diseñado para tener un control absoluto sobre el hardware, mientras que Java nació bajo la filosofía <em>"Write Once, Run Anywhere"</em> (Escribe una vez, ejecuta donde sea). Esta es la radiografía de ambos lenguajes:</p>
+
+                <!-- Tabla Comparativa SEO-Friendly -->
+                <div class="table-responsive">
+                    <table class="tech-table">
+                        <thead>
+                            <tr>
+                                <th>Característica</th>
+                                <th>C++ (El Manual)</th>
+                                <th>Java (El Automático)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Memoria</strong></td>
+                                <td>Gestión manual (<code>new</code> / <code>delete</code>)</td>
+                                <td>Automática (Garbage Collector)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ejecución</strong></td>
+                                <td>Compilado directo a código máquina</td>
+                                <td>Compilado a Bytecode (Vía JVM)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Herencia</strong></td>
+                                <td>Múltiple (potente pero caótica)</td>
+                                <td>Simple + Uso de Interfaces</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Punteros</strong></td>
+                                <td>Acceso directo a la memoria</td>
+                                <td>Ocultos por seguridad (Referencias)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>1. Adiós a las fugas de memoria</h3>
+                <p>En C++, si olvidabas liberar la memoria con <code>delete</code>, creabas una fuga de memoria que terminaba crasheando tu programa. En Java conocerás al <strong>Garbage Collector</strong>, un proceso en segundo plano que busca variables que ya no estás usando y las destruye por ti. Pierdes un poco de rendimiento, pero ganas muchísima estabilidad.</p>
                 
-                <h3>2. Todo es un Objeto</h3>
-                <p>A diferencia de C++, donde puedes tener funciones sueltas flotando en tu archivo, en Java todo debe vivir obligatoriamente dentro de una <code>class</code>. Cambiar este chip mental es lo que más cuesta al principio.</p>
+                <h3>2. Todo es un Objeto (En serio, todo)</h3>
+                <p>En C++ puedes tener funciones globales flotando solas en tu archivo. Java es un lenguaje Orientado a Objetos puro: absolutamente toda la lógica, variables y métodos deben vivir obligatoriamente dentro de una <code>class</code>.</p>
+
+                <div class="curious-facts">
+                    <strong>Datos Curiosos de la Industria ☕</strong>
+                    <ul>
+                        <li><strong>El origen secreto:</strong> Java se llamaba originalmente "Oak" y fue diseñado a principios de los 90s para decodificadores de televisión interactiva, no para la web.</li>
+                        <li><strong>El nombre de C++:</strong> El <code>++</code> es una broma nerd. Viene del operador de incremento en C, significando literalmente "el siguiente paso de C".</li>
+                    </ul>
+                </div>
+
+                <h3>Video: Mentalidad POO en Java</h3>
+                <p>A veces, ver el código en acción es mejor que la teoría pura. Este tutorial te explica las bases de la Programación Orientada a Objetos enfocado en Java:</p>
+                
+                <!-- Contenedor de Video Responsivo -->
+                <div class="video-container">
+                    <!-- Reemplaza el link en src por el ID del video de YouTube que prefieras -->
+                    <iframe src="https://www.youtube.com/embed/aZOlpo3hzEE" title="Tutorial Java" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
                 
                 <blockquote>
-                    "Aprender Java después de C++ no es empezar de cero, es aprender a organizar tu lógica de una forma mucho más estructurada."
+                    "Aprender Java después de C++ no es empezar de cero. Es tomar toda la lógica que ya tienes y aprender a organizarla en cajas perfectas."
                 </blockquote>
             </div>
-            
-            <!-- Bloque de código para copiar y pegar -->
-            <div class="code-block-wrapper">
-                <div class="code-header">
-                    <span class="code-lang">python</span>
-                    <button class="copy-btn">Copiar código</button>
-                </div>
-                <pre><code>import os
-                import openai
-
-                def generar_prompt_html(tema):
-                    print(f"Generando maquetación web para: {tema}")
-                    # Aquí iría la lógica de automatización
-                    return "Estructura generada con éxito"
-
-                generar_prompt_html("Blog Dev")</code></pre>
-            </div>
-
         </article>
     </main>
 
