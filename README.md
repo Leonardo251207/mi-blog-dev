@@ -54,6 +54,48 @@ Después, para levantar todo:
 
 Se abren cuatro ventanas de PowerShell: CMS, Métricas, Generador y Blog.
 
+## Despliegue gratuito del blog
+
+El blog es estático y se puede publicar gratis en **GitHub Pages** o **Vercel**.
+Los servicios del CMS, métricas y generador son Python y necesitan ejecutarse
+aparte (localmente o en un host Python con HTTPS).
+
+### GitHub Pages
+
+Ya está incluido el workflow `.github/workflows/pages.yml`.
+
+1. En GitHub, entra a **Settings → Pages**.
+2. En **Source**, selecciona **GitHub Actions**.
+3. Haz push a `main` o ejecuta manualmente el workflow
+   **Deploy blog to GitHub Pages**.
+4. La URL será:
+
+   <https://leonardo251207.github.io/mi-blog-dev/>
+
+### Vercel
+
+1. Importa el repositorio <https://github.com/Leonardo251207/mi-blog-dev>.
+2. Framework Preset: **Other**.
+3. Root Directory: `dev-blog` (o deja la raíz; el `vercel.json` ya apunta a
+   `dev-blog`).
+4. Build Command: vacío.
+5. Output Directory: `dev-blog` (o `.` si usaste Root Directory `dev-blog`).
+6. Deploy.
+
+### Importante
+
+- En Pages/Vercel solo se publica el **blog estático**. La portada intentará
+  llamar a `http://127.0.0.1:8080` y `http://127.0.0.1:8000`; si no están
+  disponibles, `notes.js` muestra las tarjetas estáticas de respaldo.
+- El artículo dinámico (`articulo.html?slug=...`) y `admin.html` necesitan la
+  API del CMS. Para usarlos desde internet hay que desplegar el CMS (y
+  opcionalmente métricas/generador) en un host Python con HTTPS, cambiar
+  `API_BASE_URL`, `METRICS_BASE_URL` y `STATIC_GENERATOR_BASE_URL` en
+  `dev-blog/api-config.js`, y agregar el dominio del blog a `CMS_CORS_ORIGINS`
+  y `CORS_ORIGINS`.
+- Las páginas `articulo-cpp.html`, `articulo-voz.html` y `articulo-vercel.html`
+  sí funcionan sin API.
+
 ## URLs útiles
 
 - CMS / Swagger: <http://127.0.0.1:8080/docs>
