@@ -36,6 +36,9 @@ cd mi-blog-dev
 .\setup.ps1
 ```
 
+> Si PowerShell bloquea la ejecución de scripts, abre la sesión con:
+> `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
+
 `setup.ps1` hace lo siguiente:
 
 1. Crea los entornos `.venv` del CMS, Métricas y Generador.
