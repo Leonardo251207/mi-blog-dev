@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Despliega tu web gratis en Vercel — DevBlog_</title>
+  <meta name="description" content="Checklist previo, guía paso a paso y simulación de consola para publicar tu portafolio gratis en Vercel.">
+  <meta name="theme-color" content="#050807">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23050807'/%3E%3Crect x='7' y='23' width='18' height='3' fill='%233df0a8'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav__inner">
+      <a class="logo" href="index.html" aria-label="DevBlog, volver al inicio">DevBlog<span>_</span></a>
+      <a class="btn btn--ghost" href="index.html">← Volver al inicio</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="article-hero">
+      <div class="article-hero__inner intro">
+        <p class="status" style="--i:0"><i></i>[ TUTORIAL / DEPLOYMENT ]</p>
+        <h1 style="--i:1">Despliega tu web gratis <span>en Vercel</span></h1>
+        <p class="byline" style="--i:2">Por Leonardo Nucamendi <b>•</b> 5 min de lectura</p>
+      </div>
+    </section>
+
+    <!-- ===== 01 Control previo ===== -->
+    <section class="article-section" aria-labelledby="t-check">
+      <div class="article-wrap--wide article-wrap">
+        <div class="mod-head mod-head--green reveal">
+          <p class="mono-label"><b>01</b> Control previo</p>
+          <h2 id="t-check">Lista de Verificación <span class="acc-green nowrap">Pre-Despliegue</span></h2>
+          <p>Comprueba los elementos esenciales antes de publicar tu proyecto.</p>
+        </div>
+
+        <div class="check-grid reveal" data-checklist style="--d:.08s">
+          <ul class="check-list" aria-label="Verificaciones previas">
+            <li>
+              <button class="check" type="button" role="checkbox" aria-checked="false">
+                <span class="check__box" aria-hidden="true"></span>
+                <span class="check__label">index.html en la raíz</span>
+                <span class="check__state">PENDIENTE</span>
+              </button>
+            </li>
+            <li>
+              <button class="check" type="button" role="checkbox" aria-checked="false">
+                <span class="check__box" aria-hidden="true"></span>
+                <span class="check__label">Enlaces relativos probados</span>
+                <span class="check__state">PENDIENTE</span>
+              </button>
+            </li>
+            <li>
+              <button class="check" type="button" role="checkbox" aria-checked="true">
+                <span class="check__box" aria-hidden="true"></span>
+                <span class="check__label">Repositorio en GitHub</span>
+                <span class="check__state">VERIFICADO</span>
+              </button>
+            </li>
+          </ul>
+
+          <div class="check-ring" aria-live="polite">
+            <div class="ring-wrap">
+              <svg viewBox="0 0 100 100" aria-hidden="true">
+                <circle class="ring-track" cx="50" cy="50" r="44"/>
+                <circle class="ring-bar" data-ring cx="50" cy="50" r="44" pathLength="100"/>
+              </svg>
+              <div class="ring-text"><strong data-pct>33%</strong><small>COMPLETADO</small></div>
+            </div>
+            <p class="ring-caption" data-caption>33% · VERIFICACIÓN PENDIENTE</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 02 Asistente de despliegue ===== -->
+    <section class="article-section" aria-labelledby="t-guia">
+      <div class="article-wrap--wide article-wrap">
+        <div class="mod-head mod-head--left mod-head--green reveal">
+          <p class="mono-label"><b>02</b> Asistente de despliegue</p>
+          <h2 id="t-guia">Guía Interactiva: El Flujo de Despliegue <span class="acc-green">Paso a Paso</span></h2>
+        </div>
+
+        <div class="deploy reveal" data-tabs style="--d:.08s">
+          <div class="tabs" role="tablist" aria-label="Pasos del despliegue">
+            <button class="tab" role="tab" id="d-tab-1" aria-controls="d-panel-1">[ 01. Subir a GitHub ]</button>
+            <button class="tab" role="tab" id="d-tab-2" aria-controls="d-panel-2">[ 02. Importar en Vercel ]</button>
+            <button class="tab" role="tab" id="d-tab-3" aria-controls="d-panel-3">[ 03. Build Settings ]</button>
+            <button class="tab" role="tab" id="d-tab-4" aria-controls="d-panel-4">[ 04. Dominio Live ]</button>
+          </div>
+
+          <!-- Paso 1 -->
+          <div class="deploy__panel" role="tabpanel" id="d-panel-1" aria-labelledby="d-tab-1">
+            <div class="deploy__info">
+              <p class="step-id">PASO_01</p>
+              <h3>Prepara y publica tu repositorio</h3>
+              <p>Confirma tus cambios y envía la rama principal a GitHub para que Vercel pueda importarla.</p>
+              <span class="pill">✓ REPOSITORIO_SINCRONIZADO</span>
+            </div>
+            <div class="deploy__term">
+              <div class="mini-term">
+                <div class="mini-term__bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>terminal — despliegue</span><span></span></div>
+                <div class="mini-term__body">
+                  <span class="tl tl--cmd">git add .</span>
+                  <span class="tl tl--out">git commit -m "Preparar despliegue"</span>
+                  <span class="tl tl--out">git push origin main</span>
+                  <span class="tl cursor" aria-hidden="true">_</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paso 2 -->
+          <div class="deploy__panel" role="tabpanel" id="d-panel-2" aria-labelledby="d-tab-2" hidden>
+            <div class="deploy__info">
+              <p class="step-id">PASO_02</p>
+              <h3>Conecta GitHub con Vercel</h3>
+              <p>Selecciona el repositorio del portafolio y permite que Vercel detecte automáticamente el proyecto.</p>
+              <span class="pill">✓ PROYECTO_IMPORTADO</span>
+            </div>
+            <div class="deploy__term">
+              <div class="mini-term">
+                <div class="mini-term__bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>terminal — despliegue</span><span></span></div>
+                <div class="mini-term__body">
+                  <span class="tl tl--cmd">vercel link</span>
+                  <span class="tl tl--out">Seleccionando: tu-portafolio</span>
+                  <span class="tl tl--out">Proyecto conectado correctamente</span>
+                  <span class="tl cursor" aria-hidden="true">_</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paso 3 -->
+          <div class="deploy__panel" role="tabpanel" id="d-panel-3" aria-labelledby="d-tab-3" hidden>
+            <div class="deploy__info">
+              <p class="step-id">PASO_03</p>
+              <h3>Revisa la configuración de compilación</h3>
+              <p>Define el comando de compilación y verifica que la carpeta de salida coincida con tu proyecto.</p>
+              <span class="pill">✓ CONFIGURACIÓN_VALIDADA</span>
+            </div>
+            <div class="deploy__term">
+              <div class="mini-term">
+                <div class="mini-term__bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>terminal — despliegue</span><span></span></div>
+                <div class="mini-term__body">
+                  <span class="tl tl--cmd">Comando: pnpm build</span>
+                  <span class="tl tl--out">Directorio de salida: dist</span>
+                  <span class="tl tl--out">Entorno: producción</span>
+                  <span class="tl cursor" aria-hidden="true">_</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paso 4 -->
+          <div class="deploy__panel" role="tabpanel" id="d-panel-4" aria-labelledby="d-tab-4" hidden>
+            <div class="deploy__info">
+              <p class="step-id">PASO_04</p>
+              <h3>Publica y comparte tu dominio</h3>
+              <p>Inicia el despliegue final. Vercel generará una URL pública con HTTPS automáticamente.</p>
+              <span class="pill">✓ DOMINIO_ACTIVO</span>
+            </div>
+            <div class="deploy__term">
+              <div class="mini-term">
+                <div class="mini-term__bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>terminal — despliegue</span><span></span></div>
+                <div class="mini-term__body">
+                  <span class="tl tl--cmd">vercel --prod</span>
+                  <span class="tl tl--out">Asignando dominio seguro...</span>
+                  <span class="tl tl--out">https://tu-portafolio.vercel.app</span>
+                  <span class="tl cursor" aria-hidden="true">_</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 03 Simulación en vivo ===== -->
+    <section class="article-section" aria-labelledby="t-consola">
+      <div class="article-wrap--wide article-wrap">
+        <div class="mod-head mod-head--green reveal">
+          <p class="mono-label"><b>03</b> Simulación en vivo</p>
+          <h2 id="t-consola">Consola de <span class="acc-green">Producción</span></h2>
+          <p>Observa el flujo completo desde la compilación hasta la publicación.</p>
+        </div>
+
+        <div class="pipe reveal" data-pipeline style="--d:.08s">
+          <div class="pipe__log">
+            <div class="term__bar">
+              <span class="term__ctl" aria-hidden="true"><span>[X]</span><span>[-]</span><span>[+]</span></span>
+              <span class="term__title">vercel-build-pipeline.log</span>
+              <button class="pipe__live" type="button" data-replay aria-label="Repetir simulación">EN VIVO</button>
+            </div>
+            <ol class="log">
+              <li class="log__line">Inicializando entorno de producción...</li>
+              <li class="log__line">Clonando repositorio desde GitHub</li>
+              <li class="log__line">Instalando dependencias con pnpm</li>
+              <li class="log__line">Ejecutando compilación optimizada</li>
+              <li class="log__line">Generando recursos estáticos</li>
+              <li class="log__line">Asignando dominio y certificado HTTPS</li>
+              <li class="log__line log__line--ok">SUCCESS: Deployed to https://tu-portafolio.vercel.app</li>
+            </ol>
+          </div>
+
+          <div class="pipe__side">
+            <div class="site-preview">
+              <div class="site-preview__bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>tu-portafolio.vercel.app</span></div>
+              <div class="site-preview__body">
+                <p class="step-id" style="color:var(--green)">PORTAFOLIO_EN_LÍNEA</p>
+                <p class="site-preview__title">Hola, mundo<span class="cursor">_</span></p>
+                <p class="site-preview__text">Tu nueva web está lista para recibir visitas.</p>
+              </div>
+            </div>
+            <!-- TODO: reemplaza el href con la URL real de tu portafolio en Vercel -->
+            <a class="btn btn--solid pipe__cta" href="index.html">
+              <span aria-hidden="true">[</span>
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>
+              Visitar web en vivo
+              <span aria-hidden="true">]</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <div class="site-footer__row">
+        <a class="logo" href="index.html">DevBlog<span>_</span></a>
+        <p>Ideas, código y experimentación digital.</p>
+        <nav class="site-footer__links" aria-label="Redes">
+          <a href="https://github.com/Leonardo251207" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="https://www.linkedin.com/in/leonardo-nucamendi-703b48441/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          <a href="mailto:" data-email-link>Correo</a>
+        </nav>
+      </div>
+      <div class="footer-bar"><span>© 2025 Leonardo Nucamendi · Hecho en México</span></div>
+    </div>
+  </footer>
+
+  <script src="api-config.js"></script>
+  <script src="metrics.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

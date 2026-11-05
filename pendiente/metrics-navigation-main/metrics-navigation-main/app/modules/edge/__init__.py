@@ -1,0 +1,1 @@
+"""Módulo Edge: captura de peticiones en servidor (bots, crawlers, logs)."""

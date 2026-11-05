@@ -1,0 +1,14 @@
+# Entorno de Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Configuración local y secretos
+.env
+
+# Base de datos SQLite (se genera al arrancar)
+data/
+*.db
+*.db-wal
+*.db-shm

@@ -1,0 +1,1 @@
+"""Entidades del contexto Synthetic: sondas, ejecuciones, métricas."""

@@ -1,0 +1,1 @@
+"""Entidades del contexto Alerts: reglas, canales, notificaciones."""

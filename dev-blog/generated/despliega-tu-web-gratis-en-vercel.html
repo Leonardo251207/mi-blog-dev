@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astro Page - devblog-despliega-tu-web-gratis-en-vercel</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #222; }
+        header { border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 24px; }
+        pre { background: #1e293b; color: #f8fafc; padding: 16px; border-radius: 8px; overflow-x: auto; }
+        blockquote { border-left: 4px solid #3b82f6; margin: 0; padding-left: 16px; color: #475569; font-style: italic; }
+        .badge { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <header>
+        <span class="badge">Engine: Astro Static</span>
+        <h1>Página compilada: devblog-despliega-tu-web-gratis-en-vercel</h1>
+    </header>
+    <main>
+        <pre>---
+page_id: "devblog-despliega-tu-web-gratis-en-vercel"
+slug: "despliega-tu-web-gratis-en-vercel"
+content_type: "DEV_BLOG"
+layout: "../../layouts/BaseLayout.astro"
+title: "Despliega tu web gratis en Vercel"
+tags: ["tutorial", "deployment"]
+published_at: "2026-11-05T03:04:55Z"
+reading_time_min: 1
+source: "DevBlog CMS"
+---
+## Antes de desplegar
+
+Publicar un portafolio en Vercel es rápido si llegas con el trabajo ordenado. Esta es la lista que uso antes de cada despliegue.
+
+- `index.html` en la raíz del proyecto.
+- Enlaces relativos probados en local.
+- Repositorio sincronizado en GitHub.
+
+## Flujo de despliegue
+
+1. Sube los cambios con `git push origin main`.
+2. Importa el repositorio desde el panel de Vercel.
+3. Revisa el comando de build y el directorio de salida.
+4. Publica y comprueba la URL asignada.
+
+```bash
+git add .
+git commit -m "Preparar despliegue"
+git push origin main
+```
+
+> Consejo: si el proyecto es estático, Vercel no necesita comando de build.
+> — **
+
+La primera vez parece un trámite largo; después son tres pasos y un café.
+</pre>
+    </main>
+    <footer>
+        <hr/>
+        <p><small>Compilado por static_pages_generator (Astro Compiler Slice)</small></p>
+    </footer>
+</body>
+</html>

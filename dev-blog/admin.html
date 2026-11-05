@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Consola CMS — DevBlog_</title>
+  <meta name="description" content="Consola de administración del CMS de DevBlog_: borradores, publicación y métricas.">
+  <meta name="theme-color" content="#050807">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23050807'/%3E%3Crect x='7' y='23' width='18' height='3' fill='%233df0a8'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="article.css">
+  <link rel="stylesheet" href="admin.css">
+  <script>document.documentElement.classList.add('js')</script>
+</head>
+<body class="admin-page">
+
+  <header class="nav">
+    <div class="nav__inner">
+      <a class="logo" href="index.html" aria-label="DevBlog, volver al inicio">DevBlog<span>_</span></a>
+      <div class="admin__nav-actions">
+        <a class="btn btn--ghost" href="index.html">← Ver blog</a>
+        <button class="btn btn--ghost" id="logout" type="button" hidden>Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin">
+    <section class="admin__auth" id="auth-panel" aria-labelledby="auth-title">
+      <p class="mono-label"><b>CMS</b> Consola de administración</p>
+      <h1 id="auth-title">Conecta con tu API</h1>
+      <p class="admin__lead">
+        Introduce el token de la Consola de Administración (scope <code>cms:write</code>).
+        Se guarda solo en esta pestaña; no se escribe en el código.
+      </p>
+
+      <form id="auth-form" class="admin__auth-form">
+        <label for="token">Token de consola</label>
+        <input id="token" type="password" placeholder="console-dev-token" autocomplete="off" spellcheck="false">
+        <button class="btn btn--solid" type="submit">Conectar</button>
+      </form>
+
+      <p id="auth-status" class="admin__status" role="status"></p>
+      <p class="admin__hint">
+        API: <code id="api-url"></code> ·
+        Salud: <a id="health-link" href="#" target="_blank" rel="noopener">/health</a> ·
+        Métricas: <a href="http://127.0.0.1:8000/v1/query" target="_blank" rel="noopener">GraphiQL</a> ·
+        Generador: <a href="http://127.0.0.1:8001/docs" target="_blank" rel="noopener">Swagger</a>
+      </p>
+    </section>
+
+    <section id="workspace" hidden>
+      <div class="admin__toolbar">
+        <div>
+          <p class="mono-label"><b>01</b> Contenido</p>
+          <h1>Consola CMS</h1>
+        </div>
+        <button class="btn btn--solid" id="new-draft" type="button">+ Nuevo borrador</button>
+      </div>
+
+      <div class="admin__grid">
+        <aside class="admin__list" aria-label="Borradores y publicaciones">
+          <div class="admin__list-head">
+            <h2>Borradores</h2>
+            <button class="admin__mini" id="refresh-drafts" type="button" title="Actualizar borradores">↻</button>
+          </div>
+          <ul id="drafts-list" class="admin__items"></ul>
+          <button class="btn btn--ghost admin__more" id="more-drafts" type="button" hidden>Cargar más borradores</button>
+
+          <div class="admin__list-head">
+            <h2>Publicaciones</h2>
+            <button class="admin__mini" id="refresh-posts" type="button" title="Actualizar publicaciones">↻</button>
+          </div>
+          <ul id="posts-list" class="admin__items"></ul>
+          <button class="btn btn--ghost admin__more" id="more-posts" type="button" hidden>Cargar más publicaciones</button>
+        </aside>
+
+        <section class="admin__editor" aria-label="Editor de contenido">
+          <form id="draft-form">
+            <fieldset id="editor-fields" class="admin__fields" disabled>
+              <div class="admin__row">
+                <label for="f-title">Título
+                  <input id="f-title" type="text" minlength="5" maxlength="120" required>
+                </label>
+                <label for="f-slug">Slug
+                  <input id="f-slug" type="text" maxlength="100" placeholder="se-genera-desde-el-titulo">
+                </label>
+              </div>
+
+              <label for="f-tags">Etiquetas
+                <input id="f-tags" type="text" placeholder="tutorial, deployment">
+              </label>
+
+              <label for="f-content">Contenido (Markdown)
+                <textarea id="f-content" rows="16" required></textarea>
+              </label>
+
+              <div class="admin__actions">
+                <button class="btn btn--solid" type="submit" id="save-draft" disabled>Guardar borrador</button>
+                <button class="btn btn--ghost" type="button" id="publish-draft" disabled>Publicar</button>
+                <button class="btn btn--ghost" type="button" id="delete-draft" disabled>Eliminar borrador</button>
+                <button class="btn btn--ghost danger" type="button" id="delete-post" hidden>Eliminar publicación</button>
+                <button class="btn btn--ghost" type="button" id="generate-static" disabled>Generar HTML estático</button>
+                <button class="btn btn--ghost" type="button" id="toggle-preview">Vista previa</button>
+              </div>
+            </fieldset>
+          </form>
+
+          <div id="preview" class="md admin__preview" hidden></div>
+          <div id="metrics" class="admin__metrics" hidden></div>
+          <div id="static-result" class="admin__metrics" hidden></div>
+          <p id="workspace-status" class="admin__status" role="status"></p>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <div class="site-footer__row">
+        <a class="logo" href="index.html">DevBlog<span>_</span></a>
+        <p>Consola de administración del CMS.</p>
+        <nav class="site-footer__links" aria-label="Redes">
+          <a href="https://github.com/Leonardo251207" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="https://www.linkedin.com/in/leonardo-nucamendi-703b48441/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          <a href="mailto:" data-email-link>Correo</a>
+        </nav>
+      </div>
+      <div class="footer-bar"><span>© 2025 Leonardo Nucamendi · Hecho en México</span></div>
+    </div>
+  </footer>
+
+  <script src="api-config.js"></script>
+  <script src="api.js"></script>
+  <script src="admin.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

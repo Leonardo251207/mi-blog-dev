@@ -1,0 +1,305 @@
+openapi: 3.0.3
+info:
+  title: static_pages_generator API
+  description: >
+    API de soporte para generación, repositorio y ciclo de vida de páginas estáticas.
+    Recibe instantáneas del cms-core-api (pipeline de compilación estática), compila
+    con Astro / Quarto / Hugo y gestiona publish / archive / delete de artefactos.
+  version: 1.0.0
+  contact:
+    name: Pipeline de Compilación Estática
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Servidor local de desarrollo
+
+paths:
+  /pages:
+    post:
+      summary: Generar página estática desde payload CMS
+      description: >
+        Recibe la instantánea del documento (frozen_template, canvas_blocks,
+        metadata_values, slug, content_type) igual que el pipeline del CMS.
+        Crea un build asíncrono. Si excede 10s devuelve 202.
+      operationId: createPage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PageCreationPayload'
+      responses:
+        '201':
+          description: Creado inmediatamente (motor rápido o caché)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+        '202':
+          description: Aceptado para procesamiento asíncrono
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+        '422':
+          description: Payload inválido o template no soportado
+        '409':
+          description: Conflicto (slug duplicado, documento no publicado, etc.)
+
+    get:
+      summary: Listar páginas generadas
+      operationId: listPages
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [GENERATING, PUBLISHED, ARCHIVED, FAILED]
+        - name: content_type
+          in: query
+          schema:
+            type: string
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Lista paginada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageList'
+
+  /pages/{page_id}:
+    parameters:
+      - name: page_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Obtener página generada
+      operationId: getPage
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+        '404':
+          description: Página no encontrada
+
+    delete:
+      summary: Eliminar artefacto estático
+      operationId: deletePage
+      description: Solo permitido si no está PUBLISHED ni ARCHIVED (política de soporte).
+      responses:
+        '204':
+          description: Eliminado
+        '409':
+          description: No se puede eliminar (publicado o archivado)
+
+  /pages/{page_id}/content:
+    parameters:
+      - name: page_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Descargar HTML / landing renderizada
+      operationId: getPageContent
+      responses:
+        '200':
+          description: Contenido HTML
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          description: No generado o no encontrado
+
+  /pages/{page_id}/publish:
+    parameters:
+      - name: page_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      summary: Publicar página (hacer pública)
+      operationId: publishPage
+      description: Solo si build está COMPLETED.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+        '409':
+          description: No se puede publicar (build fallido o ya publicado)
+
+  /pages/{page_id}/archive:
+    parameters:
+      - name: page_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      summary: Archivar página (terminal)
+      operationId: archivePage
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+        '409':
+          description: Ya archivado o no publicado
+
+  /builds/{build_id}:
+    parameters:
+      - name: build_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Consultar estado del build
+      operationId: getBuild
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Build'
+        '404':
+          description: Build no encontrado
+
+components:
+  schemas:
+    PageCreationPayload:
+      type: object
+      required: [document_id, slug, content_type, frozen_template, canvas_blocks]
+      properties:
+        document_id:
+          type: string
+          format: uuid
+          description: ID del documento en cms-core-api
+        slug:
+          type: string
+          description: Slug único del documento
+        content_type:
+          type: string
+          enum: [DEV_BLOG, LANDING_CV, DEV_DOC, LANDING_GENERIC]
+        frozen_template:
+          type: object
+          description: Copia congelada de la plantilla (layout_structure, metadata_contract, allow_published_edit)
+        canvas_blocks:
+          type: array
+          items:
+            $ref: '#/components/schemas/CanvasBlock'
+        metadata_values:
+          type: object
+          description: Valores de metadatos validados
+        engine_hint:
+          type: string
+          enum: [astro, quarto, hugo]
+          description: Motor preferido; si no se envía, se infiere de content_type
+
+    CanvasBlock:
+      type: object
+      required: [block_id, block_type, order_index, content_payload]
+      properties:
+        block_id:
+          type: string
+          format: uuid
+        block_type:
+          type: string
+          enum: [HEADING, PARAGRAPH, CODE, IMAGE, SECTION, QUOTE]
+        order_index:
+          type: integer
+        content_payload:
+          type: object
+        style_config:
+          type: object
+
+    Page:
+      type: object
+      required: [page_id, document_id, slug, status, created_at]
+      properties:
+        page_id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        content_type:
+          type: string
+        status:
+          type: string
+          enum: [GENERATING, PUBLISHED, ARCHIVED, FAILED]
+        build_id:
+          type: string
+          format: uuid
+        output_url:
+          type: string
+          format: uri
+          description: URL pública si está PUBLISHED
+        frozen_template_snapshot:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Build:
+      type: object
+      required: [build_id, page_id, status, started_at]
+      properties:
+        build_id:
+          type: string
+          format: uuid
+        page_id:
+          type: string
+          format: uuid
+        engine:
+          type: string
+          enum: [astro, quarto, hugo]
+        status:
+          type: string
+          enum: [PENDING, PROCESSING, COMPLETED, FAILED]
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+        error_message:
+          type: string
+
+    PageList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Page'
+        next_cursor:
+          type: string

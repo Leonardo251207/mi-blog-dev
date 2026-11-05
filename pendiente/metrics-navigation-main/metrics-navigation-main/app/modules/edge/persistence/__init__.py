@@ -1,0 +1,1 @@
+"""Persistencia del contexto Edge."""

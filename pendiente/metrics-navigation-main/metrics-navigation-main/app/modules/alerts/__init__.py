@@ -1,0 +1,1 @@
+"""Módulo Alerts: reglas, evaluación y notificaciones (Telegram, Discord, Webhook)."""

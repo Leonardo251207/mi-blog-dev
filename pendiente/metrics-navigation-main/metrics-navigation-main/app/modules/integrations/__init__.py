@@ -1,0 +1,1 @@
+"""Módulo Integrations: sincronización con APIs externas (GA4, Search Console, AdSense)."""

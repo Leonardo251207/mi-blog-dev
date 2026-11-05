@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Artículo — DevBlog_</title>
+  <meta name="description" content="Artículo publicado desde la API del CMS de DevBlog_.">
+  <meta name="theme-color" content="#050807">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23050807'/%3E%3Crect x='7' y='23' width='18' height='3' fill='%233df0a8'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="article.css">
+  <script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav__inner">
+      <a class="logo" href="index.html" aria-label="DevBlog, volver al inicio">DevBlog<span>_</span></a>
+      <a class="btn btn--ghost" href="index.html">← Volver al inicio</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="article-hero">
+      <div class="article-hero__inner intro">
+        <p class="status" id="article-status" style="--i:0"><i></i>[ CARGANDO ]</p>
+        <h1 id="article-title" style="--i:1">Cargando artículo…</h1>
+        <p class="byline" id="article-byline" style="--i:2"></p>
+      </div>
+    </section>
+
+    <section class="article-section" aria-labelledby="article-title">
+      <div class="article-wrap">
+        <div id="article-state" class="article-state" role="status">Cargando artículo…</div>
+        <article id="article-body" class="md" hidden></article>
+        <div id="article-tags" class="article-tags" aria-label="Etiquetas" hidden></div>
+        <div id="article-actions" class="article-actions" hidden>
+          <a class="btn btn--ghost" href="index.html#notas">← Volver a las notas</a>
+          <a id="legacy-link" class="btn btn--ghost" hidden>Ver versión interactiva →</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <div class="site-footer__row">
+        <a class="logo" href="index.html">DevBlog<span>_</span></a>
+        <p>Ideas, código y experimentación digital.</p>
+        <nav class="site-footer__links" aria-label="Redes">
+          <a href="https://github.com/Leonardo251207" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="https://www.linkedin.com/in/leonardo-nucamendi-703b48441/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          <a href="mailto:" data-email-link>Correo</a>
+        </nav>
+      </div>
+      <div class="footer-bar"><span>© 2025 Leonardo Nucamendi · Hecho en México</span></div>
+    </div>
+  </footer>
+
+  <script src="api-config.js"></script>
+  <script src="metrics.js"></script>
+  <script src="api.js"></script>
+  <script src="articulo.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

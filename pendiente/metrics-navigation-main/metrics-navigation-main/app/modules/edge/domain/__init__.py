@@ -1,0 +1,1 @@
+"""Entidades del contexto Edge: visitas de servidor, bots, peticiones."""

@@ -1,0 +1,1 @@
+"""Módulo Synthetic: sondas de disponibilidad, latencia y TLS."""

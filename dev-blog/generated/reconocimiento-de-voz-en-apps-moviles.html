@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astro Page - devblog-reconocimiento-de-voz-en-apps-moviles</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #222; }
+        header { border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 24px; }
+        pre { background: #1e293b; color: #f8fafc; padding: 16px; border-radius: 8px; overflow-x: auto; }
+        blockquote { border-left: 4px solid #3b82f6; margin: 0; padding-left: 16px; color: #475569; font-style: italic; }
+        .badge { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <header>
+        <span class="badge">Engine: Astro Static</span>
+        <h1>Página compilada: devblog-reconocimiento-de-voz-en-apps-moviles</h1>
+    </header>
+    <main>
+        <pre>---
+page_id: "devblog-reconocimiento-de-voz-en-apps-moviles"
+slug: "reconocimiento-de-voz-en-apps-moviles"
+content_type: "DEV_BLOG"
+layout: "../../layouts/BaseLayout.astro"
+title: "Reconocimiento de voz en apps m\u00f3viles"
+tags: ["desarrollo", "apps"]
+published_at: "2026-11-05T03:04:55Z"
+reading_time_min: 1
+source: "DevBlog CMS"
+---
+## El problema
+
+En Math & English Quest necesitábamos que los niños practicaran pronunciación sin depender de un teclado. La app debía escuchar, comparar y responder con voz.
+
+## Flujo de reconocimiento
+
+1. El niño mantiene presionado el botón y pronuncia la palabra.
+2. `SpeechRecognizer` captura el audio y devuelve el texto reconocido.
+3. La app compara con la palabra objetivo y calcula una coincidencia.
+4. La retroalimentación se explica con `SpeechSynthesis`.
+
+```kotlin
+val recognizer = SpeechRecognizer
+  .createSpeechRecognizer(context)
+recognizer.setRecognitionListener(listener)
+recognizer.startListening(intent)
+```
+
+## Lo que aprendí
+
+- El silencio también es información: hay que manejar el timeout.
+- La retroalimentación debe ser inmediata y amable.
+- Probar con voces y acentos distintos cambia por completo el resultado.
+
+> La tecnología educativa funciona cuando el error se siente como parte del juego.
+> — **
+</pre>
+    </main>
+    <footer>
+        <hr/>
+        <p><small>Compilado por static_pages_generator (Astro Compiler Slice)</small></p>
+    </footer>
+</body>
+</html>

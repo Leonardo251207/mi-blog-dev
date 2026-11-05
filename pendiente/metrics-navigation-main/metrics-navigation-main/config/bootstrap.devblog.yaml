@@ -1,0 +1,59 @@
+sites:
+  - slug: demo
+    name: Demo local
+    type: laboratorio
+    timezone: UTC
+    retention_events_days: 90
+    retention_aggregates_months: 25
+    tags:
+      - demo
+    domains:
+      - host: localhost:8000
+        type: temporal
+        environment: local
+        canonical: true
+      - host: 127.0.0.1:8000
+        type: temporal
+        environment: local
+        canonical: false
+    channels:
+      - type: beacon
+        origin_mode: exact
+        origins:
+          - http://localhost:8000
+          - http://127.0.0.1:8000
+        environments:
+          - local
+        key_ref: env:DEV_BEACON_KEY
+
+  # Sitio real del blog DevBlog_: el beacon del navegador llega desde el
+  # servidor estático del blog (puerto 5500).
+  - slug: devblog
+    name: DevBlog_ local
+    type: propia
+    timezone: America/Mexico_City
+    retention_events_days: 90
+    retention_aggregates_months: 25
+    tags:
+      - devblog
+      - local
+    domains:
+      - host: localhost:5500
+        type: temporal
+        environment: local
+        canonical: true
+      - host: 127.0.0.1:5500
+        type: temporal
+        environment: local
+        canonical: false
+    channels:
+      - type: beacon
+        origin_mode: exact
+        origins:
+          - http://localhost:5500
+          - http://127.0.0.1:5500
+        environments:
+          - local
+        # Clave pública de escritura para el beacon del blog.
+        # El navegador la lleva en data-key; es de solo escritura.
+        key_ref: literal:pk_live_devblog_0000000000000000000000000000

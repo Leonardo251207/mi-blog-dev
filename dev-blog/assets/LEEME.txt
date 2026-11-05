@@ -1,0 +1,11 @@
+Coloca aquí tus archivos. Los enlaces "Ver PDF" del index.html esperan estos nombres
+(renómbralos o cambia el href en index.html si usas otros):
+
+  cert-cpp.pdf                  -> Curso profesional de C++ (Código Facilito)
+  cert-aws-cloud.pdf            -> AWS Academy Graduate - Cloud Foundations
+  cert-google-so.pdf            -> Soporte de sistemas operativos (Google)
+  cert-cisco-redes.pdf          -> Conceptos básicos de redes (Cisco)
+  cert-cisco-iot.pdf            -> Introducción al IoT y Transformación Digital (Cisco)
+
+Foto de perfil (opcional): guarda perfil.jpg aquí y sigue el comentario en index.html
+(busca "FOTO DE PERFIL") para reemplazar la silueta.

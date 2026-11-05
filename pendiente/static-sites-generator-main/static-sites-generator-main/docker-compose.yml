@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  generator:
+    build: .
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./data:/app/data
+      - ./dist:/app/dist
+      - ./sources:/app/sources
+    environment:
+      - DATA_DIR=/app/data
+      - STORAGE_DIR=/app/dist
+      - SOURCES_DIR=/app/sources
+      - PORT=8001

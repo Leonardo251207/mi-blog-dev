@@ -1,0 +1,27 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Configuración local y secretos
+.env
+.env.local
+
+# Bases de datos y datos generados
+*.db
+*.db-wal
+*.db-shm
+API/devblog-cms-api-1.2/devblog-cms-api/data/
+pendiente/**/data/
+pendiente/**/dist/
+pendiente/**/sources/
+
+# Logs
+*.log
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
