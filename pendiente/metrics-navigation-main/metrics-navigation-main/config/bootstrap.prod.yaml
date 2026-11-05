@@ -1,0 +1,42 @@
+sites:
+  # Sitio público del blog DevBlog_ en producción.
+  - slug: devblog
+    name: DevBlog_
+    type: propia
+    timezone: America/Mexico_City
+    retention_events_days: 90
+    retention_aggregates_months: 25
+    tags:
+      - devblog
+      - production
+    domains:
+      - host: mi-blog-dev.vercel.app
+        type: plataforma
+        environment: production
+        canonical: true
+      - host: leonardo251207.github.io
+        type: plataforma
+        environment: production
+        canonical: false
+      # Permiten probar el frontend local contra el colector de producción.
+      - host: localhost:5500
+        type: temporal
+        environment: local
+        canonical: false
+      - host: 127.0.0.1:5500
+        type: temporal
+        environment: local
+        canonical: false
+    channels:
+      - type: beacon
+        origin_mode: exact
+        origins:
+          - https://mi-blog-dev.vercel.app
+          - https://leonardo251207.github.io
+          - http://localhost:5500
+          - http://127.0.0.1:5500
+        environments:
+          - production
+          - local
+        # Clave pública de escritura del beacon del blog.
+        key_ref: literal:pk_live_devblog_7f3a9c2e5b1d4a8f9c0e6b2d7a4f1c8e

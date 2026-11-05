@@ -16,9 +16,9 @@ from .config import Settings, load_settings
 from .errors import register_error_handlers
 from .infra import IdempotencyStore, RateLimiter
 from .repository import PostRepository
+from .repository_factory import build_repository
 from .routers import drafts, health, posts
 from .services import PostService
-from .sqlite_repository import SqlitePostRepository
 
 logger = logging.getLogger("devblog.api")
 
@@ -32,7 +32,7 @@ def create_app(settings: Settings | None = None,
     """
     settings = settings or load_settings()
     logger.setLevel(getattr(logging, settings.log_level.upper(), logging.INFO))
-    repo = repository or SqlitePostRepository(settings.db_path)
+    repo = repository or build_repository(settings)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):

@@ -1,4 +1,4 @@
-sites:
+﻿sites:
   - slug: demo
     name: Demo local
     type: laboratorio
@@ -27,7 +27,7 @@ sites:
         key_ref: env:DEV_BEACON_KEY
 
   # Sitio real del blog DevBlog_: el beacon del navegador llega desde el
-  # servidor estático del blog (puerto 5500).
+  # servidor estÃ¡tico del blog (puerto 5500).
   - slug: devblog
     name: DevBlog_ local
     type: propia
@@ -54,6 +54,7 @@ sites:
           - http://127.0.0.1:5500
         environments:
           - local
-        # Clave pública de escritura para el beacon del blog.
+        # Clave pÃºblica de escritura para el beacon del blog.
         # El navegador la lleva en data-key; es de solo escritura.
-        key_ref: literal:pk_live_devblog_0000000000000000000000000000
+        key_ref: literal:pk_live_devblog_7f3a9c2e5b1d4a8f9c0e6b2d7a4f1c8e
+

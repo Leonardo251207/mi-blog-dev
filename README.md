@@ -57,8 +57,13 @@ Se abren cuatro ventanas de PowerShell: CMS, Métricas, Generador y Blog.
 ## Despliegue gratuito del blog
 
 El blog es estático y se puede publicar gratis en **GitHub Pages** o **Vercel**.
-Los servicios del CMS, métricas y generador son Python y necesitan ejecutarse
-aparte (localmente o en un host Python con HTTPS).
+Los servicios del CMS, métricas y generador son Python. Para publicarlos en
+internet con persistencia, sigue la guía:
+
+- [`DEPLOY_RENDER.md`](DEPLOY_RENDER.md) — Render Free + MongoDB Atlas.
+
+Mientras no despliegues esos servicios, el blog publicado usa las tarjetas
+estáticas de respaldo.
 
 ### GitHub Pages
 
@@ -92,11 +97,10 @@ Ya está incluido el workflow `.github/workflows/pages.yml`.
   llamar a `http://127.0.0.1:8080` y `http://127.0.0.1:8000`; si no están
   disponibles, `notes.js` muestra las tarjetas estáticas de respaldo.
 - El artículo dinámico (`articulo.html?slug=...`) y `admin.html` necesitan la
-  API del CMS. Para usarlos desde internet hay que desplegar el CMS (y
-  opcionalmente métricas/generador) en un host Python con HTTPS, cambiar
-  `API_BASE_URL`, `METRICS_BASE_URL` y `STATIC_GENERATOR_BASE_URL` en
-  `dev-blog/api-config.js`, y agregar el dominio del blog a `CMS_CORS_ORIGINS`
-  y `CORS_ORIGINS`.
+  API del CMS. Para usarlos desde internet, despliega el CMS (y las métricas y
+  el generador) con [`DEPLOY_RENDER.md`](DEPLOY_RENDER.md). El archivo
+  `dev-blog/api-config.js` ya distingue entre local y producción; solo cambia
+  las URLs si Render te asigna nombres distintos.
 - Las páginas `articulo-cpp.html`, `articulo-voz.html` y `articulo-vercel.html`
   sí funcionan sin API.
 

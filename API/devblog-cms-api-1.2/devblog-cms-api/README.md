@@ -163,6 +163,8 @@ solo en `sessionStorage` mientras dura la pestaña.
 | `CMS_APP_NAME` | `DevBlog CMS API` | Nombre que aparece en `/docs`. |
 | `CMS_ENV` | `development` | `production` activa avisos de seguridad. |
 | `CMS_DB_PATH` | `data/devblog.db` | Archivo SQLite. Usa `:memory:` solo en pruebas. |
+| `CMS_MONGO_URI` | vacío | Si se define, el CMS usa MongoDB Atlas en vez de SQLite. |
+| `CMS_MONGO_DB` | `devblog_cms` | Base de datos del CMS en MongoDB. |
 | `CMS_CONSOLE_TOKEN` | `console-dev-token` | Token de escritura. |
 | `CMS_PUBLIC_TOKEN` | `public-dev-token` | Token de lectura/vistas. |
 | `CMS_CURSOR_SECRET` | valor de desarrollo | Secreto HMAC de los cursores. |
@@ -189,7 +191,9 @@ CMS_PUBLIC_ARTICLE_PATH=/articulo.html?slug={slug}
 | `app/domain.py` | Entidad `Post`, estados, UUIDv7, slug y tiempo de lectura. |
 | `app/services.py` | Reglas de negocio e invariantes (Paso 3). |
 | `app/repository.py` | Interfaz `PostRepository` + implementación en memoria. |
-| `app/sqlite_repository.py` | Implementación SQLite (persistencia real). |
+| `app/sqlite_repository.py` | Implementación SQLite (persistencia local). |
+| `app/mongo_repository.py` | Implementación MongoDB Atlas (persistencia en la nube). |
+| `app/repository_factory.py` | Elige Mongo si hay `CMS_MONGO_URI`; si no, SQLite. |
 | `app/routers/drafts.py` | Endpoints 1-6 (`/drafts`). |
 | `app/routers/posts.py` | Endpoints 7-12 (`/posts`). |
 | `app/routers/health.py` | `GET /health`. |
@@ -200,6 +204,8 @@ CMS_PUBLIC_ARTICLE_PATH=/articulo.html?slug={slug}
 | `app/pagination.py` | Cursor opaco firmado (id + timestamp). |
 | `app/seed.py` | Carga inicial de artículos. |
 | `scripts/generate_static.py` | Genera artefactos HTML en el servicio de 8001. |
+| `scripts/start_prod.sh` | Arranque de producción (seed + Uvicorn). |
+| `Dockerfile` | Imagen del CMS para Render u otro host de contenedores. |
 
 ## Endpoints
 

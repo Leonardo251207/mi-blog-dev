@@ -94,8 +94,11 @@ class Settings:
     environment: str = "development"
     api_prefix: str = "/api/v1"
 
-    # Persistencia: archivo SQLite. Usa ":memory:" solo para pruebas.
+    # Persistencia: archivo SQLite o MongoDB Atlas.
+    # Si mongo_uri está definido, el CMS usa MongoDB; si no, SQLite.
     db_path: str = "data/devblog.db"
+    mongo_uri: str = ""
+    mongo_db: str = "devblog_cms"
 
     # URL que se devuelve al publicar. Si public_site_url está vacío, es relativa.
     public_site_url: str = ""
@@ -182,6 +185,8 @@ def load_settings() -> Settings:
         environment=_env("CMS_ENV", "DEVBLOG_ENV", default="development") or "development",
         api_prefix=_env("CMS_API_PREFIX", "DEVBLOG_API_PREFIX", default="/api/v1") or "/api/v1",
         db_path=_env("CMS_DB_PATH", "DEVBLOG_DB_PATH", default="data/devblog.db") or "data/devblog.db",
+        mongo_uri=_env("CMS_MONGO_URI", "MONGO_URI", "DEVBLOG_MONGO_URI", default="") or "",
+        mongo_db=_env("CMS_MONGO_DB", "MONGO_DB", "DEVBLOG_MONGO_DB", default="devblog_cms") or "devblog_cms",
         public_site_url=public_site_url,
         public_article_path=_env(
             "CMS_PUBLIC_ARTICLE_PATH",

@@ -10,9 +10,9 @@ tenga contenido la primera vez que se conecta a la API.
 from __future__ import annotations
 
 from .config import load_settings
+from .repository_factory import build_repository
 from .schemas import DraftCreate
 from .services import PostService
-from .sqlite_repository import SqlitePostRepository
 
 ARTICLES: list[dict] = [
     {
@@ -108,7 +108,7 @@ recognizer.startListening(intent)
 
 def main() -> None:
     settings = load_settings()
-    repo = SqlitePostRepository(settings.db_path)
+    repo = build_repository(settings)
     service = PostService(repo, settings.cursor_secret)
     try:
         for article in ARTICLES:

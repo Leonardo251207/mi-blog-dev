@@ -1,0 +1,85 @@
+services:
+  - type: web
+    name: devblog-cms-leonardo
+    runtime: python
+    plan: free
+    rootDir: API/devblog-cms-api-1.2/devblog-cms-api
+    buildCommand: pip install -r requirements.txt
+    startCommand: sh scripts/start_prod.sh
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.6
+      - key: CMS_ENV
+        value: production
+      - key: CMS_APP_NAME
+        value: DevBlog CMS API
+      - key: CMS_MONGO_URI
+        sync: false
+      - key: CMS_MONGO_DB
+        value: devblog_cms
+      - key: CMS_CONSOLE_TOKEN
+        generateValue: true
+      - key: CMS_PUBLIC_TOKEN
+        value: pub_live_devblog_2026
+      - key: CMS_CURSOR_SECRET
+        generateValue: true
+      - key: CMS_CORS_ORIGINS
+        value: https://mi-blog-dev.vercel.app,https://leonardo251207.github.io,http://localhost:5500,http://127.0.0.1:5500
+      - key: CMS_PUBLIC_SITE_URL
+        value: https://mi-blog-dev.vercel.app
+      - key: CMS_PUBLIC_ARTICLE_PATH
+        value: /articulo.html?slug={slug}
+      - key: CMS_LOG_LEVEL
+        value: INFO
+      - key: CMS_SEED_ON_START
+        value: "true"
+
+  - type: web
+    name: devblog-metrics-leonardo
+    runtime: python
+    plan: free
+    rootDir: pendiente/metrics-navigation-main/metrics-navigation-main
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.6
+      # APP_ENV=local mantiene GraphiQL disponible para la demostración.
+      - key: APP_ENV
+        value: local
+      - key: APP_MODE
+        value: minimal
+      - key: STORAGE
+        value: mongo
+      - key: MONGO_URI
+        sync: false
+      - key: MONGO_DB
+        value: metrics
+      - key: ADMIN_API_KEY
+        generateValue: true
+      - key: IP_HASH_SALT
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: https://mi-blog-dev.vercel.app,https://leonardo251207.github.io,http://localhost:5500,http://127.0.0.1:5500
+      - key: BOOTSTRAP_FILE
+        value: config/bootstrap.prod.yaml
+      - key: BOOTSTRAP_ON_START
+        value: "true"
+      - key: DEV_BEACON_KEY
+        value: pk_live_dev_00000000000000000000000000000000
+      - key: BEACON_RATE_LIMIT_PER_MINUTE
+        value: "600"
+
+  - type: web
+    name: devblog-generator-leonardo
+    runtime: python
+    plan: free
+    rootDir: pendiente/static-sites-generator-main/static-sites-generator-main
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn src.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.6

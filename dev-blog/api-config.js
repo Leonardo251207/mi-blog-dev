@@ -1,21 +1,34 @@
 /* ==========================================================
-   Configuración del cliente de la API
-   Cambia estos valores al desplegar el blog o reutilizar la API
-   en otro proyecto.
+   Configuración del cliente de la API.
+   - En local usa los servicios de 127.0.0.1.
+   - En GitHub Pages/Vercel usa los servicios públicos de Render.
+   Cambia los nombres de Render si tu blueprint usa otros.
    ========================================================== */
-window.DEVBLOG_CONFIG = {
-  // URL base de la API del CMS (sin barra final). En local:
-  // CMS en 8080 para coexistir con Métricas (8000) y Generador (8001).
-  API_BASE_URL: "http://127.0.0.1:8080/api/v1",
+(() => {
+  "use strict";
 
-  // Servicios del ecosistema del profesor.
-  METRICS_ENABLED: true,
-  METRICS_BASE_URL: "http://127.0.0.1:8000",
-  METRICS_KEY: "pk_live_devblog_0000000000000000000000000000",
-  METRICS_SITE: "devblog",
-  STATIC_GENERATOR_BASE_URL: "http://127.0.0.1:8001",
+  const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+  const metricsKey = "pk_live_devblog_7f3a9c2e5b1d4a8f9c0e6b2d7a4f1c8e";
 
-  // Token de solo lectura del Sitio Web Público.
-  // Es visible en el navegador: nunca uses aquí el token de la consola.
-  PUBLIC_TOKEN: "public-dev-token",
-};
+  const local = {
+    API_BASE_URL: "http://127.0.0.1:8080/api/v1",
+    PUBLIC_TOKEN: "public-dev-token",
+    METRICS_ENABLED: true,
+    METRICS_BASE_URL: "http://127.0.0.1:8000",
+    METRICS_KEY: metricsKey,
+    METRICS_SITE: "devblog",
+    STATIC_GENERATOR_BASE_URL: "http://127.0.0.1:8001",
+  };
+
+  const production = {
+    API_BASE_URL: "https://devblog-cms-leonardo.onrender.com/api/v1",
+    PUBLIC_TOKEN: "pub_live_devblog_2026",
+    METRICS_ENABLED: true,
+    METRICS_BASE_URL: "https://devblog-metrics-leonardo.onrender.com",
+    METRICS_KEY: metricsKey,
+    METRICS_SITE: "devblog",
+    STATIC_GENERATOR_BASE_URL: "https://devblog-generator-leonardo.onrender.com",
+  };
+
+  window.DEVBLOG_CONFIG = isLocal ? local : production;
+})();
