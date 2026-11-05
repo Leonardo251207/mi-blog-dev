@@ -72,6 +72,10 @@ Ya está incluido el workflow `.github/workflows/pages.yml`.
 
    <https://leonardo251207.github.io/mi-blog-dev/>
 
+> La primera ejecución puede fallar con `Create Pages site failed` hasta que
+> actives Pages. Después de activarlo, entra a **Actions → Deploy blog to
+> GitHub Pages → Re-run all jobs**.
+
 ### Vercel
 
 1. Importa el repositorio <https://github.com/Leonardo251207/mi-blog-dev>.
