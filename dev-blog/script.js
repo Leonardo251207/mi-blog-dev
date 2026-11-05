@@ -10,6 +10,12 @@
   const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // La consola necesita la API local; no la anunciamos en GitHub Pages/Vercel.
+  const isLocalHost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+  if (!isLocalHost) {
+    $$('a[href="admin.html"]').forEach((link) => link.remove());
+  }
+
   /* ---------- Menú móvil ---------- */
   const nav = $(".nav");
   const toggle = $(".nav__toggle");

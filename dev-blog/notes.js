@@ -92,7 +92,7 @@
     const notice = document.createElement("p");
     notice.className = "notes__fallback";
     notice.textContent =
-      "Mostrando contenido local: la API no está disponible en este momento.";
+      "Mostrando contenido estático: la API del CMS no está disponible en este despliegue.";
     grid.after(notice);
   }
 
