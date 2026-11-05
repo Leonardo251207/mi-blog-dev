@@ -24,7 +24,8 @@ $services = @(
     @{
         Name = "Blog (5500)"
         Dir  = Join-Path $root "dev-blog"
-        Command = "python -m http.server 5500"
+        Command = "http.server 5500"
+        Python = Join-Path $root "API\devblog-cms-api-1.2\devblog-cms-api\.venv\Scripts\python.exe"
     }
 )
 
@@ -34,7 +35,10 @@ foreach ($service in $services) {
         continue
     }
 
-    $python = Join-Path $service.Dir ".venv\Scripts\python.exe"
+    $python = $service.Python
+    if (-not $python) {
+        $python = Join-Path $service.Dir ".venv\Scripts\python.exe"
+    }
     if (-not (Test-Path $python)) {
         $python = "python"
     }
