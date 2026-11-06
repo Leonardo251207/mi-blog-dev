@@ -70,6 +70,14 @@
   apiUrlEl.textContent = API.config.API_BASE_URL;
   healthLink.href = new URL("/health", API.config.API_BASE_URL).href;
 
+  const config = window.DEVBLOG_CONFIG || {};
+  const metricsBase = String(config.METRICS_BASE_URL || "http://127.0.0.1:8000")
+    .replace(/\/+$/, "");
+  const metricsLink = $("#metrics-link");
+  const generatorLink = $("#generator-link");
+  if (metricsLink) metricsLink.href = `${metricsBase}/v1/query`;
+  if (generatorLink) generatorLink.href = `${STATIC_GENERATOR_BASE_URL}/docs`;
+
   function formatDate(value) {
     if (!value) return "—";
     const date = new Date(value);
