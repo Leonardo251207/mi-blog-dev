@@ -221,6 +221,61 @@ panel de Render y guarda; el servicio se reinicia.
 
 ## 10. Problemas comunes
 
+### `bad auth : authentication failed`
+
+Es el error de Atlas. Casi siempre es la cadena de conexión, no el código.
+Revisa en este orden:
+
+1. Reemplazaste `USUARIO` y `PASSWORD` de verdad; no dejaste los placeholders.
+2. La contraseña no tiene caracteres especiales sin codificar.
+   - Lo más simple: crea un usuario nuevo en Atlas con una contraseña
+     alfanumérica (por ejemplo `DevBlog2026Mongo`).
+   - Si quieres conservar la contraseña, codifícala:
+
+```powershell
+cd API\devblog-cms-api-1.2\devblog-cms-api
+$env:MONGO_PASSWORD = "tu contraseña real"
+.venv\Scripts\python.exe scripts\encode_mongo_password.py
+```
+
+Copia el resultado y úsalo en la URI, por ejemplo:
+
+```text
+mongodb+srv://devblog:MiPasswordCodificada@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority
+```
+
+3. El usuario de Atlas está en el **mismo proyecto/clúster** y tiene permiso
+   `readWriteAnyDatabase` o `Atlas admin`.
+4. En **Network Access** está `0.0.0.0/0`.
+5. En Render, el valor de `CMS_MONGO_URI` y `MONGO_URI` no tiene comillas,
+   espacios al inicio/final ni saltos de línea. Pega solo la cadena.
+6. Prueba la cadena desde tu laptop antes de volver a Render:
+
+```powershell
+cd API\devblog-cms-api-1.2\devblog-cms-api
+$env:CMS_MONGO_URI = "mongodb+srv://..."
+.venv\Scripts\python.exe scripts\test_mongo_uri.py
+```
+
+El script te dice si el usuario, la red o la base son el problema. No imprime
+la contraseña.
+
+7. Si el script dice `Conexión correcta`, actualiza las dos variables en Render
+   (`CMS_MONGO_URI` y `MONGO_URI`) y haz **Manual Deploy → Deploy latest commit**.
+
+### Workaround temporal para presentar
+
+Si necesitas el sitio funcionando ya y todavía no resuelves Atlas:
+
+- **CMS**: elimina o deja vacía `CMS_MONGO_URI` en Render. El CMS usará SQLite
+  en el disco efímero de Render; el seed cargará los tres artículos. Los
+  artículos nuevos se perderán al reiniciar el servicio.
+- **Métricas**: cambia `STORAGE` a `memory` y redespliega. GraphQL y el beacon
+  funcionarán, pero los eventos se pierden al reiniciar.
+
+Esto sirve para la demostración; la persistencia real se obtiene corrigiendo
+la URI de Atlas.
+
 **El CMS responde 502 al despertar.**
 Render está arrancando; espera 30–60 s y recarga.
 
