@@ -20,12 +20,12 @@
   <img src="https://img.shields.io/badge/Generator-Swagger-3df0a8?style=for-the-badge&logo=python&logoColor=0b0f0e" alt="Generator">
 </a>
 <a href="#pruebas">
-  <img src="https://img.shields.io/badge/Tests-64%20passed-0b0f0e?style=for-the-badge&logo=pytest&logoColor=3df0a8" alt="64 tests">
+  <img src="https://img.shields.io/badge/Tests-74%20passed-0b0f0e?style=for-the-badge&logo=pytest&logoColor=3df0a8" alt="74 tests">
 </a>
 
 # DevBlog_
 
-**CMS API-First + blog estático + métricas con GraphQL + generador de HTML estático.**
+**CMS API-First + blog estático + landing editable + publicidad + métricas con GraphQL + generador de HTML estático.**
 
 Proyecto de Aplicaciones Web construido con FastAPI, MongoDB Atlas, Render,
 Vercel y GitHub Pages.
@@ -59,8 +59,8 @@ Vercel y GitHub Pages.
 ```mermaid
 flowchart LR
   subgraph Cliente
-    B["Blog estático<br/>Vercel / GitHub Pages"]
-    A["Consola CMS<br/>admin.html"]
+    B["Blog + landing<br/>Vercel / GitHub Pages"]
+    A["Consola CMS<br/>blog · landing · métricas"]
   end
 
   subgraph Render
@@ -83,10 +83,12 @@ flowchart LR
 
 | Módulo | Qué hace |
 |---|---|
-| **CMS API** | 12 endpoints para borradores y publicaciones. UUIDv7, slug único, cursor firmado, idempotencia, rate limit, ETag/304 y errores uniformes. |
+| **CMS API** | 12 endpoints de blog + 11 de landing, publicidad y métricas. UUIDv7, slug único, cursor firmado, idempotencia, rate limit, ETag/304 y errores uniformes. |
 | **Blog** | Portada dinámica, artículo por slug, Markdown seguro, registro de vistas y respaldo estático si la API no responde. |
-| **Consola CMS** | Crear, editar, publicar y eliminar artículos; métricas; vista previa Markdown y generación de HTML estático. |
-| **Métricas** | Beacon ligero, pageviews, sesiones, rutas, hosts y consultas GraphQL. |
+| **Landing editable** | La consola edita el contenido de `index.html` (hero, secciones, proyectos, certificaciones y contacto) con borrador y publicación separados. |
+| **Publicidad** | Anuncio configurable desde el CMS: textos, llamada a la acción, imagen, disposición y colores. Solo se muestra si está activo. |
+| **Consola CMS** | Pestañas de Blog, Landing y Publicidad, y Métricas; vista previa Markdown y generación de HTML estático. |
+| **Métricas** | Beacon ligero, pageviews, sesiones, rutas, hosts, consultas GraphQL y resumen dentro de la consola. |
 | **Generador** | Convierte una instantánea del artículo en un artefacto HTML con checksum SHA-256. |
 | **Documentación** | Contrato v1.2, Anexo D de implementación y guías de despliegue. |
 
@@ -118,10 +120,10 @@ La guía completa de puertos, tokens, estructura y pruebas está en
 
 | Suite | Resultado |
 |---|---|
-| CMS (contrato + Mongo) | **47 / 47** |
+| CMS (contrato + Mongo + contenido) | **57 / 57** |
 | Métricas | **13 / 13** |
 | Generador estático | **4 / 4** |
-| **Total** | **64 / 64** |
+| **Total** | **74 / 74** |
 
 ```powershell
 cd API\devblog-cms-api-1.2\devblog-cms-api

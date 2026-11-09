@@ -34,7 +34,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 2. Instala las dependencias de cada servicio.
 3. Copia los `.env.example` a `.env` si faltan.
 4. Carga los tres artículos de ejemplo en SQLite (o en Mongo si configuras
-   `CMS_MONGO_URI`).
+   `CMS_MONGO_URI`), además de la landing inicial y una publicidad de ejemplo.
 
 ## Levantar todo
 
@@ -57,11 +57,12 @@ Para detenerlos, cierra cada ventana o pulsa `Ctrl+C`.
 
 - CMS / Swagger: <http://127.0.0.1:8080/docs>
 - Salud del CMS: <http://127.0.0.1:8080/health>
+- Landing pública: <http://127.0.0.1:8080/api/v1/landing>
 - Métricas / GraphiQL: <http://127.0.0.1:8000/v1/query>
 - Salud de Métricas: <http://127.0.0.1:8000/health>
 - Generador / Swagger: <http://127.0.0.1:8001/docs>
 - Salud del Generador: <http://127.0.0.1:8001/health>
-- Blog: <http://127.0.0.1:5500/>
+- Blog y landing: <http://127.0.0.1:5500/>
 - Consola CMS: <http://127.0.0.1:5500/admin.html>
 
 ## Tokens
@@ -97,6 +98,7 @@ mi-blog-dev/
 │   ├── articulo.html
 │   ├── admin.html
 │   ├── api.js / api-config.js
+│   ├── landing.js                    # Aplica la landing y la publicidad del CMS
 │   ├── metrics.js                    # Beacon de métricas
 │   └── generated/                    # Artefactos HTML del generador
 ├── pendiente/
@@ -105,7 +107,8 @@ mi-blog-dev/
 │   └── README_DESPLIEGUE.md
 ├── docs/
 │   ├── banner.svg
-│   └── GUIA_LOCAL.md
+│   ├── GUIA_LOCAL.md
+│   └── GUION_VIDEO.md
 ├── DEPLOY_RENDER.md
 ├── render.yaml
 ├── start-all.ps1
@@ -120,13 +123,28 @@ mi-blog-dev/
 - La portada pide `GET /api/v1/posts` al CMS.
 - El artículo dinámico usa `GET /api/v1/posts/slug/{slug}`.
 - La vista propia se registra con `POST /api/v1/posts/{post_id}/views`.
-- Si la API no responde, `notes.js` muestra las tarjetas estáticas de respaldo.
+- La landing pide `GET /api/v1/landing` y `landing.js` aplica el contenido
+  publicado y la publicidad activa sobre `index.html`.
+- Si la API no responde, `notes.js` y `landing.js` conservan el HTML estático de
+  respaldo.
+
+### Consola → CMS (landing y publicidad)
+
+- **Landing y publicidad** carga el borrador con `GET /api/v1/landing/draft`.
+- **Guardar borrador** usa `PUT /api/v1/landing/draft`; **Publicar landing**
+  usa `POST /api/v1/landing/publish`. El sitio público solo ve lo publicado.
+- La publicidad se administra con `GET /api/v1/ads/admin`, `POST /api/v1/ads`,
+  `PUT /api/v1/ads/{ad_id}` y `DELETE /api/v1/ads/{ad_id}`.
+- La ruta pública `GET /api/v1/ads` solo devuelve anuncios activos.
 
 ### Blog → Métricas
 
 - `dev-blog/metrics.js` inyecta `/v1/beacon.js` del colector.
 - El beacon envía pageviews y engagement al sitio `devblog`.
 - Las consultas reales se hacen por GraphQL en `/v1/query`.
+- La consola pide `GET /api/v1/metrics/overview` al CMS; el backend consulta
+  `CMS_METRICS_URL` por GraphQL. Así se evita CORS y el navegador no necesita
+  conocer la URL interna del colector.
 
 ### Consola → Generador
 
@@ -144,7 +162,8 @@ servidos por el generador en `/api/v1/pages/{page_id}/content`.
 
 ## Persistencia
 
-- **Local**: SQLite en `data/devblog.db` (no se versiona).
+- **Local**: SQLite en `data/devblog.db` (no se versiona). Guarda posts,
+  landing (borrador/publicada), publicidad y metadatos de seed.
 - **Producción**: MongoDB Atlas si `CMS_MONGO_URI` está definido.
 - **Métricas**: Mongo Atlas en producción; `STORAGE=memory` si no hay Mongo.
 - **Generador**: disco local/efímero; los artefactos se pueden regenerar.
@@ -159,7 +178,7 @@ CMS_MONGO_DB=devblog_cms
 ## Pruebas
 
 ```powershell
-# CMS: 47 pruebas (43 del contrato + 4 del repositorio Mongo)
+# CMS: 57 pruebas (contrato, contenido y repositorio Mongo)
 cd API\devblog-cms-api-1.2\devblog-cms-api
 .venv\Scripts\python.exe -m pytest -q
 
@@ -171,6 +190,8 @@ cd pendiente\metrics-navigation-main\metrics-navigation-main
 cd pendiente\static-sites-generator-main\static-sites-generator-main
 .venv\Scripts\python.exe -m unittest tests/test_api.py -v
 ```
+
+Total del ecosistema: **74 pruebas**.
 
 ## Documentación
 
@@ -199,6 +220,18 @@ El slug ya existe en un borrador o publicación.
 **Error de CORS en producción.**
 Agrega el origen exacto del blog a `CMS_CORS_ORIGINS` y `CORS_ORIGINS`, y
 redespliega.
+
+**Guardé la landing pero el sitio sigue igual.**
+El cambio queda como borrador. Pulsa **Publicar landing**. La lectura pública
+tiene caché de 60 s.
+
+**La consola dice «Métricas no disponibles».**
+Comprueba que el servicio de métricas esté corriendo en `127.0.0.1:8000` y que
+`CMS_METRICS_URL`/`CMS_METRICS_SITE=devblog` sean correctos. El CMS consulta
+GraphQL desde el backend; no es un problema de CORS del navegador.
+
+**La publicidad no aparece.**
+Debe estar **activa**. La ruta pública solo devuelve anuncios activos.
 
 **Render tarda en responder.**
 Los servicios gratuitos se duermen; la primera petición puede tardar 30–60 s.

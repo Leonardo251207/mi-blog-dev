@@ -30,6 +30,12 @@ services:
         value: https://mi-blog-dev.vercel.app
       - key: CMS_PUBLIC_ARTICLE_PATH
         value: /articulo.html?slug={slug}
+      - key: CMS_METRICS_URL
+        value: https://devblog-metrics-leonardo.onrender.com
+      - key: CMS_METRICS_SITE
+        value: devblog
+      - key: CMS_METRICS_TIMEOUT_S
+        value: "10"
       - key: CMS_LOG_LEVEL
         value: INFO
       - key: CMS_SEED_ON_START

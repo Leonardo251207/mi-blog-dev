@@ -18,6 +18,7 @@ from .domain import UUID7_PATTERN
 from .errors import ApiError
 from .infra import IdempotencyStore
 from .services import PostService
+from .services_content import ContentService
 
 # auto_error=False: el contrato exige 401 (no el 403 que FastAPI usaría por defecto).
 _bearer = HTTPBearer(auto_error=False, description="Token Bearer con el scope del consumidor.")
@@ -60,6 +61,10 @@ def get_settings(request: Request) -> Settings:
     return request.app.state.settings
 
 
+def get_content_service(request: Request) -> ContentService:
+    return request.app.state.content_service
+
+
 def post_id_path(post_id: Annotated[str, Path(pattern=UUID7_PATTERN,
                                               description="UUIDv7 del Post")]) -> str:
     """Un post_id que no sea UUIDv7 responde 422 (Paso 5) antes de tocar la lógica."""
@@ -67,6 +72,7 @@ def post_id_path(post_id: Annotated[str, Path(pattern=UUID7_PATTERN,
 
 
 ServiceDep = Annotated[PostService, Depends(get_service)]
+ContentServiceDep = Annotated[ContentService, Depends(get_content_service)]
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 IdempotencyDep = Annotated[IdempotencyStore, Depends(get_idempotency)]
 PostId = Annotated[str, Depends(post_id_path)]

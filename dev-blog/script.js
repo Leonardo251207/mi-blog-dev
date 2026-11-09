@@ -411,20 +411,28 @@
   };
 
   $$("[data-email-link]").forEach((link) => {
-    link.href = `mailto:${CONTACT_EMAIL}`; // clic con Ctrl/Cmd o menú contextual abre el programa de correo
+    const currentEmail = () => link.dataset.email || CONTACT_EMAIL;
+    link.href = `mailto:${currentEmail()}`; // clic con Ctrl/Cmd o menú contextual abre el programa de correo
     const label = $("#texto-correo", link) || link;
-    const original = label.textContent;
+    let original = label.textContent;
     let timer;
+
+    // La landing puede cambiar el correo desde el CMS después de cargar.
+    link.addEventListener("devblog:email", () => {
+      link.href = `mailto:${currentEmail()}`;
+      original = label.textContent;
+    });
 
     link.addEventListener("click", async (e) => {
       e.preventDefault();
-      const copied = await copyToClipboard(CONTACT_EMAIL);
+      const email = currentEmail();
+      const copied = await copyToClipboard(email);
       if (!copied) {
-        window.location.href = `mailto:${CONTACT_EMAIL}`; // plan B si el navegador bloquea el portapapeles
+        window.location.href = `mailto:${email}`; // plan B si el navegador bloquea el portapapeles
         return;
       }
       clearTimeout(timer);
-      label.textContent = `¡Copiado! ${CONTACT_EMAIL}`;
+      label.textContent = `¡Copiado! ${email}`;
       link.classList.add("is-copied");
       timer = setTimeout(() => {
         label.textContent = original;

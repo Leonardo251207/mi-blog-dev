@@ -16,16 +16,25 @@ decisiones operativas:
 ## Qué incluye esta versión
 
 - Los 12 endpoints del contrato (`/drafts` y `/posts`).
-- Persistencia en SQLite (los artículos sobreviven al reinicio).
+- Módulos nuevos de sitio: `/landing`, `/landing/draft`, `/landing/publish`,
+  `/ads`, `/ads/admin` y `/metrics/overview`.
+- Persistencia en SQLite (artículos, landing y publicidad sobreviven al reinicio).
+- Landing con **borrador** y **versión publicada**; el sitio público lee la
+  publicada.
+- Publicidad configurable (textos, CTA, imagen, disposición y tema) con
+  interruptor `active`.
+- Resumen de métricas en la consola: el backend consulta GraphQL mediante
+  `CMS_METRICS_URL`.
 - Configuración por entorno o `.env` para reutilizar la API en otro proyecto.
 - CORS para que el blog estático pueda consumir la API desde otro origen.
 - Cursor de paginación **firmado** con HMAC: un cursor alterado responde 422.
 - Errores 500 con el mismo formato `{"error": {...}}` del contrato.
 - Idempotencia separada por consumidor y por clave.
 - Endpoint de salud `GET /health`.
-- Script de carga inicial con los tres artículos del blog.
-- Cliente JS (`api.js`), portada dinámica (`notes.js`), artículo dinámico
-  (`articulo.html`) y consola de administración (`admin.html`).
+- Script de carga inicial con los tres artículos, la landing y una publicidad.
+- Cliente JS (`api.js`), portada dinámica (`notes.js`), landing dinámica
+  (`landing.js`), artículo dinámico (`articulo.html`) y consola de
+  administración (`admin.html`).
 
 ## Requisitos
 

@@ -10,9 +10,11 @@ tenga contenido la primera vez que se conecta a la API.
 from __future__ import annotations
 
 from .config import load_settings
-from .repository_factory import build_repository
-from .schemas import DraftCreate
+from .content_defaults import DEFAULT_ADS
+from .repository_factory import build_content_repository, build_repository
+from .schemas import AdCreate, DraftCreate
 from .services import PostService
+from .services_content import ContentService
 
 ARTICLES: list[dict] = [
     {
@@ -110,6 +112,8 @@ def main() -> None:
     settings = load_settings()
     repo = build_repository(settings)
     service = PostService(repo, settings.cursor_secret)
+    content_repo = build_content_repository(settings)
+    content_service = ContentService(content_repo)
     try:
         for article in ARTICLES:
             if repo.get_by_slug(article["slug"]) is not None:
@@ -118,8 +122,22 @@ def main() -> None:
             draft = service.create_draft(DraftCreate(**article))
             published = service.publish(draft.post_id)
             print(f"+ {published.slug} -> {settings.article_url(published.slug)}")
+
+        # Landing: el repositorio crea la versión inicial al arrancar. Aquí solo
+        # se informa; la consola puede sobrescribirla.
+        content, landing = content_service.get_draft_landing()
+        print(f"= landing ({len(content.projects)} proyectos, "
+              f"{len(content.certifications)} certificaciones)")
+
+        if not content_service.list_ads(only_active=False):
+            for ad_data in DEFAULT_ADS:
+                ad = content_service.create_ad(AdCreate(**ad_data))
+                print(f"+ publicidad: {ad.title}")
+        else:
+            print("= publicidad (ya existe)")
     finally:
         repo.close()
+        content_repo.close()
 
 
 if __name__ == "__main__":

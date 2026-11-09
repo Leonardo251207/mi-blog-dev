@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Consola CMS — DevBlog_</title>
-  <meta name="description" content="Consola de administración del CMS de DevBlog_: borradores, publicación y métricas.">
+  <meta name="description" content="Consola de administración del CMS de DevBlog_: blog, landing, publicidad y métricas.">
   <meta name="theme-color" content="#050807">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23050807'/%3E%3Crect x='7' y='23' width='18' height='3' fill='%233df0a8'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,66 +54,386 @@
     <section id="workspace" hidden>
       <div class="admin__toolbar">
         <div>
-          <p class="mono-label"><b>01</b> Contenido</p>
+          <p class="mono-label"><b>CMS</b> Panel de administración</p>
           <h1>Consola CMS</h1>
         </div>
-        <button class="btn btn--solid" id="new-draft" type="button">+ Nuevo borrador</button>
+        <div class="admin__tabs" role="tablist" aria-label="Secciones de la consola">
+          <button class="admin__tab is-active" id="tab-blog" type="button"
+                  role="tab" aria-selected="true" aria-controls="panel-blog" data-tab="blog">Blog</button>
+          <button class="admin__tab" id="tab-landing" type="button"
+                  role="tab" aria-selected="false" aria-controls="panel-landing" data-tab="landing">Landing y publicidad</button>
+          <button class="admin__tab" id="tab-metrics" type="button"
+                  role="tab" aria-selected="false" aria-controls="panel-metrics" data-tab="metrics">Métricas</button>
+        </div>
       </div>
 
-      <div class="admin__grid">
-        <aside class="admin__list" aria-label="Borradores y publicaciones">
-          <div class="admin__list-head">
-            <h2>Borradores</h2>
-            <button class="admin__mini" id="refresh-drafts" type="button" title="Actualizar borradores">↻</button>
+      <!-- ============================= BLOG ============================= -->
+      <section id="panel-blog" class="admin__panel" role="tabpanel" aria-labelledby="tab-blog">
+        <div class="admin__toolbar admin__toolbar--inner">
+          <div>
+            <p class="mono-label"><b>01</b> Contenido del blog</p>
+            <h2>Borradores y publicaciones</h2>
           </div>
-          <ul id="drafts-list" class="admin__items"></ul>
-          <button class="btn btn--ghost admin__more" id="more-drafts" type="button" hidden>Cargar más borradores</button>
+          <button class="btn btn--solid" id="new-draft" type="button">+ Nuevo borrador</button>
+        </div>
 
-          <div class="admin__list-head">
-            <h2>Publicaciones</h2>
-            <button class="admin__mini" id="refresh-posts" type="button" title="Actualizar publicaciones">↻</button>
+        <div class="admin__grid">
+          <aside class="admin__list" aria-label="Borradores y publicaciones">
+            <div class="admin__list-head">
+              <h2>Borradores</h2>
+              <button class="admin__mini" id="refresh-drafts" type="button" title="Actualizar borradores">↻</button>
+            </div>
+            <ul id="drafts-list" class="admin__items"></ul>
+            <button class="btn btn--ghost admin__more" id="more-drafts" type="button" hidden>Cargar más borradores</button>
+
+            <div class="admin__list-head">
+              <h2>Publicaciones</h2>
+              <button class="admin__mini" id="refresh-posts" type="button" title="Actualizar publicaciones">↻</button>
+            </div>
+            <ul id="posts-list" class="admin__items"></ul>
+            <button class="btn btn--ghost admin__more" id="more-posts" type="button" hidden>Cargar más publicaciones</button>
+          </aside>
+
+          <section class="admin__editor" aria-label="Editor de contenido">
+            <form id="draft-form">
+              <fieldset id="editor-fields" class="admin__fields" disabled>
+                <div class="admin__row">
+                  <label for="f-title">Título
+                    <input id="f-title" type="text" minlength="5" maxlength="120" required>
+                  </label>
+                  <label for="f-slug">Slug
+                    <input id="f-slug" type="text" maxlength="100" placeholder="se-genera-desde-el-titulo">
+                  </label>
+                </div>
+
+                <label for="f-tags">Etiquetas
+                  <input id="f-tags" type="text" placeholder="tutorial, deployment">
+                </label>
+
+                <label for="f-content">Contenido (Markdown)
+                  <textarea id="f-content" rows="16" required></textarea>
+                </label>
+
+                <div class="admin__actions">
+                  <button class="btn btn--solid" type="submit" id="save-draft" disabled>Guardar borrador</button>
+                  <button class="btn btn--ghost" type="button" id="publish-draft" disabled>Publicar</button>
+                  <button class="btn btn--ghost" type="button" id="delete-draft" disabled>Eliminar borrador</button>
+                  <button class="btn btn--ghost danger" type="button" id="delete-post" hidden>Eliminar publicación</button>
+                  <button class="btn btn--ghost" type="button" id="generate-static" disabled>Generar HTML estático</button>
+                  <button class="btn btn--ghost" type="button" id="toggle-preview">Vista previa</button>
+                </div>
+              </fieldset>
+            </form>
+
+            <div id="preview" class="md admin__preview" hidden></div>
+            <div id="metrics" class="admin__metrics" hidden></div>
+            <div id="static-result" class="admin__metrics" hidden></div>
+            <p id="workspace-status" class="admin__status" role="status"></p>
+          </section>
+        </div>
+      </section>
+
+      <!-- ============================ LANDING =========================== -->
+      <section id="panel-landing" class="admin__panel" role="tabpanel" aria-labelledby="tab-landing" hidden>
+        <div class="admin__panel-head">
+          <div>
+            <p class="mono-label"><b>02</b> Portada del sitio</p>
+            <h2>Landing editable</h2>
+            <p class="admin__lead">
+              Edita el contenido de <code>index.html</code> sin tocar el HTML. Guarda el borrador,
+              revísalo y publícalo cuando esté listo. El sitio público solo muestra la versión publicada.
+            </p>
           </div>
-          <ul id="posts-list" class="admin__items"></ul>
-          <button class="btn btn--ghost admin__more" id="more-posts" type="button" hidden>Cargar más publicaciones</button>
-        </aside>
+          <div class="admin__actions admin__actions--inline">
+            <button class="btn btn--ghost" id="refresh-landing" type="button">Recargar</button>
+            <button class="btn btn--ghost" id="publish-landing" type="button">Publicar landing</button>
+            <button class="btn btn--solid" id="save-landing" type="button">Guardar borrador</button>
+          </div>
+        </div>
 
-        <section class="admin__editor" aria-label="Editor de contenido">
-          <form id="draft-form">
-            <fieldset id="editor-fields" class="admin__fields" disabled>
-              <div class="admin__row">
-                <label for="f-title">Título
-                  <input id="f-title" type="text" minlength="5" maxlength="120" required>
-                </label>
-                <label for="f-slug">Slug
-                  <input id="f-slug" type="text" maxlength="100" placeholder="se-genera-desde-el-titulo">
-                </label>
-              </div>
+        <p id="landing-status" class="admin__status" role="status"></p>
+        <p id="landing-meta" class="admin__hint"></p>
 
-              <label for="f-tags">Etiquetas
-                <input id="f-tags" type="text" placeholder="tutorial, deployment">
+        <form id="landing-form" class="admin__editor" autocomplete="off">
+          <fieldset class="admin__fields">
+            <h3 class="admin__subhead">Hero</h3>
+            <div class="admin__row admin__row--3">
+              <label for="l-eyebrow">Eyebrow
+                <input id="l-eyebrow" type="text" maxlength="80" data-landing-field="hero.eyebrow">
               </label>
-
-              <label for="f-content">Contenido (Markdown)
-                <textarea id="f-content" rows="16" required></textarea>
+              <label for="l-first-name">Nombre
+                <input id="l-first-name" type="text" maxlength="60" data-landing-field="hero.first_name">
               </label>
+              <label for="l-last-name">Apellidos
+                <input id="l-last-name" type="text" maxlength="80" data-landing-field="hero.last_name">
+              </label>
+            </div>
+            <div class="admin__row">
+              <label for="l-role">Rol
+                <input id="l-role" type="text" maxlength="180" data-landing-field="hero.role">
+              </label>
+              <label for="l-location">Ubicación
+                <input id="l-location" type="text" maxlength="80" data-landing-field="hero.location">
+              </label>
+            </div>
+            <label for="l-tagline">Tagline
+              <input id="l-tagline" type="text" maxlength="240" data-landing-field="hero.tagline">
+            </label>
+            <div class="admin__row admin__row--3">
+              <label for="l-cta-label">Texto del botón
+                <input id="l-cta-label" type="text" maxlength="60" data-landing-field="hero.cta_label">
+              </label>
+              <label for="l-cta-url">Enlace del botón
+                <input id="l-cta-url" type="text" maxlength="500" data-landing-field="hero.cta_url">
+              </label>
+              <label for="l-note">Nota
+                <input id="l-note" type="text" maxlength="120" data-landing-field="hero.note">
+              </label>
+            </div>
+            <label for="l-photo">Foto (URL o data:image)
+              <input id="l-photo" type="text" maxlength="500" data-landing-field="hero.photo_url">
+            </label>
 
-              <div class="admin__actions">
-                <button class="btn btn--solid" type="submit" id="save-draft" disabled>Guardar borrador</button>
-                <button class="btn btn--ghost" type="button" id="publish-draft" disabled>Publicar</button>
-                <button class="btn btn--ghost" type="button" id="delete-draft" disabled>Eliminar borrador</button>
-                <button class="btn btn--ghost danger" type="button" id="delete-post" hidden>Eliminar publicación</button>
-                <button class="btn btn--ghost" type="button" id="generate-static" disabled>Generar HTML estático</button>
-                <button class="btn btn--ghost" type="button" id="toggle-preview">Vista previa</button>
+            <h3 class="admin__subhead">Títulos de sección</h3>
+            <div class="admin__section-grid">
+              <label for="l-sec-tech-label">Etiqueta · Tecnologías
+                <input id="l-sec-tech-label" type="text" maxlength="120" data-landing-field="sections.technologies.label">
+              </label>
+              <label for="l-sec-tech-title">Título · Tecnologías
+                <input id="l-sec-tech-title" type="text" maxlength="160" data-landing-field="sections.technologies.title">
+              </label>
+              <label for="l-sec-proj-label">Etiqueta · Proyectos
+                <input id="l-sec-proj-label" type="text" maxlength="120" data-landing-field="sections.projects.label">
+              </label>
+              <label for="l-sec-proj-title">Título · Proyectos
+                <input id="l-sec-proj-title" type="text" maxlength="160" data-landing-field="sections.projects.title">
+              </label>
+              <label for="l-sec-cert-label">Etiqueta · Certificaciones
+                <input id="l-sec-cert-label" type="text" maxlength="120" data-landing-field="sections.certifications.label">
+              </label>
+              <label for="l-sec-cert-title">Título · Certificaciones
+                <input id="l-sec-cert-title" type="text" maxlength="160" data-landing-field="sections.certifications.title">
+              </label>
+              <label for="l-sec-notes-label">Etiqueta · Notas
+                <input id="l-sec-notes-label" type="text" maxlength="120" data-landing-field="sections.notes.label">
+              </label>
+              <label for="l-sec-notes-title">Título · Notas
+                <input id="l-sec-notes-title" type="text" maxlength="160" data-landing-field="sections.notes.title">
+              </label>
+              <label for="l-sec-contact-label">Etiqueta · Contacto
+                <input id="l-sec-contact-label" type="text" maxlength="120" data-landing-field="sections.contact.label">
+              </label>
+              <label for="l-sec-contact-title">Título · Contacto
+                <input id="l-sec-contact-title" type="text" maxlength="160" data-landing-field="sections.contact.title">
+              </label>
+            </div>
+
+            <h3 class="admin__subhead">Contacto</h3>
+            <div class="admin__row admin__row--3">
+              <label for="l-contact-kicker">Kicker
+                <input id="l-contact-kicker" type="text" maxlength="120" data-landing-field="contact.kicker">
+              </label>
+              <label for="l-contact-title">Título
+                <input id="l-contact-title" type="text" maxlength="160" data-landing-field="contact.title">
+              </label>
+              <label for="l-contact-accent">Acento
+                <input id="l-contact-accent" type="text" maxlength="80" data-landing-field="contact.accent">
+              </label>
+            </div>
+            <label for="l-contact-message">Mensaje
+              <textarea id="l-contact-message" rows="3" maxlength="400" data-landing-field="contact.message"></textarea>
+            </label>
+            <div class="admin__row admin__row--3">
+              <label for="l-contact-github">GitHub
+                <input id="l-contact-github" type="text" maxlength="500" data-landing-field="contact.github">
+              </label>
+              <label for="l-contact-linkedin">LinkedIn
+                <input id="l-contact-linkedin" type="text" maxlength="500" data-landing-field="contact.linkedin">
+              </label>
+              <label for="l-contact-email">Correo
+                <input id="l-contact-email" type="email" maxlength="160" data-landing-field="contact.email">
+              </label>
+            </div>
+            <label for="l-contact-footer">Pie de página
+              <input id="l-contact-footer" type="text" maxlength="200" data-landing-field="contact.footer">
+            </label>
+
+            <h3 class="admin__subhead">Colecciones</h3>
+            <p class="admin__hint admin__hint--block">
+              Tecnologías, proyectos y certificaciones se muestran en la portada en el orden de esta lista.
+            </p>
+
+            <div class="admin__collection">
+              <div class="admin__collection-head">
+                <h4>Tecnologías</h4>
+                <button class="admin__mini" type="button" id="add-tech" title="Añadir tecnología">+</button>
               </div>
-            </fieldset>
-          </form>
+              <div id="tech-editor" class="admin__collection-items" data-collection="technologies"></div>
+            </div>
 
-          <div id="preview" class="md admin__preview" hidden></div>
-          <div id="metrics" class="admin__metrics" hidden></div>
-          <div id="static-result" class="admin__metrics" hidden></div>
-          <p id="workspace-status" class="admin__status" role="status"></p>
+            <div class="admin__collection">
+              <div class="admin__collection-head">
+                <h4>Proyectos</h4>
+                <button class="admin__mini" type="button" id="add-project" title="Añadir proyecto">+</button>
+              </div>
+              <div id="project-editor" class="admin__collection-items" data-collection="projects"></div>
+            </div>
+
+            <div class="admin__collection">
+              <div class="admin__collection-head">
+                <h4>Certificaciones</h4>
+                <button class="admin__mini" type="button" id="add-cert" title="Añadir certificación">+</button>
+              </div>
+              <div id="cert-editor" class="admin__collection-items" data-collection="certifications"></div>
+            </div>
+          </fieldset>
+        </form>
+
+        <!-- ------------------------- PUBLICIDAD ------------------------- -->
+        <section class="admin__ad-section" aria-labelledby="ads-title">
+          <div class="admin__panel-head">
+            <div>
+              <p class="mono-label"><b>03</b> Publicidad</p>
+              <h2 id="ads-title">Diseño del anuncio</h2>
+              <p class="admin__lead">
+                Cambia textos, colores, disposición e imagen. Solo las publicidades activas aparecen en la portada.
+              </p>
+            </div>
+            <button class="btn btn--solid" id="new-ad" type="button">+ Nueva publicidad</button>
+          </div>
+
+          <div class="admin__ads-grid">
+            <aside class="admin__list" aria-label="Publicidades">
+              <div class="admin__list-head">
+                <h3>Anuncios</h3>
+                <button class="admin__mini" id="refresh-ads" type="button" title="Actualizar publicidades">↻</button>
+              </div>
+              <ul id="ads-list" class="admin__items"></ul>
+              <p id="ads-status" class="admin__status" role="status"></p>
+            </aside>
+
+            <form id="ad-form" class="admin__editor" autocomplete="off">
+              <fieldset id="ad-fields" class="admin__fields" disabled>
+                <input id="ad-id" type="hidden">
+                <div class="admin__row">
+                  <label for="ad-title">Título
+                    <input id="ad-title" type="text" minlength="3" maxlength="120" required>
+                  </label>
+                  <label for="ad-subtitle">Subtítulo
+                    <input id="ad-subtitle" type="text" maxlength="160">
+                  </label>
+                </div>
+                <label for="ad-body">Texto
+                  <textarea id="ad-body" rows="3" maxlength="600"></textarea>
+                </label>
+                <div class="admin__row">
+                  <label for="ad-cta-label">Texto del botón
+                    <input id="ad-cta-label" type="text" maxlength="60">
+                  </label>
+                  <label for="ad-cta-url">Enlace del botón
+                    <input id="ad-cta-url" type="text" maxlength="500" placeholder="#contacto">
+                  </label>
+                </div>
+                <div class="admin__row">
+                  <label for="ad-image">Imagen (URL o data:image)
+                    <input id="ad-image" type="text" maxlength="500" placeholder="assets/anuncio.jpg">
+                  </label>
+                  <label for="ad-layout">Disposición
+                    <select id="ad-layout">
+                      <option value="banner">Banner</option>
+                      <option value="split">Split (imagen + texto)</option>
+                      <option value="tarjeta">Tarjeta centrada</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="admin__colors">
+                  <label for="ad-bg">Fondo
+                    <input id="ad-bg" type="color" value="#0b1110">
+                  </label>
+                  <label for="ad-text">Texto
+                    <input id="ad-text" type="color" value="#eef5f1">
+                  </label>
+                  <label for="ad-accent">Acento
+                    <input id="ad-accent" type="color" value="#3df0a8">
+                  </label>
+                  <label class="admin__check" for="ad-active">
+                    <input id="ad-active" type="checkbox" checked>
+                    Publicidad activa
+                  </label>
+                </div>
+
+                <h4 class="admin__subhead">Vista previa</h4>
+                <div class="ad admin__ad-preview" id="ad-preview">
+                  <div class="ad__media" id="ad-preview-media" hidden>
+                    <img id="ad-preview-image" alt="">
+                  </div>
+                  <div class="ad__body">
+                    <p class="ad__subtitle" id="ad-preview-subtitle"></p>
+                    <p class="ad__title" id="ad-preview-title">Título del anuncio</p>
+                    <p class="ad__text" id="ad-preview-text"></p>
+                    <span class="btn btn--solid ad__cta" id="ad-preview-cta" hidden></span>
+                  </div>
+                </div>
+
+                <div class="admin__actions">
+                  <button class="btn btn--solid" type="submit" id="save-ad" disabled>Guardar publicidad</button>
+                  <button class="btn btn--ghost danger" type="button" id="delete-ad" disabled>Eliminar</button>
+                </div>
+              </fieldset>
+            </form>
+          </div>
         </section>
-      </div>
+      </section>
+
+      <!-- ============================ MÉTRICAS ========================== -->
+      <section id="panel-metrics" class="admin__panel" role="tabpanel" aria-labelledby="tab-metrics" hidden>
+        <div class="admin__panel-head">
+          <div>
+            <p class="mono-label"><b>04</b> Analítica</p>
+            <h2>Métricas del sitio</h2>
+            <p class="admin__lead">
+              Resumen de tráfico consultado al servicio de métricas. Si el servicio no responde,
+              el panel lo indica y el CMS sigue funcionando.
+            </p>
+          </div>
+          <div class="admin__actions admin__actions--inline">
+            <label class="admin__inline-field" for="metrics-days">Periodo
+              <select id="metrics-days">
+                <option value="7">7 días</option>
+                <option value="30">30 días</option>
+                <option value="90">90 días</option>
+              </select>
+            </label>
+            <label class="admin__inline-field" for="metrics-grano">Granularidad
+              <select id="metrics-grano">
+                <option value="DIA">Día</option>
+                <option value="HORA">Hora</option>
+              </select>
+            </label>
+            <button class="btn btn--solid" id="refresh-metrics" type="button">Actualizar</button>
+          </div>
+        </div>
+
+        <p id="metrics-status" class="admin__status" role="status"></p>
+        <div id="metrics-kpis" class="admin__metrics admin__metrics--kpi"></div>
+
+        <div class="admin__metrics-grid">
+          <section class="admin__card" aria-labelledby="routes-title">
+            <h3 id="routes-title">Rutas con más vistas</h3>
+            <table class="admin__table">
+              <thead><tr><th>Ruta</th><th>Pageviews</th></tr></thead>
+              <tbody id="metrics-routes"><tr><td colspan="2">Sin datos.</td></tr></tbody>
+            </table>
+          </section>
+
+          <section class="admin__card" aria-labelledby="series-title">
+            <h3 id="series-title">Serie temporal</h3>
+            <div id="metrics-serie" class="admin__bars">
+              <p class="admin__empty">Sin datos.</p>
+            </div>
+          </section>
+        </div>
+      </section>
     </section>
   </main>
 

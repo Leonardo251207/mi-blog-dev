@@ -2,7 +2,7 @@
 
 Esta guía publica el CMS, las métricas/GraphQL y el generador estático en
 **Render** (capa gratuita) con persistencia en **MongoDB Atlas** (M0 gratuita).
-El blog ya está en Vercel y GitHub Pages.
+El blog, la landing y la publicidad ya están en Vercel y GitHub Pages.
 
 ## Arquitectura
 
@@ -89,10 +89,17 @@ Abre el Swagger del CMS y prueba:
    - Debes enviar `Idempotency-Key`.
 2. `POST /api/v1/drafts/{post_id}/publish`.
 3. `GET /api/v1/posts` con el token público `pub_live_devblog_2026`.
+4. `GET /api/v1/landing` con el token público: devuelve el contenido publicado
+   de la portada y la publicidad activa.
+5. `GET /api/v1/landing/draft` y `GET /api/v1/ads/admin` con el token de
+   consola: son los datos que edita la pestaña **Landing y publicidad**.
+6. `GET /api/v1/metrics/overview?days=7&grano=DIA` con el token de consola:
+   debe devolver `disponible: true` si `CMS_METRICS_URL` apunta al servicio.
 
 El CMS ejecuta `python -m app.seed` al arrancar y carga los tres artículos en
-Atlas si la base está vacía. Los artículos que crees desde la consola se
-guardan en Atlas y sobreviven a reinicios.
+Atlas si la base está vacía. También crea la landing inicial y una publicidad de
+ejemplo (solo la primera vez). Los cambios de contenido se guardan en Atlas y
+sobreviven a reinicios.
 
 ---
 
@@ -124,6 +131,12 @@ El `CORS_ORIGINS` del servicio ya incluye:
 `https://mi-blog-dev.vercel.app`, `https://leonardo251207.github.io` y los
 orígenes locales de prueba.
 
+La consola **no** consulta GraphQL desde el navegador: llama a
+`GET /api/v1/metrics/overview` en el CMS y el backend consulta
+`CMS_METRICS_URL`. Por eso no hace falta añadir CORS entre la consola y el
+servicio de métricas. Si el servicio está dormido, el panel muestra
+«Métricas no disponibles» sin romper el resto de la consola.
+
 ---
 
 ## 5. Verificar el frontend
@@ -139,7 +152,13 @@ Después de desplegar Render, entra a:
 - <https://leonardo251207.github.io/mi-blog-dev/>
 
 Debes ver la portada con las publicaciones reales del CMS (no el respaldo
-estático). El artículo dinámico y la consola también deben funcionar.
+estático), el contenido de la landing y la publicidad activa. El artículo
+dinámico y la consola también deben funcionar.
+
+La consola tiene tres pestañas: **Blog**, **Landing y publicidad** y
+**Métricas**. Los cambios de la landing se guardan como borrador y no se ven en
+el sitio hasta pulsar **Publicar landing**. La publicidad se puede activar,
+desactivar y rediseñar sin tocar el HTML.
 
 Si ves el aviso de “contenido estático”, revisa:
 
@@ -174,6 +193,9 @@ La consola tiene el botón **Generar HTML estático**. En producción llama a
 | `CMS_CURSOR_SECRET` | Generado por Render |
 | `CMS_CORS_ORIGINS` | Vercel + GitHub Pages + localhost |
 | `CMS_PUBLIC_SITE_URL` | `https://mi-blog-dev.vercel.app` |
+| `CMS_METRICS_URL` | `https://devblog-metrics-leonardo.onrender.com` |
+| `CMS_METRICS_SITE` | `devblog` |
+| `CMS_METRICS_TIMEOUT_S` | `10` (opcional) |
 
 ### Métricas
 
@@ -294,3 +316,19 @@ Usa el `CMS_CONSOLE_TOKEN` generado en el panel de Render, no el token local
 **No aparecen publicaciones en la portada.**
 Comprueba que `api-config.js` apunte a las URLs de Render y que el CMS tenga
 artículos publicados.
+
+**La landing no cambia al editar.**
+Guarda el borrador y después pulsa **Publicar landing**. El endpoint público
+`/api/v1/landing` tiene `Cache-Control: public, max-age=60`, así que el cambio
+puede tardar hasta un minuto en otros clientes; la portada local usa
+`no-store`.
+
+**La consola dice «Métricas no disponibles».**
+Verifica `CMS_METRICS_URL` (debe apuntar a
+`https://devblog-metrics-leonardo.onrender.com`), `CMS_METRICS_SITE=devblog` y
+que el servicio de métricas esté despierto. Este resumen se consulta desde el
+backend del CMS; no necesitas CORS adicional.
+
+**La publicidad no aparece en el sitio.**
+Comprueba que esté marcada como **activa**. La ruta pública `/api/v1/ads` solo
+devuelve anuncios activos y también tiene caché de 60 segundos.

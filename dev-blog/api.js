@@ -103,6 +103,7 @@
     registerView: (postId) => request(`/posts/${encodeURIComponent(postId)}/views`, {
       method: "POST",
     }),
+    getLanding: () => request("/landing", { cache: "no-store" }),
   };
 
   const adminApi = {
@@ -153,6 +154,45 @@
       method: "DELETE",
       token,
     }),
+
+    // ---- landing y publicidad (contenido del sitio) ----
+    getLandingDraft: (token) => request("/landing/draft", {
+      token,
+      cache: "no-store",
+    }),
+    saveLandingDraft: (token, content) => request("/landing/draft", {
+      method: "PUT",
+      token,
+      body: content,
+    }),
+    publishLanding: (token) => request("/landing/publish", {
+      method: "POST",
+      token,
+    }),
+    listAds: (token) => request("/ads/admin", {
+      token,
+      cache: "no-store",
+    }),
+    createAd: (token, data) => request("/ads", {
+      method: "POST",
+      token,
+      body: data,
+    }),
+    updateAd: (token, adId, data) => request(`/ads/${encodeURIComponent(adId)}`, {
+      method: "PUT",
+      token,
+      body: data,
+    }),
+    deleteAd: (token, adId) => request(`/ads/${encodeURIComponent(adId)}`, {
+      method: "DELETE",
+      token,
+    }),
+
+    // ---- resumen de métricas (el backend consulta GraphQL) ----
+    getMetricsOverview: (token, { days = 7, grano = "DIA" } = {}) => request(
+      `/metrics/overview?days=${encodeURIComponent(days)}&grano=${encodeURIComponent(grano)}`,
+      { token, cache: "no-store" }
+    ),
   };
 
   // ---------------------------------------------------------------- Markdown

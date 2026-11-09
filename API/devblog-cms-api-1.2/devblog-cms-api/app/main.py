@@ -16,9 +16,10 @@ from .config import Settings, load_settings
 from .errors import register_error_handlers
 from .infra import IdempotencyStore, RateLimiter
 from .repository import PostRepository
-from .repository_factory import build_repository
-from .routers import drafts, health, posts
+from .repository_factory import build_content_repository, build_repository
+from .routers import content, drafts, health, metrics, posts
 from .services import PostService
+from .services_content import ContentService
 
 logger = logging.getLogger("devblog.api")
 
@@ -33,6 +34,7 @@ def create_app(settings: Settings | None = None,
     settings = settings or load_settings()
     logger.setLevel(getattr(logging, settings.log_level.upper(), logging.INFO))
     repo = repository or build_repository(settings)
+    content_repo = build_content_repository(settings)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -47,6 +49,7 @@ def create_app(settings: Settings | None = None,
             yield
         finally:
             repo.close()
+            content_repo.close()
 
     app = FastAPI(
         title=settings.app_name,
@@ -58,11 +61,13 @@ def create_app(settings: Settings | None = None,
     # Estado por aplicación: facilita las pruebas (cada test crea su propia app limpia).
     app.state.settings = settings
     app.state.repository = repo
+    app.state.content_repository = content_repo
     app.state.tokens = settings.tokens
     app.state.limiter = RateLimiter()
     app.state.idempotency = IdempotencyStore(settings.idempotency_ttl_s)
     # Para usar otra base de datos, cambia SOLO el repositorio que se pasa aquí.
     app.state.service = PostService(repo, settings.cursor_secret)
+    app.state.content_service = ContentService(content_repo)
 
     register_error_handlers(app)
 
@@ -93,6 +98,8 @@ def create_app(settings: Settings | None = None,
     app.include_router(health.router)
     app.include_router(drafts.router, prefix=settings.api_prefix)
     app.include_router(posts.router, prefix=settings.api_prefix)
+    app.include_router(content.router, prefix=settings.api_prefix)
+    app.include_router(metrics.router, prefix=settings.api_prefix)
     return app
 
 

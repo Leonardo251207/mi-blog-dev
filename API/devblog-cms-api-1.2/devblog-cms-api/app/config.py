@@ -8,7 +8,7 @@ Variables principales (ver `.env.example`):
     CMS_APP_NAME, CMS_ENV, CMS_DB_PATH
     CMS_CONSOLE_TOKEN, CMS_PUBLIC_TOKEN, CMS_CURSOR_SECRET
     CMS_CORS_ORIGINS, CMS_PUBLIC_SITE_URL, CMS_PUBLIC_ARTICLE_PATH
-    CMS_IDEMPOTENCY_TTL_S
+    CMS_IDEMPOTENCY_TTL_S, CMS_METRICS_URL, CMS_METRICS_SITE
 
 Los nombres antiguos `DEVBLOG_*` siguen funcionando como respaldo para no
 romper instalaciones existentes.
@@ -120,6 +120,12 @@ class Settings:
     idempotency_ttl_s: float = 24 * 60 * 60
     cursor_secret: str = DEFAULT_CURSOR_SECRET
     log_level: str = "INFO"
+
+    # Servicio de métricas (GraphQL). La consola consulta el resumen desde el
+    # backend para no depender de CORS ni exponer la URL de escritura.
+    metrics_url: str = "http://127.0.0.1:8000"
+    metrics_site: str = "devblog"
+    metrics_timeout_s: float = 8.0
 
     def __post_init__(self) -> None:
         if not self.api_prefix.startswith("/"):
@@ -239,6 +245,20 @@ def load_settings() -> Settings:
             default=DEFAULT_CURSOR_SECRET,
         ) or DEFAULT_CURSOR_SECRET,
         log_level=_env("CMS_LOG_LEVEL", "DEVBLOG_LOG_LEVEL", default="INFO") or "INFO",
+        metrics_url=_env(
+            "CMS_METRICS_URL",
+            "METRICS_URL",
+            default="http://127.0.0.1:8000",
+        ) or "",
+        metrics_site=_env(
+            "CMS_METRICS_SITE",
+            "METRICS_SITE",
+            default="devblog",
+        ) or "devblog",
+        metrics_timeout_s=_env_float(
+            "CMS_METRICS_TIMEOUT_S",
+            default=8.0,
+        ),
     )
 
 

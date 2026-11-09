@@ -14,13 +14,15 @@ router = APIRouter(tags=["Salud"])
 def health(request: Request):
     settings = request.app.state.settings
     repo = request.app.state.repository
-    ok = repo.ping()
+    content_repo = request.app.state.content_repository
+    ok = repo.ping() and content_repo.ping()
     return JSONResponse(
         {
             "status": "ok" if ok else "degraded",
             "service": settings.app_name,
             "version": settings.app_version,
             "database": "ok" if ok else "error",
+            "content": "ok" if content_repo.ping() else "error",
             "environment": settings.environment,
         },
         status_code=200 if ok else 503,

@@ -302,9 +302,14 @@ def test_rate_limit_public_10_per_second(client):
     assert r.json()["error"]["code"] == "RATE_LIMITED"
 
 
-def test_no_ads_anywhere_in_contract(client):
-    spec = json.dumps(client.get("/openapi.json").json()).lower()
-    assert "ads" not in spec.replace("heads", "").replace("loads", "").replace("threads", "")
+def test_new_site_content_modules_are_separate_from_posts(client):
+    """La publicidad y la landing son módulos nuevos; no contaminan el contrato de Posts."""
+    spec = client.get("/openapi.json").json()
+    assert "/api/v1/landing" in spec["paths"]
+    assert "/api/v1/ads" in spec["paths"]
+    assert "/api/v1/metrics/overview" in spec["paths"]
+    post_schema = json.dumps(spec["components"]["schemas"]["PostDetail"]).lower()
+    assert "ads" not in post_schema.replace("heads", "").replace("loads", "").replace("threads", "")
 
 
 # ------------------------------------------------------------ cachÃ© HTTP (v1.2)

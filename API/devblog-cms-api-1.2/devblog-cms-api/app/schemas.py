@@ -5,12 +5,13 @@
 - Las salidas serializan las fechas como ISO 8601 UTC con "Z".
 """
 from datetime import datetime
-from typing import Annotated, Optional
+from typing import Annotated, Literal, Optional
 
 from pydantic import (BaseModel, ConfigDict, Field, PlainSerializer, StringConstraints,
                       field_validator)
 
-from . import domain
+from . import content_defaults, domain
+from .content import Ad
 from .domain import Post, PostStatus
 
 UtcDatetime = Annotated[datetime, PlainSerializer(domain.iso, return_type=str, when_used="json")]
@@ -204,3 +205,266 @@ class PostMetrics(BaseModel):                        # endpoint 11
     def from_post(cls, p: Post) -> "PostMetrics":
         return cls(post_id=p.post_id, views_total=p.views_total,
                    reading_time_min=domain.reading_time_min(p.content), published_at=p.published_at)
+
+
+# ==================== CONTENIDO DE LA LANDING (CMS) ==========================
+# Modelos anidados: el CMS edita la landing como un documento estructurado.
+# `extra="ignore"` permite leer documentos guardados por versiones anteriores
+# sin romper la página si algún día se retira un campo.
+def _safe_url(value: str, *, allow_data_image: bool = False) -> str:
+    value = (value or "").strip()
+    if not value:
+        return value
+    lowered = value.lower()
+    if lowered.startswith(("javascript:", "vbscript:")):
+        raise ValueError("URL no permitida")
+    if lowered.startswith("data:") and not (
+        allow_data_image and lowered.startswith("data:image/")
+    ):
+        raise ValueError("URL no permitida")
+    return value
+
+
+class LandingHero(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    eyebrow: str = Field(default="Hola, mundo", max_length=80)
+    first_name: str = Field(default="Leonardo", min_length=1, max_length=60)
+    last_name: str = Field(default="Nucamendi Ruiz", min_length=1, max_length=80)
+    role: str = Field(default="", max_length=180)
+    location: str = Field(default="", max_length=80)
+    tagline: str = Field(default="", max_length=240)
+    cta_label: str = Field(default="Ver mis proyectos", max_length=60)
+    cta_url: str = Field(default="#proyectos", max_length=500)
+    note: str = Field(default="Creando desde · México", max_length=120)
+    photo_url: str = Field(default="assets/perfil.jpg", max_length=500)
+
+    @field_validator("cta_url")
+    @classmethod
+    def _cta_url(cls, v: str) -> str:
+        return _safe_url(v)
+
+    @field_validator("photo_url")
+    @classmethod
+    def _photo_url(cls, v: str) -> str:
+        return _safe_url(v, allow_data_image=True)
+
+
+class SectionHeading(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    label: str = Field(default="", max_length=120)
+    title: str = Field(default="", max_length=160)
+
+
+class LandingSections(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    technologies: SectionHeading = Field(default_factory=SectionHeading)
+    projects: SectionHeading = Field(default_factory=SectionHeading)
+    certifications: SectionHeading = Field(default_factory=SectionHeading)
+    notes: SectionHeading = Field(default_factory=SectionHeading)
+    contact: SectionHeading = Field(default_factory=SectionHeading)
+
+
+class TechnologyContent(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    name: str = Field(min_length=1, max_length=40)
+    icon: str = Field(default="", max_length=8)
+    color: str = Field(default="var(--green)", max_length=40)
+
+
+class ProjectContent(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    title: str = Field(min_length=1, max_length=120)
+    badge: str = Field(default="", max_length=40)
+    description: str = Field(default="", max_length=400)
+    url: str = Field(default="", max_length=500)
+    link_label: str = Field(default="", max_length=60)
+    art: Literal["green", "dots", "purple"] = "dots"
+
+    @field_validator("url")
+    @classmethod
+    def _url(cls, v: str) -> str:
+        return _safe_url(v)
+
+
+class CertificationContent(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    issuer: str = Field(default="", max_length=120)
+    title: str = Field(min_length=1, max_length=160)
+    url: str = Field(default="", max_length=500)
+    tag: str = Field(default="", max_length=40)
+    color: str = Field(default="var(--green)", max_length=40)
+
+    @field_validator("url")
+    @classmethod
+    def _url(cls, v: str) -> str:
+        return _safe_url(v)
+
+
+class LandingContact(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    kicker: str = Field(default="Construyamos algo juntos", max_length=120)
+    title: str = Field(default="¿Tienes una idea?", max_length=160)
+    accent: str = Field(default="Hablemos.", max_length=80)
+    message: str = Field(default="", max_length=400)
+    github: str = Field(default="", max_length=500)
+    linkedin: str = Field(default="", max_length=500)
+    email: str = Field(default="", max_length=160)
+    footer: str = Field(default="", max_length=200)
+
+    @field_validator("github", "linkedin")
+    @classmethod
+    def _urls(cls, v: str) -> str:
+        return _safe_url(v)
+
+
+def _default_technologies() -> list[TechnologyContent]:
+    return [TechnologyContent(**item)
+            for item in content_defaults.DEFAULT_LANDING_CONTENT["technologies"]]
+
+
+def _default_projects() -> list[ProjectContent]:
+    return [ProjectContent(**item)
+            for item in content_defaults.DEFAULT_LANDING_CONTENT["projects"]]
+
+
+def _default_certifications() -> list[CertificationContent]:
+    return [CertificationContent(**item)
+            for item in content_defaults.DEFAULT_LANDING_CONTENT["certifications"]]
+
+
+def _default_sections() -> LandingSections:
+    sections = content_defaults.DEFAULT_LANDING_CONTENT["sections"]
+    return LandingSections(
+        technologies=SectionHeading(**sections["technologies"]),
+        projects=SectionHeading(**sections["projects"]),
+        certifications=SectionHeading(**sections["certifications"]),
+        notes=SectionHeading(**sections["notes"]),
+        contact=SectionHeading(**sections["contact"]),
+    )
+
+
+def _default_hero() -> LandingHero:
+    return LandingHero(**content_defaults.DEFAULT_LANDING_CONTENT["hero"])
+
+
+def _default_contact() -> LandingContact:
+    return LandingContact(**content_defaults.DEFAULT_LANDING_CONTENT["contact"])
+
+
+class LandingContent(BaseModel):
+    """Documento completo de la landing. La consola lo guarda como borrador."""
+    model_config = ConfigDict(extra="ignore")
+    hero: LandingHero = Field(default_factory=_default_hero)
+    sections: LandingSections = Field(default_factory=_default_sections)
+    technologies: list[TechnologyContent] = Field(
+        default_factory=_default_technologies, max_length=12)
+    projects: list[ProjectContent] = Field(
+        default_factory=_default_projects, max_length=12)
+    certifications: list[CertificationContent] = Field(
+        default_factory=_default_certifications, max_length=12)
+    contact: LandingContact = Field(default_factory=_default_contact)
+
+
+class LandingDraftOut(BaseModel):
+    content: LandingContent
+    updated_at: UtcDatetime
+    published_at: Optional[UtcDatetime] = None
+    has_published: bool = False
+
+
+# ============================ PUBLICIDAD ====================================
+Color = Annotated[str, StringConstraints(pattern=r"^#[0-9a-fA-F]{6}$")]
+
+
+class AdTheme(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    background: Color = "#0b1110"
+    text: Color = "#eef5f1"
+    accent: Color = "#3df0a8"
+
+
+class AdBase(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    title: str = Field(min_length=3, max_length=120)
+    subtitle: str = Field(default="", max_length=160)
+    body: str = Field(default="", max_length=600)
+    cta_label: str = Field(default="", max_length=60)
+    cta_url: str = Field(default="", max_length=500)
+    image_url: str = Field(default="", max_length=500)
+    layout: Literal["banner", "tarjeta", "split"] = "banner"
+    theme: AdTheme = Field(default_factory=AdTheme)
+    active: bool = True
+
+    @field_validator("cta_url")
+    @classmethod
+    def _cta_url(cls, v: str) -> str:
+        return _safe_url(v)
+
+    @field_validator("image_url")
+    @classmethod
+    def _image_url(cls, v: str) -> str:
+        return _safe_url(v, allow_data_image=True)
+
+
+class AdCreate(AdBase):
+    pass
+
+
+class AdUpdate(AdBase):
+    pass
+
+
+class AdOut(AdBase):
+    ad_id: str
+    created_at: UtcDatetime
+    updated_at: UtcDatetime
+
+    @classmethod
+    def from_ad(cls, ad: Ad) -> "AdOut":
+        return cls(
+            ad_id=ad.ad_id,
+            title=ad.title,
+            subtitle=ad.subtitle,
+            body=ad.body,
+            cta_label=ad.cta_label,
+            cta_url=ad.cta_url,
+            image_url=ad.image_url,
+            layout=ad.layout,  # type: ignore[arg-type]
+            theme=AdTheme(**ad.theme),
+            active=ad.active,
+            created_at=ad.created_at,
+            updated_at=ad.updated_at,
+        )
+
+
+class PublicLanding(BaseModel):
+    content: LandingContent
+    ads: list[AdOut] = []
+    ad: Optional[AdOut] = None
+
+
+# ============================== MÉTRICAS ====================================
+class MetricsRow(BaseModel):
+    clave: str
+    valor: int
+
+
+class MetricsSeriesPoint(BaseModel):
+    cubo: UtcDatetime
+    pageviews: int
+    sesiones: int
+
+
+class MetricsOverview(BaseModel):
+    disponible: bool
+    sitio: str
+    desde: UtcDatetime
+    hasta: UtcDatetime
+    grano: str
+    pageviews: int = 0
+    sesiones: int = 0
+    visitantes_unicos: int = 0
+    por_ruta: list[MetricsRow] = []
+    por_host: list[MetricsRow] = []
+    serie: list[MetricsSeriesPoint] = []
+    error: Optional[str] = None
