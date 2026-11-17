@@ -76,8 +76,12 @@
     .replace(/\/+$/, "");
   const metricsLink = $("#metrics-link");
   const generatorLink = $("#generator-link");
+  const landingLink = $("#landing-link");
   if (metricsLink) metricsLink.href = `${metricsBase}/v1/query`;
   if (generatorLink) generatorLink.href = `${STATIC_GENERATOR_BASE_URL}/docs`;
+  if (landingLink && config.LANDING_BASE_URL) {
+    landingLink.href = `${String(config.LANDING_BASE_URL).replace(/\/+$/, "")}/`;
+  }
 
   function formatDate(value) {
     if (!value) return "—";
@@ -928,7 +932,7 @@
       landingContent = data.content || landingContent;
       fillLanding(landingContent);
       updateLandingMeta(data);
-      setStatus("Landing publicada. Recarga index.html para verla.", "ok", landingStatus);
+      setStatus("Landing publicada. Recarga el sitio de la landing para verla.", "ok", landingStatus);
     } catch (error) {
       handleError(error, landingStatus);
     } finally {

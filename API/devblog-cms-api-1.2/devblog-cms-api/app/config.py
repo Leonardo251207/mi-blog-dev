@@ -33,6 +33,8 @@ DEFAULT_CURSOR_SECRET = "dev-cursor-secret-change-me"
 DEFAULT_CORS_ORIGINS = (
     "http://localhost:5500",
     "http://127.0.0.1:5500",
+    "http://localhost:5599",
+    "http://127.0.0.1:5599",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:5173",

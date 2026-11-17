@@ -4,14 +4,20 @@ Esta guía publica el CMS, las métricas/GraphQL y el generador estático en
 **Render** (capa gratuita) con persistencia en **MongoDB Atlas** (M0 gratuita).
 El blog, la landing y la publicidad ya están en Vercel y GitHub Pages.
 
+La **landing/portafolio** vive en un repositorio aparte
+([`mi-landing-devblog`](https://github.com/Leonardo251207/mi-landing-devblog)).
+No necesita Render, pero sí consume el CMS para su contenido editable y la
+publicidad.
+
 ## Arquitectura
 
 ```text
-Vercel / GitHub Pages (blog estático)
-        │
-        ├── https://devblog-cms-leonardo.onrender.com       → CMS FastAPI
-        ├── https://devblog-metrics-leonardo.onrender.com   → Métricas + GraphQL
-        └── https://devblog-generator-leonardo.onrender.com → Generador HTML
+Blog (Vercel / GitHub Pages) ──┐
+Landing (repo aparte) ─────────┼── REST /api/v1 ──→ CMS FastAPI
+Consola CMS ───────────────────┘         │
+                                         ├── https://devblog-cms-leonardo.onrender.com
+                                         ├── https://devblog-metrics-leonardo.onrender.com
+                                         └── https://devblog-generator-leonardo.onrender.com
 
 CMS y Métricas → MongoDB Atlas (M0)
 ```
@@ -128,8 +134,8 @@ sobreviven a reinicios.
 ```
 
 El `CORS_ORIGINS` del servicio ya incluye:
-`https://mi-blog-dev.vercel.app`, `https://leonardo251207.github.io` y los
-orígenes locales de prueba.
+`https://mi-blog-dev.vercel.app`, `https://mi-landing-devblog.vercel.app`,
+`https://leonardo251207.github.io` y los orígenes locales de prueba.
 
 La consola **no** consulta GraphQL desde el navegador: llama a
 `GET /api/v1/metrics/overview` en el CMS y el backend consulta
@@ -150,10 +156,12 @@ Después de desplegar Render, entra a:
 
 - <https://mi-blog-dev.vercel.app/>
 - <https://leonardo251207.github.io/mi-blog-dev/>
+- <https://mi-landing-devblog.vercel.app/>
+- <https://leonardo251207.github.io/mi-landing-devblog/>
 
-Debes ver la portada con las publicaciones reales del CMS (no el respaldo
-estático), el contenido de la landing y la publicidad activa. El artículo
-dinámico y la consola también deben funcionar.
+El blog debe mostrar las publicaciones reales del CMS (no el respaldo estático).
+La landing debe mostrar el contenido publicado y la publicidad activa. El
+artículo dinámico y la consola también deben funcionar.
 
 La consola tiene tres pestañas: **Blog**, **Landing y publicidad** y
 **Métricas**. Los cambios de la landing se guardan como borrador y no se ven en
@@ -163,7 +171,7 @@ desactivar y rediseñar sin tocar el HTML.
 Si ves el aviso de “contenido estático”, revisa:
 
 - Que las URLs de Render en `api-config.js` sean las correctas.
-- Que `CMS_CORS_ORIGINS` incluya el origen exacto del blog.
+- Que `CMS_CORS_ORIGINS` incluya el origen exacto del blog y de la landing.
 - Que el CMS esté despierto (la primera petición puede tardar).
 
 ---
@@ -191,7 +199,7 @@ La consola tiene el botón **Generar HTML estático**. En producción llama a
 | `CMS_PUBLIC_TOKEN` | `pub_live_devblog_2026` |
 | `CMS_CONSOLE_TOKEN` | Generado por Render (cópialo) |
 | `CMS_CURSOR_SECRET` | Generado por Render |
-| `CMS_CORS_ORIGINS` | Vercel + GitHub Pages + localhost |
+| `CMS_CORS_ORIGINS` | `https://mi-blog-dev.vercel.app,https://mi-landing-devblog.vercel.app,https://leonardo251207.github.io,http://localhost:5500,http://127.0.0.1:5500` |
 | `CMS_PUBLIC_SITE_URL` | `https://mi-blog-dev.vercel.app` |
 | `CMS_METRICS_URL` | `https://devblog-metrics-leonardo.onrender.com` |
 | `CMS_METRICS_SITE` | `devblog` |
@@ -206,7 +214,7 @@ La consola tiene el botón **Generar HTML estático**. En producción llama a
 | `MONGO_DB` | `metrics` |
 | `BOOTSTRAP_FILE` | `config/bootstrap.prod.yaml` |
 | `APP_ENV` | `local` (mantiene GraphiQL visible) |
-| `CORS_ORIGINS` | Vercel + GitHub Pages + localhost |
+| `CORS_ORIGINS` | `https://mi-blog-dev.vercel.app,https://mi-landing-devblog.vercel.app,https://leonardo251207.github.io,http://localhost:5500,http://127.0.0.1:5500` |
 
 ### Generador
 

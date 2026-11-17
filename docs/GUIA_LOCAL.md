@@ -62,8 +62,20 @@ Para detenerlos, cierra cada ventana o pulsa `Ctrl+C`.
 - Salud de Métricas: <http://127.0.0.1:8000/health>
 - Generador / Swagger: <http://127.0.0.1:8001/docs>
 - Salud del Generador: <http://127.0.0.1:8001/health>
-- Blog y landing: <http://127.0.0.1:5500/>
+- Blog: <http://127.0.0.1:5500/>
 - Consola CMS: <http://127.0.0.1:5500/admin.html>
+
+La landing/portafolio vive en un repositorio aparte
+([`mi-landing-devblog`](https://github.com/Leonardo251207/mi-landing-devblog)).
+Para verla en local:
+
+```powershell
+cd ..\mi-landing-devblog
+python -m http.server 5599
+```
+
+Luego abre <http://127.0.0.1:5599/>. La landing consume el CMS de
+`127.0.0.1:8080` y, si no está disponible, conserva su HTML estático.
 
 ## Tokens
 
@@ -94,11 +106,10 @@ mi-blog-dev/
 │       ├── devblog-cms-api/          # FastAPI, Mongo/SQLite, tests y scripts
 │       └── Especificacion_...docx/.pdf
 ├── dev-blog/                         # Blog estático + consola CMS
-│   ├── index.html
-│   ├── articulo.html
-│   ├── admin.html
+│   ├── index.html                    # Portada del blog (últimas entradas)
+│   ├── articulo.html                 # Artículo dinámico por slug
+│   ├── admin.html                    # Consola: blog, landing, publicidad y métricas
 │   ├── api.js / api-config.js
-│   ├── landing.js                    # Aplica la landing y la publicidad del CMS
 │   ├── metrics.js                    # Beacon de métricas
 │   └── generated/                    # Artefactos HTML del generador
 ├── pendiente/
@@ -116,17 +127,35 @@ mi-blog-dev/
 └── README.md
 ```
 
+El repo de la landing tiene su propia estructura:
+
+```text
+mi-landing-devblog/
+├── index.html            # Landing editable (data-landing, publicidad)
+├── landing.js            # Aplica el contenido publicado y la publicidad
+├── notes.js              # Últimas notas del blog
+├── api.js / api-config.js
+├── metrics.js
+├── styles.css / script.js
+├── assets/               # Foto de perfil y certificados PDF
+└── .github/workflows/    # GitHub Pages
+```
+
 ## Integración
 
 ### Blog → CMS
 
-- La portada pide `GET /api/v1/posts` al CMS.
+- La portada del blog pide `GET /api/v1/posts` al CMS.
 - El artículo dinámico usa `GET /api/v1/posts/slug/{slug}`.
 - La vista propia se registra con `POST /api/v1/posts/{post_id}/views`.
-- La landing pide `GET /api/v1/landing` y `landing.js` aplica el contenido
-  publicado y la publicidad activa sobre `index.html`.
-- Si la API no responde, `notes.js` y `landing.js` conservan el HTML estático de
-  respaldo.
+- Si la API no responde, `notes.js` conserva las tarjetas estáticas de respaldo.
+
+### Landing → CMS
+
+- La landing del repo aparte pide `GET /api/v1/landing` y `landing.js` aplica el
+  contenido publicado y la publicidad activa sobre `index.html`.
+- Si la API no responde (o el origen no está en CORS), la landing conserva su
+  HTML estático y sigue navegable.
 
 ### Consola → CMS (landing y publicidad)
 
@@ -218,8 +247,9 @@ Espera el `Retry-After`; los límites son 60/min consola y 10/s sitio público.
 El slug ya existe en un borrador o publicación.
 
 **Error de CORS en producción.**
-Agrega el origen exacto del blog a `CMS_CORS_ORIGINS` y `CORS_ORIGINS`, y
-redespliega.
+Agrega el origen exacto del blog **y de la landing** a `CMS_CORS_ORIGINS` y
+`CORS_ORIGINS`, y redespliega. La landing necesita, además de su URL de Vercel,
+el origen de GitHub Pages (`https://leonardo251207.github.io`).
 
 **Guardé la landing pero el sitio sigue igual.**
 El cambio queda como borrador. Pulsa **Publicar landing**. La lectura pública

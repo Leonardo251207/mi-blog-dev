@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Leonardo Nucamendi Ruiz — DevBlog_</title>
-  <meta name="description" content="Portafolio de Leonardo Nucamendi Ruiz, estudiante de Ing. en Tecnologías de la Información e Innovación Digital en México. Proyectos, certificaciones y notas.">
+  <title>Notas y Experimentación — DevBlog_</title>
+  <meta name="description" content="Blog técnico de Leonardo Nucamendi Ruiz: notas sobre desarrollo web, datos, automatización y despliegue. Contenido servido desde el CMS.">
   <meta name="theme-color" content="#050807">
+  <meta property="og:title" content="Notas y Experimentación — DevBlog_">
+  <meta property="og:description" content="Blog técnico de Leonardo Nucamendi Ruiz. Artículos sobre desarrollo, datos y despliegue.">
+  <meta property="og:type" content="website">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23050807'/%3E%3Crect x='7' y='23' width='18' height='3' fill='%233df0a8'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,234 +21,46 @@
   <!-- ===== Navegación ===== -->
   <header class="nav">
     <div class="nav__inner">
-      <a class="logo" href="#top" aria-label="DevBlog, ir al inicio">DevBlog<span>_</span></a>
+      <a class="logo" href="index.html" aria-label="DevBlog, ir al inicio del blog">DevBlog<span>_</span></a>
 
       <button class="nav__toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu"><span></span></button>
 
       <ul class="nav__links" id="menu">
-        <li><a href="#tecnologias">Tecnologías</a></li>
-        <li><a href="#proyectos">Proyectos</a></li>
-        <li><a href="#certificaciones">Certificaciones</a></li>
-        <li><a href="#notas">Notas y Experimentación</a></li>
-        <li><a href="#contacto">Contacto</a></li>
+        <li><a href="#notas">Notas</a></li>
+        <li><a href="https://mi-landing-devblog.vercel.app/">Portafolio <span aria-hidden="true">↗</span></a></li>
+        <li><a href="https://mi-landing-devblog.vercel.app/#proyectos">Proyectos <span aria-hidden="true">↗</span></a></li>
+        <li><a href="https://mi-landing-devblog.vercel.app/#contacto">Contacto <span aria-hidden="true">↗</span></a></li>
       </ul>
 
-      <span class="nav__status"><i></i>Disponible para trabajar</span>
+      <span class="nav__status"><i></i>CMS conectado</span>
     </div>
   </header>
 
   <main>
-    <!-- ===== Hero ===== -->
-    <section class="hero" aria-labelledby="nombre">
-      <div class="wrap hero__grid">
-        <div class="intro">
-          <p class="eyebrow" style="--i:0"><b>01</b> <span data-landing="hero.eyebrow">Hola, mundo</span></p>
-          <h1 id="nombre" style="--i:1" data-landing-name>Leonardo <span>Nucamendi Ruiz</span></h1>
-          <p class="hero__role" style="--i:2"><span data-landing="hero.role">Estudiante de Ing. en Tecnologías de la Información e Innovación Digital</span> <em data-landing="hero.location">| México</em></p>
-          <p class="hero__tagline" style="--i:3" data-landing="hero.tagline">Transformo ideas en soluciones digitales eficientes y escalables.</p>
-          <div class="hero__cta" style="--i:4">
-            <a class="btn btn--solid" href="#proyectos" data-landing-href="hero.cta_url"><span data-landing="hero.cta_label">Ver mis proyectos</span> <span class="arrow" aria-hidden="true">→</span></a>
-            <small data-landing="hero.note">Creando desde · México</small>
-          </div>
-        </div>
-
-        <figure class="frame" aria-label="Foto de perfil">
-          <div class="frame__screen">
-            <img src="assets/perfil.jpg" alt="Foto de Leonardo Nucamendi Ruiz" data-landing-src="hero.photo_url" data-landing-alt="hero">
-            <span class="scan" aria-hidden="true"></span>
-            <figcaption class="frame__tag">PERFIL_01</figcaption>
-          </div>
-        </figure>
-      </div>
-    </section>
-
-    <!-- ===== 02 Tecnologías ===== -->
-    <section class="section" id="tecnologias" aria-labelledby="t-tec">
-      <div class="wrap">
-        <div class="section-head reveal">
-          <p class="mono-label"><b>02</b><span data-landing="sections.technologies.label">Tecnologías principales</span></p>
-          <h2 class="title" id="t-tec" data-landing="sections.technologies.title">Herramientas y Lenguajes</h2>
-        </div>
-
-        <ul class="tech reveal" style="--d:.1s" data-landing-tech>
-          <li><span class="tech__icon" style="--c:var(--blue)" aria-hidden="true">C++</span>C++</li>
-          <li><span class="tech__icon" style="--c:#ff8a3d" aria-hidden="true">J</span>Java</li>
-          <li><span class="tech__icon" style="--c:var(--yellow)" aria-hidden="true">JS</span>JavaScript</li>
-          <li><span class="tech__icon" style="--c:var(--purple)" aria-hidden="true">PY</span>Python</li>
-          <li><span class="tech__icon" style="--c:#ff6a55" aria-hidden="true">&lt;/&gt;</span>HTML</li>
-          <li><span class="tech__icon" style="--c:#3da5ff" aria-hidden="true">#</span>CSS</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- ===== 03 Proyectos ===== -->
-    <section class="section" id="proyectos" aria-labelledby="t-proy">
-      <div class="wrap">
-        <div class="section-head reveal">
-          <p class="mono-label"><b>03</b><span data-landing="sections.projects.label">Trabajo seleccionado</span></p>
-          <h2 class="title" id="t-proy" data-landing="sections.projects.title">Proyectos Destacados</h2>
-        </div>
-
-        <div class="grid-3" data-landing-projects>
-          <!-- Lawpocket -->
-          <a class="card reveal" data-landing-project href="https://law-pocket-integrador.vercel.app/index.html" target="_blank" rel="noopener noreferrer">
-            <div class="art art--glow-green" aria-hidden="true">
-              <svg viewBox="0 0 270 162" preserveAspectRatio="xMidYMid slice">
-                <rect x="68" y="26" width="134" height="32"/>
-                <text class="calc-display" x="194" y="48" text-anchor="end" font-size="15">8.75</text>
-                <g>
-                  <rect x="68" y="72" width="28" height="22"/><rect x="102" y="72" width="28" height="22"/><rect x="136" y="72" width="28" height="22"/><rect class="hl" x="170" y="72" width="32" height="22"/>
-                  <rect x="68" y="100" width="28" height="22"/><rect x="102" y="100" width="28" height="22"/><rect x="136" y="100" width="28" height="22"/><rect class="hl" x="170" y="100" width="32" height="22"/>
-                </g>
-              </svg>
-            </div>
-            <div class="card__body">
-              <span class="badge">Web</span>
-              <h3>Lawpocket</h3>
-              <p>Plataforma de gestión, expedientes y analíticas para despachos de abogados.</p>
-              <span class="card__link">Ver web ↗</span>
-            </div>
-          </a>
-
-          <!-- Math & English Quest -->
-          <a class="card reveal" data-landing-project style="--d:.1s" href="https://math-english-quest.vercel.app/" target="_blank" rel="noopener noreferrer">
-            <div class="art art--dots" aria-hidden="true">
-              <svg viewBox="0 0 270 162" preserveAspectRatio="xMidYMid slice">
-                <rect x="48" y="38" width="174" height="76" style="fill:#08100d"/>
-                <line x1="48" y1="56" x2="222" y2="56"/>
-                <circle class="fill-blue" cx="60" cy="47" r="2"/><circle class="fill-blue" cx="68" cy="47" r="2"/>
-                <rect class="fill-blue" x="60" y="64" width="8" height="8"/><line class="dim" x1="82" y1="68" x2="190" y2="68"/>
-                <rect x="60" y="80" width="8" height="8"/><line class="dim" x1="82" y1="84" x2="196" y2="84"/>
-                <rect x="60" y="96" width="8" height="8"/><line class="dim" x1="82" y1="100" x2="190" y2="100"/>
-              </svg>
-            </div>
-            <div class="card__body">
-              <span class="badge">Mobile</span>
-              <h3>Math &amp; English Quest</h3>
-              <p>App educativa interactiva con sistema de voz y reconocimiento de imágenes para niños.</p>
-              <span class="card__link">Ver web ↗</span>
-            </div>
-          </a>
-
-          <!-- Marketplace Universitario (en desarrollo) -->
-          <article class="card reveal" data-landing-project style="--d:.2s">
-            <div class="art art--glow-purple" aria-hidden="true">
-              <svg viewBox="0 0 270 162" preserveAspectRatio="xMidYMid slice">
-                <g class="orb">
-                  <circle class="purple" cx="135" cy="68" r="31"/>
-                  <circle class="hl" cx="135" cy="68" r="12"/>
-                </g>
-                <text class="sparkle" x="70" y="52" font-size="12" text-anchor="middle">✦</text>
-                <text class="sparkle sparkle--2" x="200" y="102" font-size="12" text-anchor="middle" style="fill:var(--purple)">✦</text>
-                <line class="dim" x1="98" y1="124" x2="172" y2="124"/>
-                <line class="dim" x1="112" y1="136" x2="158" y2="136"/>
-              </svg>
-            </div>
-            <div class="card__body">
-              <span class="badge">En desarrollo</span>
-              <h3>Marketplace Universitario</h3>
-              <p>Plataforma comunitaria para intercambio de apuntes y recursos académicos.</p>
-            </div>
-          </article>
+    <!-- ===== Portada del blog ===== -->
+    <section class="blog-hero" aria-labelledby="blog-title">
+      <div class="wrap blog-hero__inner">
+        <p class="eyebrow"><b>05</b> Bitácora publicada</p>
+        <h1 id="blog-title">Notas y <span>Experimentación</span></h1>
+        <p class="blog-hero__lead">
+          Apuntes de desarrollo, datos y despliegue. Todo lo que publico aquí nace en el
+          CMS, se mide con el colector de métricas y puede exportarse como HTML estático.
+        </p>
+        <div class="blog-hero__tags" aria-label="Tecnologías del blog">
+          <span>CMS API-First</span>
+          <span>MongoDB Atlas</span>
+          <span>GraphQL</span>
+          <span>Generador estático</span>
         </div>
       </div>
     </section>
 
-    <!-- ===== Publicidad (gestionada desde el CMS) ===== -->
-    <section class="section ad-section" id="publicidad" data-landing-ad hidden aria-labelledby="t-ad">
-      <div class="wrap">
-        <div class="ad" data-ad-card>
-          <div class="ad__media" data-ad-media hidden>
-            <img data-ad-image alt="">
-          </div>
-          <div class="ad__body">
-            <p class="ad__subtitle" data-ad-subtitle></p>
-            <h2 class="ad__title" id="t-ad" data-ad-title></h2>
-            <p class="ad__text" data-ad-text></p>
-            <a class="btn btn--solid ad__cta" data-ad-cta href="#contacto"></a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== 04 Certificaciones ===== -->
-    <section class="section" id="certificaciones" aria-labelledby="t-cert">
-      <div class="wrap">
-        <div class="section-head reveal">
-          <p class="mono-label"><b>04</b><span data-landing="sections.certifications.label">Conocimiento acreditado</span></p>
-          <h2 class="title" id="t-cert" data-landing="sections.certifications.title">Certificaciones y Credenciales</h2>
-        </div>
-
-        <div class="grid-3" data-landing-certifications>
-          <a class="card cert reveal" data-landing-cert href="assets/cert-cpp.pdf" target="_blank" rel="noopener">
-            <div class="art art--dots cert__art" style="--c:var(--green)" aria-hidden="true">
-              <span class="cert__tag">C++ / 24</span><span class="cert__arc"></span>
-              <span class="cert__check">✓</span><span class="cert__bar"></span>
-            </div>
-            <div class="card__body">
-              <p class="cert__issuer">Código Facilito</p>
-              <h3>Curso profesional de C++</h3>
-              <span class="card__link">Ver PDF ↗</span>
-            </div>
-          </a>
-
-          <a class="card cert reveal" data-landing-cert style="--d:.08s" href="assets/cert-aws-cloud.pdf" target="_blank" rel="noopener">
-            <div class="art art--dots cert__art" style="--c:var(--blue)" aria-hidden="true">
-              <span class="cert__tag">NUBE / 24</span><span class="cert__arc"></span>
-              <span class="cert__check">✓</span><span class="cert__bar"></span>
-            </div>
-            <div class="card__body">
-              <p class="cert__issuer">AWS Academy</p>
-              <h3>AWS Academy Graduate - Cloud Foundations</h3>
-              <span class="card__link">Ver PDF ↗</span>
-            </div>
-          </a>
-
-          <a class="card cert reveal" data-landing-cert style="--d:.16s" href="assets/cert-google-so.pdf" target="_blank" rel="noopener">
-            <div class="art art--dots cert__art" style="--c:var(--purple)" aria-hidden="true">
-              <span class="cert__tag">SO / 24</span><span class="cert__arc"></span>
-              <span class="cert__check">✓</span><span class="cert__bar"></span>
-            </div>
-            <div class="card__body">
-              <p class="cert__issuer">Google</p>
-              <h3>Soporte de sistemas operativos</h3>
-              <span class="card__link">Ver PDF ↗</span>
-            </div>
-          </a>
-
-          <a class="card cert reveal" data-landing-cert href="assets/cert-cisco-redes.pdf" target="_blank" rel="noopener">
-            <div class="art art--dots cert__art" style="--c:var(--blue)" aria-hidden="true">
-              <span class="cert__tag">RED / 25</span><span class="cert__arc"></span>
-              <span class="cert__check">✓</span><span class="cert__bar"></span>
-            </div>
-            <div class="card__body">
-              <p class="cert__issuer">Cisco Networking Academy</p>
-              <h3>Conceptos básicos de redes</h3>
-              <span class="card__link">Ver PDF ↗</span>
-            </div>
-          </a>
-
-          <a class="card cert reveal" data-landing-cert style="--d:.08s" href="assets/cert-cisco-iot.pdf" target="_blank" rel="noopener">
-            <div class="art art--dots cert__art" style="--c:var(--green)" aria-hidden="true">
-              <span class="cert__tag">IOT / 25</span><span class="cert__arc"></span>
-              <span class="cert__check">✓</span><span class="cert__bar"></span>
-            </div>
-            <div class="card__body">
-              <p class="cert__issuer">Cisco Networking Academy</p>
-              <h3>Introducción al IoT y Transformación Digital</h3>
-              <span class="card__link">Ver PDF ↗</span>
-            </div>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== 05 Notas y Experimentación ===== -->
+    <!-- ===== Notas ===== -->
     <section class="section" id="notas" aria-labelledby="t-notas">
       <div class="wrap">
         <div class="section-head reveal">
-          <p class="mono-label"><b>05</b><span data-landing="sections.notes.label">Bitácora publicada</span></p>
-          <h2 class="title" id="t-notas" data-landing="sections.notes.title">Notas y Experimentación</h2>
+          <p class="mono-label"><b>ARTÍCULOS</b>Publicaciones recientes</p>
+          <h2 class="title" id="t-notas">Últimas entradas</h2>
         </div>
 
         <div class="grid-3" data-notes-grid>
@@ -307,32 +122,21 @@
       </div>
     </section>
 
-    <!-- ===== Contacto ===== -->
-    <section class="section contact" id="contacto" aria-labelledby="t-contacto">
+    <!-- ===== CTA portafolio ===== -->
+    <section class="section contact" aria-labelledby="t-portafolio">
       <div class="wrap">
-        <p class="mono-label contact__kicker reveal" data-landing="contact.kicker">Construyamos algo juntos</p>
-        <h2 id="t-contacto" class="reveal" style="--d:.08s"><span data-landing="contact.title">¿Tienes una idea?</span> <span data-landing="contact.accent">Hablemos.</span></h2>
-        <p class="contact__message reveal" style="--d:.12s" data-landing="contact.message">Estoy abierto a proyectos, colaboraciones y oportunidades para seguir aprendiendo.</p>
-
-        <div class="contact__links reveal" style="--d:.16s">
-          <a href="https://github.com/Leonardo251207" target="_blank" rel="noopener noreferrer" data-landing-href="contact.github">
-            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-            GitHub
-          </a>
-          <a href="https://www.linkedin.com/in/leonardo-nucamendi-703b48441/" target="_blank" rel="noopener noreferrer" data-landing-href="contact.linkedin">
-            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 5.5h3V15H1V5.5zM2.5 1a1.75 1.75 0 1 1 0 3.5 1.75 1.75 0 0 1 0-3.5zM6 5.5h2.9v1.3h.04c.4-.76 1.4-1.56 2.88-1.56 3.08 0 3.65 2.03 3.65 4.66V15h-3v-4.6c0-1.1-.02-2.5-1.52-2.5s-1.76 1.2-1.76 2.43V15H6V5.5z"/></svg>
-            LinkedIn
-          </a>
-          <a href="mailto:" class="btn-correo" data-email-link data-landing-email="contact.email">
-            <svg viewBox="0 0 16 16" aria-hidden="true" width="16" height="16">
-              <path fill="currentColor" d="M1 3h14a1 1 0 0 1 1 1v.4L8 9 0 4.4V4a1 1 0 0 1 1-1zm-1 3.1V12a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V6.1L8 10.7 0 6.1z"/>
-            </svg>
-            <span id="texto-correo" aria-live="polite">Correo</span>
-          </a>
+        <p class="mono-label contact__kicker reveal">Fuera del blog</p>
+        <h2 id="t-portafolio" class="reveal" style="--d:.08s">Mira el <span>portafolio.</span></h2>
+        <p class="blog-hero__lead reveal" style="--d:.12s">
+          Proyectos, certificaciones y la persona detrás de estas notas.
+        </p>
+        <div class="blog-cta reveal" style="--d:.16s">
+          <a class="btn btn--solid" href="https://mi-landing-devblog.vercel.app/">Ir al portafolio <span class="arrow" aria-hidden="true">→</span></a>
+          <small>landing · proyectos · contacto</small>
         </div>
 
         <div class="footer-bar">
-          <span data-landing="contact.footer">© 2025 Leonardo Nucamendi — creado con intención</span>
+          <span>© 2026 Leonardo Nucamendi — creado con intención</span>
           <span><a href="admin.html">Consola CMS</a> · <a href="#top">Volver arriba ↑</a></span>
         </div>
       </div>
@@ -342,7 +146,6 @@
   <script src="api-config.js"></script>
   <script src="metrics.js"></script>
   <script src="api.js"></script>
-  <script src="landing.js"></script>
   <script src="notes.js"></script>
   <script src="script.js"></script>
 </body>

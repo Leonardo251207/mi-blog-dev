@@ -4,8 +4,11 @@
 
 <br>
 
+<a href="https://mi-landing-devblog.vercel.app/">
+  <img src="https://img.shields.io/badge/Portafolio-Live-3df0a8?style=for-the-badge&logo=vercel&logoColor=0b0f0e" alt="Portafolio">
+</a>
 <a href="https://mi-blog-dev.vercel.app/">
-  <img src="https://img.shields.io/badge/Vercel-Live-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel">
+  <img src="https://img.shields.io/badge/Blog-Live-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Blog">
 </a>
 <a href="https://leonardo251207.github.io/mi-blog-dev/">
   <img src="https://img.shields.io/badge/GitHub%20Pages-Live-222222?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Pages">
@@ -25,7 +28,7 @@
 
 # DevBlog_
 
-**CMS API-First + blog estático + landing editable + publicidad + métricas con GraphQL + generador de HTML estático.**
+**CMS API-First + blog + landing editable en repo aparte + publicidad + métricas con GraphQL + generador de HTML estático.**
 
 Proyecto de Aplicaciones Web construido con FastAPI, MongoDB Atlas, Render,
 Vercel y GitHub Pages.
@@ -39,10 +42,23 @@ Vercel y GitHub Pages.
 
 ---
 
+## Dos repositorios, un ecosistema
+
+| Repositorio | Contenido |
+|---|---|
+| **mi-blog-dev** (este) | Blog, consola CMS, CMS API, métricas y generador estático. |
+| **[mi-landing-devblog](https://github.com/Leonardo251207/mi-landing-devblog)** | Portafolio: hero, tecnologías, proyectos, certificaciones, blog y contacto. |
+
+La landing vive en su propio repositorio desplegado en Vercel y GitHub Pages.
+Sigue siendo **editable desde este CMS**: la consola publica el contenido y la
+landing lo consume por API. La publicidad también se administra aquí.
+
 ## Demo en vivo
 
 | Recurso | URL |
 |---|---|
+| Portafolio (Vercel) | <https://mi-landing-devblog.vercel.app/> |
+| Portafolio (GitHub Pages) | <https://leonardo251207.github.io/mi-landing-devblog/> |
 | Blog en Vercel | <https://mi-blog-dev.vercel.app/> |
 | Blog en GitHub Pages | <https://leonardo251207.github.io/mi-blog-dev/> |
 | Consola CMS | <https://mi-blog-dev.vercel.app/admin.html> |
@@ -59,8 +75,9 @@ Vercel y GitHub Pages.
 ```mermaid
 flowchart LR
   subgraph Cliente
-    B["Blog + landing<br/>Vercel / GitHub Pages"]
-    A["Consola CMS<br/>blog · landing · métricas"]
+    B["Blog<br/>Vercel / GitHub Pages"]
+    L["Landing editable<br/>repo mi-landing-devblog"]
+    A["Consola CMS<br/>blog · landing · publicidad"]
   end
 
   subgraph Render
@@ -73,6 +90,8 @@ flowchart LR
 
   B -->|REST /api/v1| C
   B -->|beacon /v1/collect| M
+  L -->|landing /api/v1| C
+  L -->|beacon /v1/collect| M
   A -->|CRUD /api/v1| C
   A -->|POST /api/v1/pages| G
   C --> D
@@ -84,8 +103,8 @@ flowchart LR
 | Módulo | Qué hace |
 |---|---|
 | **CMS API** | 12 endpoints de blog + 11 de landing, publicidad y métricas. UUIDv7, slug único, cursor firmado, idempotencia, rate limit, ETag/304 y errores uniformes. |
-| **Blog** | Portada dinámica, artículo por slug, Markdown seguro, registro de vistas y respaldo estático si la API no responde. |
-| **Landing editable** | La consola edita el contenido de `index.html` (hero, secciones, proyectos, certificaciones y contacto) con borrador y publicación separados. |
+| **Blog** | Portada con las últimas entradas, artículo por slug, Markdown seguro, registro de vistas y respaldo estático si la API no responde. |
+| **Landing editable** | Vive en `mi-landing-devblog`. La consola edita su contenido (hero, secciones, proyectos, certificaciones y contacto) con borrador y publicación separados. |
 | **Publicidad** | Anuncio configurable desde el CMS: textos, llamada a la acción, imagen, disposición y colores. Solo se muestra si está activo. |
 | **Consola CMS** | Pestañas de Blog, Landing y Publicidad, y Métricas; vista previa Markdown y generación de HTML estático. |
 | **Métricas** | Beacon ligero, pageviews, sesiones, rutas, hosts, consultas GraphQL y resumen dentro de la consola. |
@@ -111,6 +130,10 @@ Abre <http://127.0.0.1:5500/> y la consola en
 
 > Si PowerShell bloquea scripts:
 > `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
+
+La landing es independiente: clona
+[`mi-landing-devblog`](https://github.com/Leonardo251207/mi-landing-devblog) y
+sirve la raíz con `python -m http.server 5599`.
 
 La guía completa de puertos, tokens, estructura y pruebas está en
 [`docs/GUIA_LOCAL.md`](docs/GUIA_LOCAL.md). Para publicarlo en internet:

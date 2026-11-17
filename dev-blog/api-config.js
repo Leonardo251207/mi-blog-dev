@@ -10,7 +10,11 @@
   const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
   const metricsKey = "pk_live_devblog_7f3a9c2e5b1d4a8f9c0e6b2d7a4f1c8e";
 
+  const BLOG_BASE_URL = "https://mi-blog-dev.vercel.app";
+
   const local = {
+    BLOG_BASE_URL,
+    LANDING_BASE_URL: "http://127.0.0.1:5599",
     API_BASE_URL: "http://127.0.0.1:8080/api/v1",
     PUBLIC_TOKEN: "public-dev-token",
     METRICS_ENABLED: true,
@@ -21,6 +25,8 @@
   };
 
   const production = {
+    BLOG_BASE_URL,
+    LANDING_BASE_URL: "https://mi-landing-devblog.vercel.app",
     API_BASE_URL: "https://devblog-cms-leonardo.onrender.com/api/v1",
     PUBLIC_TOKEN: "pub_live_devblog_2026",
     METRICS_ENABLED: true,

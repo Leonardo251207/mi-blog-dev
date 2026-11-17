@@ -25,7 +25,7 @@ services:
       - key: CMS_CURSOR_SECRET
         generateValue: true
       - key: CMS_CORS_ORIGINS
-        value: https://mi-blog-dev.vercel.app,https://leonardo251207.github.io,http://localhost:5500,http://127.0.0.1:5500
+        value: https://mi-blog-dev.vercel.app,https://mi-landing-devblog.vercel.app,https://leonardo251207.github.io,http://localhost:5500,http://127.0.0.1:5500
       - key: CMS_PUBLIC_SITE_URL
         value: https://mi-blog-dev.vercel.app
       - key: CMS_PUBLIC_ARTICLE_PATH
@@ -68,7 +68,7 @@ services:
       - key: IP_HASH_SALT
         generateValue: true
       - key: CORS_ORIGINS
-        value: https://mi-blog-dev.vercel.app,https://leonardo251207.github.io,http://localhost:5500,http://127.0.0.1:5500
+        value: https://mi-blog-dev.vercel.app,https://mi-landing-devblog.vercel.app,https://leonardo251207.github.io,http://localhost:5500,http://127.0.0.1:5500
       - key: BOOTSTRAP_FILE
         value: config/bootstrap.prod.yaml
       - key: BOOTSTRAP_ON_START
