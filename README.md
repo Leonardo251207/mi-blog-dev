@@ -156,6 +156,7 @@ cd API\devblog-cms-api-1.2\devblog-cms-api
 ## Documentación
 
 - [Guía local y de integración](docs/GUIA_LOCAL.md)
+- [Análisis de Figma Make + prompt de diseño](docs/PROMPT_FIGMA_MAKE.md)
 - [Despliegue en Render + MongoDB Atlas](DEPLOY_RENDER.md)
 - [Servicios del ecosistema](pendiente/README_DESPLIEGUE.md)
 - [README del CMS](API/devblog-cms-api-1.2/devblog-cms-api/README.md)
