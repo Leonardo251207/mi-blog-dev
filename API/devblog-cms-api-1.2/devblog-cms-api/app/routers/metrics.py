@@ -22,7 +22,7 @@ _COMMON = {401: _ERR, 403: _ERR, 429: _ERR}
             summary="Resumen de tráfico del sitio",
             responses={**_COMMON, 422: _ERR})
 def metrics_overview(principal: ConsolePrincipal, settings: SettingsDep,
-                     days: Annotated[int, Query(ge=1, le=90)] = 7,
+                     days: Annotated[int, Query(ge=1, le=365)] = 7,
                      grano: Annotated[Literal["DIA", "HORA"], Query()] = "DIA"):
     """KPIs, rutas y serie temporal del sitio configurado en `CMS_METRICS_SITE`."""
     return schemas.MetricsOverview(**overview(settings, days=days, grano=grano))
