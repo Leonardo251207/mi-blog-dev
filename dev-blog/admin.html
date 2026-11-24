@@ -321,7 +321,14 @@
               <aside class="editor-pro__preview-pane" aria-label="Vista previa del artículo">
                 <header class="editor-pro__pane-head">
                   <span class="mono-label"><b>VISTA PREVIA</b> Artículo</span>
-                  <span id="preview-stats" class="editor-pro__preview-stats"></span>
+                  <div class="editor-pro__preview-tools">
+                    <span id="preview-stats" class="editor-pro__preview-stats"></span>
+                    <select id="preview-viewport" aria-label="Tamaño de la vista previa">
+                      <option value="auto">Auto</option>
+                      <option value="760">Tablet 760</option>
+                      <option value="390">Móvil 390</option>
+                    </select>
+                  </div>
                 </header>
                 <div id="preview" class="md admin__preview"></div>
                 <p id="preview-empty" class="admin__empty">Escribe el título y el contenido para ver la vista previa.</p>

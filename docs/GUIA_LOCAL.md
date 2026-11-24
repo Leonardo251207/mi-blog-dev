@@ -108,7 +108,9 @@ mi-blog-dev/
 ├── dev-blog/                         # Blog estático + consola CMS
 │   ├── index.html                    # Portada del blog (últimas entradas)
 │   ├── articulo.html                 # Artículo dinámico por slug
-│   ├── admin.html                    # Consola: blog, landing, publicidad y métricas
+│   ├── admin.html                    # Consola: dashboard, blog, landing, publicidad y métricas
+│   ├── dashboard.js / dashboard.css  # Dashboard analítico
+│   ├── editor-pro.js / editor-pro.css# Editor enriquecido
 │   ├── api.js / api-config.js
 │   ├── metrics.js                    # Beacon de métricas
 │   └── generated/                    # Artefactos HTML del generador

@@ -565,3 +565,24 @@
     grid-template-columns: 1fr;
   }
 }
+
+.editor-pro__preview-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editor-pro__preview-tools select {
+  padding: 4px 6px;
+  background: var(--panel);
+  border: 1px solid var(--line-2);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 8px;
+}
+
+.editor-pro__preview-pane .admin__preview {
+  width: 100%;
+  max-width: var(--preview-width, 100%);
+  margin-inline: auto;
+}

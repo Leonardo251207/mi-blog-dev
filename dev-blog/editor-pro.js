@@ -25,6 +25,7 @@
   const preview = $("#preview");
   const previewEmpty = $("#preview-empty");
   const previewStats = $("#preview-stats");
+  const previewViewport = $("#preview-viewport");
   const workspace = $("#editor-workspace");
   const grid = $("#blog-grid");
 
@@ -619,6 +620,11 @@
 
   // ------------------------------------------------------------- eventos
   function bind() {
+    previewViewport?.addEventListener("change", () => {
+      const value = previewViewport.value;
+      preview.style.setProperty("--preview-width", value === "auto" ? "100%" : `${value}px`);
+    });
+
     $("#editor-view-split")?.addEventListener("click", () => setViewMode("split"));
     $("#editor-view-preview")?.addEventListener("click", () => setViewMode("preview"));
     $("#editor-view-edit")?.addEventListener("click", () => setViewMode("edit"));
