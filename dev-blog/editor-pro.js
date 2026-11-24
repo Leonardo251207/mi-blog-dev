@@ -218,13 +218,18 @@
   }
 
   // ------------------------------------------------------------- tipografía
+  function quoteFont(value) {
+    const clean = String(value || "Manrope").replace(/^['"]|['"]$/g, "");
+    return `'${clean}'`;
+  }
+
   function renderTypography() {
     const heading = fontHeading.value || "Manrope";
     const body = fontBody.value || "Manrope";
     const code = fontCode.value || "'JetBrains Mono'";
-    preview.style.setProperty("--preview-heading-font", `'${heading}', sans-serif`);
-    preview.style.setProperty("--preview-body-font", `'${body}', sans-serif`);
-    preview.style.setProperty("--preview-code-font", `${code}, monospace`);
+    preview.style.setProperty("--preview-heading-font", `${quoteFont(heading)}, sans-serif`);
+    preview.style.setProperty("--preview-body-font", `${quoteFont(body)}, sans-serif`);
+    preview.style.setProperty("--preview-code-font", `${quoteFont(code)}, monospace`);
     preview.style.setProperty("--preview-font-size", `${Number(fontSize.value) || 16}px`);
     preview.style.setProperty("--preview-line-height", String(Number(lineHeight.value) || 1.7));
     renderPreview();
@@ -472,6 +477,7 @@
     state.mode = "idle";
     state.id = null;
     state.meta = defaultMeta({});
+    if (coverFile) coverFile.value = "";
     fillMetaFields();
     renderCover();
     renderPreview();
@@ -548,7 +554,13 @@
         date: dateInput.value,
         cover: coverUrl.value,
         seo: { title: seoTitle.value, description: seoDesc.value },
-        typography: state.meta?.typography || {},
+        typography: {
+          heading: fontHeading.value,
+          body: fontBody.value,
+          code: fontCode.value,
+          size: Number(fontSize.value) || 16,
+          lineHeight: Number(lineHeight.value) || 1.7,
+        },
         content: contentInput.value,
         stats: computeStats(),
       },
