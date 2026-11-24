@@ -104,12 +104,35 @@ flowchart LR
 |---|---|
 | **CMS API** | 12 endpoints de blog + 11 de landing, publicidad y métricas. UUIDv7, slug único, cursor firmado, idempotencia, rate limit, ETag/304 y errores uniformes. |
 | **Blog** | Portada con las últimas entradas, artículo por slug, Markdown seguro, registro de vistas y respaldo estático si la API no responde. |
+| **Dashboard** | Resumen de tráfico, sitios, periodos, artículos más leídos, distribución por host/ruta, ranking con búsqueda y exportación CSV. |
+| **Editor enriquecido** | Portada, inserción de bloques Markdown, vista dividida, inspector de publicación, tipografía, SEO e índice, y exportación Markdown/JSON. |
 | **Landing editable** | Vive en `mi-landing-devblog`. La consola edita su contenido (hero, secciones, proyectos, certificaciones y contacto) con borrador y publicación separados. |
 | **Publicidad** | Anuncio configurable desde el CMS: textos, llamada a la acción, imagen, disposición y colores. Solo se muestra si está activo. |
 | **Consola CMS** | Pestañas de Blog, Landing y Publicidad, y Métricas; vista previa Markdown y generación de HTML estático. |
 | **Métricas** | Beacon ligero, pageviews, sesiones, rutas, hosts, consultas GraphQL y resumen dentro de la consola. |
 | **Generador** | Convierte una instantánea del artículo en un artefacto HTML con checksum SHA-256. |
 | **Documentación** | Contrato v1.2, Anexo D de implementación y guías de despliegue. |
+
+## Panel adaptado del profesor
+
+La consola integra las funciones del panel `cms-view` con la identidad y la API
+de este proyecto:
+
+- **Dashboard analítico** con selector de sitios, periodos, resumen global,
+  sitio destacado, histograma de artículos, distribución de tráfico y ranking
+  con búsqueda, límite y CSV.
+- **Sitios administrados**: blog y portafolio vienen preconfigurados; puedes
+  agregar otros dominios desde el dashboard (se guardan en el navegador).
+- **Editor tipo CMS**: portada, barra de bloques Markdown, vista dividida,
+  inspector de publicación, tipografía, SEO e índice, autoguardado local y
+  exportación Markdown/JSON.
+- **Datos reales**: el tráfico sale del colector (a través del backend) y las
+  vistas por artículo salen del CMS. La “retención” del panel original se
+  adaptó a **tiempo promedio de lectura**, porque el contrato de métricas no
+  expone retención por usuario.
+- Los campos editoriales que el contrato actual no guarda (portada, SEO,
+  tipografía, estado “en revisión”) se conservan en `localStorage`. El CMS
+  sigue guardando título, slug, etiquetas y Markdown.
 
 ## Stack
 

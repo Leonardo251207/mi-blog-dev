@@ -122,6 +122,7 @@
     preview.hidden = true;
     previewVisible = false;
     previewBtn.textContent = "Vista previa";
+    window.DevBlogEditorPro?.setMode(next, currentId);
   }
 
   function clearForm() {
@@ -132,6 +133,7 @@
     preview.replaceChildren();
     staticResult.hidden = true;
     staticResult.replaceChildren();
+    window.DevBlogEditorPro?.clear();
   }
 
   function fillForm(data) {
@@ -142,6 +144,7 @@
     preview.replaceChildren();
     staticResult.hidden = true;
     staticResult.replaceChildren();
+    window.DevBlogEditorPro?.load({ mode, id: currentId, data });
   }
 
   function readForm() {
@@ -479,11 +482,13 @@
         const created = await adminApi.createDraft(token, data);
         currentId = created.post_id;
         slugInput.value = created.slug;
+        window.DevBlogEditorPro?.saved(created.post_id);
         setMode("draft");
         setStatus(`Borrador creado: ${created.slug}`, "ok");
       } else {
         const updated = await adminApi.updateDraft(token, currentId, data);
         slugInput.value = updated.slug;
+        window.DevBlogEditorPro?.saved(currentId);
         setStatus(`Borrador actualizado: ${updated.slug}`, "ok");
       }
       await loadDrafts({ reset: true });
@@ -571,10 +576,10 @@
       setMode("idle");
       clearForm();
       await refreshLists();
-      activateTab("blog");
+      activateTab("dashboard");
       loadLanding();
       loadAds();
-      setStatus("Conectado. Elige un borrador, edita la landing o revisa las métricas.", "ok");
+      setStatus("Conectado. Revisa el dashboard, elige un borrador o edita la landing.", "ok");
     } catch (error) {
       sessionStorage.removeItem("devblog_console_token");
       token = "";
@@ -653,6 +658,7 @@
   //  Pestañas: Blog · Landing y publicidad · Métricas
   // ================================================================
   const TAB_PANELS = {
+    dashboard: $("#panel-dashboard"),
     blog: $("#panel-blog"),
     landing: $("#panel-landing"),
     metrics: $("#panel-metrics"),
@@ -673,6 +679,7 @@
       if (!landingContent) loadLanding();
       if (!ads.length) loadAds();
     }
+    document.dispatchEvent(new CustomEvent("devblog:tab", { detail: { name: target } }));
   }
 
   // ================================================================

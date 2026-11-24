@@ -13,6 +13,8 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="article.css">
   <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="editor-pro.css">
   <script>document.documentElement.classList.add('js')</script>
 </head>
 <body class="admin-page">
@@ -59,6 +61,8 @@
           <h1>Consola CMS</h1>
         </div>
         <div class="admin__tabs" role="tablist" aria-label="Secciones de la consola">
+          <button class="admin__tab" id="tab-dashboard" type="button"
+                  role="tab" aria-selected="false" aria-controls="panel-dashboard" data-tab="dashboard">Dashboard</button>
           <button class="admin__tab is-active" id="tab-blog" type="button"
                   role="tab" aria-selected="true" aria-controls="panel-blog" data-tab="blog">Blog</button>
           <button class="admin__tab" id="tab-landing" type="button"
@@ -67,6 +71,141 @@
                   role="tab" aria-selected="false" aria-controls="panel-metrics" data-tab="metrics">Métricas</button>
         </div>
       </div>
+
+      <!-- =========================== DASHBOARD ========================== -->
+      <section id="panel-dashboard" class="admin__panel" role="tabpanel" aria-labelledby="tab-dashboard" hidden>
+        <div class="dash">
+          <header class="dash__head">
+            <div>
+              <p class="mono-label"><b>00</b> Analítica del ecosistema</p>
+              <h2>Dashboard</h2>
+              <p class="admin__lead">
+                Tráfico real del blog y del portafolio, vistas acumuladas por artículo y
+                rendimiento de las publicaciones del CMS.
+              </p>
+            </div>
+            <div class="dash__actions">
+              <label class="dash__field" for="dash-site">Sitio
+                <select id="dash-site">
+                  <option value="all">Todos los sitios</option>
+                </select>
+              </label>
+              <button class="btn btn--ghost" id="dash-add-site" type="button">+ Sitio</button>
+              <button class="btn btn--ghost" id="dash-refresh" type="button" title="Actualizar dashboard">↻</button>
+              <button class="btn btn--solid" id="dash-export" type="button">Exportar CSV</button>
+            </div>
+          </header>
+
+          <div class="dash__periods">
+            <span class="mono-label">Periodo</span>
+            <div class="dash__period-pills" role="group" aria-label="Periodo del dashboard">
+              <button type="button" data-period="1d">1 día</button>
+              <button type="button" data-period="1w" class="is-active">1 semana</button>
+              <button type="button" data-period="2w">2 semanas</button>
+              <button type="button" data-period="1m">1 mes</button>
+              <button type="button" data-period="3m">3 meses</button>
+              <button type="button" data-period="1y">1 año</button>
+            </div>
+            <p class="dash__scope" id="dash-scope">Todos los sitios · Última semana (7 días)</p>
+          </div>
+
+          <p id="dash-status" class="admin__status" role="status"></p>
+
+          <div class="dash__summary">
+            <article class="dash__card">
+              <header>
+                <div>
+                  <h3>Resumen global</h3>
+                  <p class="dash__sub">Todos los sitios administrados agrupados en el periodo</p>
+                </div>
+                <span class="dash__tag" id="dash-summary-scope">—</span>
+              </header>
+              <div id="dash-kpis" class="dash__kpis"></div>
+            </article>
+
+            <article class="dash__card">
+              <header>
+                <div>
+                  <h3 id="dash-focus-name">Sitio destacado</h3>
+                  <p class="dash__sub" id="dash-focus-host">—</p>
+                </div>
+                <span class="dash__tag">Foco</span>
+              </header>
+              <div id="dash-focus-kpis" class="dash__kpis"></div>
+            </article>
+          </div>
+
+          <div class="dash__charts">
+            <article class="dash__card">
+              <header>
+                <div>
+                  <h3>Artículos más leídos</h3>
+                  <p class="dash__sub">Vistas acumuladas por publicación</p>
+                </div>
+                <div class="dash__seg" role="group" aria-label="Modo del histograma">
+                  <button type="button" data-hist-mode="posts" class="is-active">Artículos</button>
+                  <button type="button" data-hist-mode="sites">Sitios</button>
+                </div>
+              </header>
+              <div id="dash-histogram" class="dash__hist"></div>
+            </article>
+
+            <article class="dash__card">
+              <header>
+                <div>
+                  <h3>Distribución del tráfico</h3>
+                  <p class="dash__sub">Pageviews por host o por ruta</p>
+                </div>
+                <div class="dash__seg" role="group" aria-label="Modo del gráfico circular">
+                  <button type="button" data-pie-mode="hosts" class="is-active">Hosts</button>
+                  <button type="button" data-pie-mode="routes">Rutas</button>
+                  <button type="button" data-pie-style="pie" class="is-active">Pastel</button>
+                  <button type="button" data-pie-style="donut">Dona</button>
+                </div>
+              </header>
+              <div class="dash__pie-wrap">
+                <div id="dash-pie" class="dash__pie" role="img" aria-label="Distribución del tráfico"></div>
+                <ul id="dash-pie-legend" class="dash__legend"></ul>
+              </div>
+            </article>
+          </div>
+
+          <article class="dash__card dash__ranking">
+            <header>
+              <div>
+                <h3>Ranking de artículos</h3>
+                <p class="dash__sub" id="dash-ranking-sub">Ordenado por vistas acumuladas</p>
+              </div>
+              <div class="dash__ranking-actions">
+                <input id="dash-search" type="search" placeholder="Buscar artículo o etiqueta…" aria-label="Buscar artículo">
+                <select id="dash-limit" aria-label="Número de artículos">
+                  <option value="10">Top 10</option>
+                  <option value="20">Top 20</option>
+                  <option value="50">Top 50</option>
+                </select>
+              </div>
+            </header>
+            <div class="dash__table-wrap">
+              <table class="dash__table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Artículo</th>
+                    <th>Etiquetas</th>
+                    <th>Vistas</th>
+                    <th>Vs. media</th>
+                    <th>Lectura</th>
+                    <th>Publicado</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-ranking-body">
+                  <tr><td colspan="7">Conecta la consola y actualiza el dashboard.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </div>
+      </section>
 
       <!-- ============================= BLOG ============================= -->
       <section id="panel-blog" class="admin__panel" role="tabpanel" aria-labelledby="tab-blog">
@@ -78,7 +217,7 @@
           <button class="btn btn--solid" id="new-draft" type="button">+ Nuevo borrador</button>
         </div>
 
-        <div class="admin__grid">
+        <div class="admin__grid" id="blog-grid">
           <aside class="admin__list" aria-label="Borradores y publicaciones">
             <div class="admin__list-head">
               <h2>Borradores</h2>
@@ -96,40 +235,177 @@
           </aside>
 
           <section class="admin__editor" aria-label="Editor de contenido">
-            <form id="draft-form">
-              <fieldset id="editor-fields" class="admin__fields" disabled>
-                <div class="admin__row">
-                  <label for="f-title">Título
-                    <input id="f-title" type="text" minlength="5" maxlength="120" required>
-                  </label>
-                  <label for="f-slug">Slug
-                    <input id="f-slug" type="text" maxlength="100" placeholder="se-genera-desde-el-titulo">
-                  </label>
+            <div class="editor-pro__top">
+              <div class="editor-pro__top-left">
+                <span id="editor-status-pill" class="editor-pro__status" data-status="draft">Borrador</span>
+                <span id="editor-save-label" class="editor-pro__save">● Guardado local</span>
+                <span id="editor-stats" class="editor-pro__stats">0 palabras · 0 min</span>
+              </div>
+              <div class="editor-pro__top-right">
+                <div class="editor-pro__seg" role="group" aria-label="Vista del editor">
+                  <button type="button" id="editor-view-split" class="is-active">Dividida</button>
+                  <button type="button" id="editor-view-preview">Vista previa</button>
+                  <button type="button" id="editor-view-edit">Editor</button>
+                </div>
+                <button class="btn btn--ghost" id="editor-focus" type="button">Enfoque</button>
+                <button class="btn btn--ghost" id="editor-export" type="button">Exportar</button>
+              </div>
+            </div>
+
+            <div class="editor-pro__workspace is-split" id="editor-workspace">
+              <div class="editor-pro__main">
+                <form id="draft-form">
+                  <fieldset id="editor-fields" class="admin__fields" disabled>
+                    <div class="editor-pro__cover">
+                      <div class="editor-pro__cover-preview" id="cover-preview">
+                        <span>Sin portada</span>
+                      </div>
+                      <div class="editor-pro__cover-fields">
+                        <label for="f-cover-url">Portada (URL)
+                          <input id="f-cover-url" type="text" maxlength="500" placeholder="assets/portada.jpg">
+                        </label>
+                        <label class="editor-pro__file" for="f-cover-file">Subir imagen
+                          <input id="f-cover-file" type="file" accept="image/*">
+                        </label>
+                        <button class="btn btn--ghost" type="button" id="f-cover-clear">Quitar portada</button>
+                      </div>
+                    </div>
+
+                    <div class="admin__row">
+                      <label for="f-title">Título
+                        <input id="f-title" type="text" minlength="5" maxlength="120" required>
+                      </label>
+                      <label for="f-slug">Slug
+                        <input id="f-slug" type="text" maxlength="100" placeholder="se-genera-desde-el-titulo">
+                      </label>
+                    </div>
+
+                    <label for="f-tags">Etiquetas
+                      <input id="f-tags" type="text" placeholder="tutorial, deployment">
+                    </label>
+
+                    <div class="editor-pro__toolbar" role="toolbar" aria-label="Insertar bloque">
+                      <span class="editor-pro__toolbar-label">Insertar</span>
+                      <button type="button" data-block="paragraph">¶ Párrafo</button>
+                      <button type="button" data-block="h2">H2</button>
+                      <button type="button" data-block="h3">H3</button>
+                      <button type="button" data-block="code">&lt;/&gt; Código</button>
+                      <button type="button" data-block="callout">💡 Nota</button>
+                      <button type="button" data-block="list">• Lista</button>
+                      <button type="button" data-block="quote">“ Cita</button>
+                      <button type="button" data-block="image">▧ Imagen</button>
+                      <button type="button" data-block="divider">— Divisor</button>
+                    </div>
+
+                    <label for="f-content">Contenido (Markdown)
+                      <textarea id="f-content" rows="20" required></textarea>
+                    </label>
+
+                    <div class="admin__actions">
+                      <button class="btn btn--solid" type="submit" id="save-draft" disabled>Guardar borrador</button>
+                      <button class="btn btn--ghost" type="button" id="publish-draft" disabled>Publicar</button>
+                      <button class="btn btn--ghost" type="button" id="delete-draft" disabled>Eliminar borrador</button>
+                      <button class="btn btn--ghost danger" type="button" id="delete-post" hidden>Eliminar publicación</button>
+                      <button class="btn btn--ghost" type="button" id="generate-static" disabled>Generar HTML estático</button>
+                      <button class="btn btn--ghost" type="button" id="toggle-preview" hidden>Vista previa</button>
+                    </div>
+                  </fieldset>
+                </form>
+
+                <div id="metrics" class="admin__metrics" hidden></div>
+                <div id="static-result" class="admin__metrics" hidden></div>
+                <p id="workspace-status" class="admin__status" role="status"></p>
+              </div>
+
+              <aside class="editor-pro__preview-pane" aria-label="Vista previa del artículo">
+                <header class="editor-pro__pane-head">
+                  <span class="mono-label"><b>VISTA PREVIA</b> Artículo</span>
+                  <span id="preview-stats" class="editor-pro__preview-stats"></span>
+                </header>
+                <div id="preview" class="md admin__preview"></div>
+                <p id="preview-empty" class="admin__empty">Escribe el título y el contenido para ver la vista previa.</p>
+              </aside>
+
+              <aside class="editor-pro__inspector" aria-label="Inspector del artículo">
+                <div class="editor-pro__inspector-tabs" role="tablist" aria-label="Inspector">
+                  <button type="button" class="is-active" data-inspector="publish">Publicación</button>
+                  <button type="button" data-inspector="typography">Tipografía</button>
+                  <button type="button" data-inspector="seo">SEO</button>
+                  <button type="button" data-inspector="toc">Índice</button>
                 </div>
 
-                <label for="f-tags">Etiquetas
-                  <input id="f-tags" type="text" placeholder="tutorial, deployment">
-                </label>
+                <section class="editor-pro__inspector-panel" data-inspector-panel="publish">
+                  <label for="f-status">Estado editorial
+                    <select id="f-status">
+                      <option value="draft">Borrador</option>
+                      <option value="review">En revisión</option>
+                      <option value="published">Publicado</option>
+                    </select>
+                  </label>
+                  <label for="f-category">Categoría
+                    <input id="f-category" type="text" maxlength="60" placeholder="Tutorial">
+                  </label>
+                  <label for="f-author">Autor
+                    <input id="f-author" type="text" maxlength="80" placeholder="Leonardo Nucamendi">
+                  </label>
+                  <label for="f-date">Fecha de publicación
+                    <input id="f-date" type="date">
+                  </label>
+                  <p class="editor-pro__hint">El estado y los metadatos editoriales se guardan en este navegador. El CMS guarda título, slug, etiquetas y Markdown.</p>
+                </section>
 
-                <label for="f-content">Contenido (Markdown)
-                  <textarea id="f-content" rows="16" required></textarea>
-                </label>
+                <section class="editor-pro__inspector-panel" data-inspector-panel="typography" hidden>
+                  <label for="f-font-heading">Fuente de títulos
+                    <select id="f-font-heading">
+                      <option value="Manrope">Manrope</option>
+                      <option value="Inter">Inter</option>
+                      <option value="Georgia">Georgia</option>
+                      <option value="'JetBrains Mono'">JetBrains Mono</option>
+                    </select>
+                  </label>
+                  <label for="f-font-body">Fuente del cuerpo
+                    <select id="f-font-body">
+                      <option value="Manrope">Manrope</option>
+                      <option value="Inter">Inter</option>
+                      <option value="Georgia">Georgia</option>
+                    </select>
+                  </label>
+                  <label for="f-font-code">Fuente de código
+                    <select id="f-font-code">
+                      <option value="'JetBrains Mono'">JetBrains Mono</option>
+                      <option value="Consolas">Consolas</option>
+                      <option value="monospace">monospace</option>
+                    </select>
+                  </label>
+                  <label for="f-font-size">Tamaño base
+                    <input id="f-font-size" type="range" min="14" max="22" step="1" value="16">
+                  </label>
+                  <label for="f-line-height">Altura de línea
+                    <input id="f-line-height" type="range" min="1.3" max="1.9" step="0.05" value="1.7">
+                  </label>
+                  <p class="editor-pro__hint">La tipografía solo afecta la vista previa y la exportación JSON.</p>
+                </section>
 
-                <div class="admin__actions">
-                  <button class="btn btn--solid" type="submit" id="save-draft" disabled>Guardar borrador</button>
-                  <button class="btn btn--ghost" type="button" id="publish-draft" disabled>Publicar</button>
-                  <button class="btn btn--ghost" type="button" id="delete-draft" disabled>Eliminar borrador</button>
-                  <button class="btn btn--ghost danger" type="button" id="delete-post" hidden>Eliminar publicación</button>
-                  <button class="btn btn--ghost" type="button" id="generate-static" disabled>Generar HTML estático</button>
-                  <button class="btn btn--ghost" type="button" id="toggle-preview">Vista previa</button>
-                </div>
-              </fieldset>
-            </form>
+                <section class="editor-pro__inspector-panel" data-inspector-panel="seo" hidden>
+                  <label for="f-seo-title">Título SEO <small id="seo-title-count">0/60</small>
+                    <input id="f-seo-title" type="text" maxlength="60" placeholder="Título para buscadores">
+                  </label>
+                  <label for="f-seo-desc">Descripción SEO <small id="seo-desc-count">0/160</small>
+                    <textarea id="f-seo-desc" rows="3" maxlength="160" placeholder="Resumen para buscadores"></textarea>
+                  </label>
+                  <div class="editor-pro__serp">
+                    <span id="seo-preview-url">mi-blog-dev.vercel.app</span>
+                    <strong id="seo-preview-title">Título del artículo</strong>
+                    <p id="seo-preview-desc">Descripción del artículo para buscadores.</p>
+                  </div>
+                </section>
 
-            <div id="preview" class="md admin__preview" hidden></div>
-            <div id="metrics" class="admin__metrics" hidden></div>
-            <div id="static-result" class="admin__metrics" hidden></div>
-            <p id="workspace-status" class="admin__status" role="status"></p>
+                <section class="editor-pro__inspector-panel" data-inspector-panel="toc" hidden>
+                  <p class="editor-pro__hint">Encabezados detectados en el Markdown.</p>
+                  <ol id="editor-toc-list" class="editor-pro__toc"></ol>
+                </section>
+              </aside>
+            </div>
           </section>
         </div>
       </section>
@@ -437,6 +713,53 @@
         </div>
       </section>
     </section>
+
+    <div id="site-modal" class="admin__modal" hidden>
+      <div class="admin__modal-card" role="dialog" aria-modal="true" aria-labelledby="site-modal-title">
+        <p class="mono-label"><b>CMS</b> Nuevo sitio</p>
+        <h2 id="site-modal-title">Agregar sitio al dashboard</h2>
+        <p class="admin__lead">
+          El sitio se guarda en este navegador y filtra el tráfico por su dominio.
+          Usa el host exacto que reporta el colector de métricas.
+        </p>
+        <form id="site-form" autocomplete="off">
+          <label for="site-name">Nombre
+            <input id="site-name" type="text" maxlength="80" placeholder="Mi otro blog" required>
+          </label>
+          <label for="site-host">Dominio o dominios (separados por coma)
+            <input id="site-host" type="text" maxlength="300" placeholder="blog.ejemplo.com, ejemplo.github.io" required>
+          </label>
+          <label for="site-color">Color
+            <input id="site-color" type="color" value="#3df0a8">
+          </label>
+          <div class="admin__modal-actions">
+            <button class="btn btn--ghost" id="site-cancel" type="button">Cancelar</button>
+            <button class="btn btn--solid" type="submit">Agregar sitio</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="editor-export-modal" class="admin__modal" hidden>
+      <div class="admin__modal-card admin__modal-card--wide" role="dialog" aria-modal="true" aria-labelledby="export-title">
+        <div class="editor-pro__export-head">
+          <div>
+            <p class="mono-label"><b>EDITOR</b> Exportar</p>
+            <h2 id="export-title">Exportar artículo</h2>
+          </div>
+          <div class="editor-pro__seg" role="group" aria-label="Formato de exportación">
+            <button type="button" id="export-mode-md" class="is-active">Markdown</button>
+            <button type="button" id="export-mode-json">JSON</button>
+          </div>
+        </div>
+        <pre id="export-content" class="editor-pro__export-content"></pre>
+        <div class="admin__modal-actions">
+          <button class="btn btn--ghost" id="export-close" type="button">Cerrar</button>
+          <button class="btn btn--ghost" id="export-copy" type="button">Copiar</button>
+          <button class="btn btn--solid" id="export-download" type="button">Descargar</button>
+        </div>
+      </div>
+    </div>
   </main>
 
   <footer class="site-footer">
@@ -457,6 +780,8 @@
   <script src="api-config.js"></script>
   <script src="api.js"></script>
   <script src="admin.js"></script>
+  <script src="dashboard.js"></script>
+  <script src="editor-pro.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

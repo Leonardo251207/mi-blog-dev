@@ -189,6 +189,40 @@ python scripts\generate_static.py
 Los artefactos se guardan en `dev-blog/generated/{slug}.html` y también quedan
 servidos por el generador en `/api/v1/pages/{page_id}/content`.
 
+## Consola: dashboard y editor
+
+La consola adapta el panel del profesor (`cms-view`) a la API y al estilo de
+DevBlog_:
+
+### Dashboard
+
+- **Sitio**: Todos, DevBlog_ o Portafolio. También puedes agregar dominios
+  propios; se guardan en `localStorage`.
+- **Periodo**: 1 día, 1 semana, 2 semanas, 1 mes, 3 meses o 1 año.
+- **Resumen**: pageviews, visitantes únicos, sesiones y tiempo promedio de
+  lectura.
+- **Artículos más leídos**: vistas acumuladas de cada publicación.
+- **Distribución**: pageviews por host o por ruta, en pastel o dona.
+- **Ranking**: búsqueda, límite y exportación CSV.
+- Si el colector no responde, el dashboard muestra las vistas del CMS y un
+  aviso de error.
+
+### Editor
+
+- Portada por URL o archivo local.
+- Barra para insertar párrafo, H2, H3, código, nota, lista, cita, imagen y
+  divisor.
+- Vista dividida, solo editor o solo vista previa.
+- Inspector: publicación (estado, categoría, autor, fecha), tipografía, SEO e
+  índice.
+- Autoguardado local y exportación Markdown/JSON.
+- `Ctrl+S` guarda el borrador cuando el editor está activo.
+
+> El contrato del CMS guarda título, slug, etiquetas y Markdown. Portada, SEO,
+> tipografía y estado “en revisión” viven en `localStorage` porque el contrato
+> v1.2 no tiene esos campos. El estado real de publicación sigue siendo el del
+> CMS.
+
 ## Persistencia
 
 - **Local**: SQLite en `data/devblog.db` (no se versiona). Guarda posts,
