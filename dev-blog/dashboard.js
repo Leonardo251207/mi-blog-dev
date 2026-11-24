@@ -62,7 +62,7 @@
     period: localStorage.getItem(PERIOD_KEY) || "1w",
     site: localStorage.getItem(SITE_KEY) || "all",
     histMode: "posts",
-    pieMode: "hosts",
+    pieMode: "sites",
     pieStyle: "pie",
     search: "",
     limit: 10,
@@ -138,11 +138,6 @@
     return state.sites.find((site) =>
       (site.hosts || []).some((candidate) => hostKey(candidate) === key)
     );
-  }
-
-  function siteName(host) {
-    const site = siteOfHost(host);
-    return site ? site.name : host;
   }
 
   function siteColor(host, index = 0) {
@@ -454,18 +449,31 @@
         name: row.clave || "/",
         value: Number(row.valor) || 0,
       }));
-    } else {
+    } else if (state.pieMode === "hosts") {
       const byHost = new Map();
       (metrics.por_host || []).forEach((row) => {
         const key = hostKey(row.clave);
         byHost.set(key, (byHost.get(key) || 0) + (Number(row.valor) || 0));
       });
       rows = [...byHost.entries()].map(([host, value]) => ({
-        name: siteName(host),
-        host,
+        name: host,
         value,
         color: siteColor(host),
       }));
+    } else {
+      const bySite = new Map();
+      (metrics.por_host || []).forEach((row) => {
+        const site = siteOfHost(row.clave);
+        const key = site?.id || hostKey(row.clave);
+        const current = bySite.get(key) || {
+          name: site?.name || row.clave,
+          value: 0,
+          color: site?.color || PALETTE[bySite.size % PALETTE.length],
+        };
+        current.value += Number(row.valor) || 0;
+        bySite.set(key, current);
+      });
+      rows = [...bySite.values()];
     }
 
     rows = rows.filter((row) => row.value > 0).sort((a, b) => b.value - a.value);
