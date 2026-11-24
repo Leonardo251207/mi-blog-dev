@@ -61,7 +61,7 @@
 .editor-pro__save,
 .editor-pro__stats {
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 9.5px;
   letter-spacing: 0.08em;
   color: var(--dim);
 }
@@ -586,3 +586,21 @@
   max-width: var(--preview-width, 100%);
   margin-inline: auto;
 }
+
+/* Legibilidad de etiquetas pequeñas */
+.editor-pro__status,
+.editor-pro__save,
+.editor-pro__stats { font-size: 9.5px; }
+.editor-pro__preview-stats { font-size: 9px; }
+.editor-pro__seg button { font-size: 9px; }
+.editor-pro__cover-preview { font-size: 10px; }
+.editor-pro__toolbar-label { font-size: 9px; }
+.editor-pro__toolbar button { font-size: 9.5px; }
+.editor-pro__inspector-tabs button { font-size: 9px; }
+.editor-pro__inspector-panel label { font-size: 9.5px; }
+.editor-pro__hint { font-size: 9.5px; }
+.editor-pro__toc button { font-size: 9.5px; }
+.editor-preview__meta { font-size: 9.5px; }
+.editor-preview__tags span { font-size: 8.5px; }
+.editor-pro__preview-tools select { font-size: 8.5px; }
+
