@@ -1,9 +1,9 @@
-﻿/* Reintento de despliegue de GitHub Pages */
+/* Reintento de despliegue de GitHub Pages */
 /* ==========================================================
-   Dashboard analÃ­tico del CMS
-   - Usa el trÃ¡fico real del colector (a travÃ©s del backend).
-   - Usa las vistas reales de cada artÃ­culo del CMS.
-   - Adapta el panel del profesor a la estÃ©tica DevBlog_.
+   Dashboard analítico del CMS
+   - Usa el tráfico real del colector (a través del backend).
+   - Usa las vistas reales de cada artículo del CMS.
+   - Adapta el panel del profesor a la estética DevBlog_.
    ========================================================== */
 (() => {
   "use strict";
@@ -40,12 +40,12 @@
   ];
 
   const PERIODS = {
-    "1d": { days: 1, grano: "HORA", label: "Ãšltimo dÃ­a (24 h)" },
-    "1w": { days: 7, grano: "DIA", label: "Ãšltima semana (7 dÃ­as)" },
-    "2w": { days: 14, grano: "DIA", label: "Ãšltimas 2 semanas (14 dÃ­as)" },
-    "1m": { days: 30, grano: "DIA", label: "Ãšltimo mes (30 dÃ­as)" },
-    "3m": { days: 90, grano: "DIA", label: "Ãšltimos 3 meses (90 dÃ­as)" },
-    "1y": { days: 365, grano: "DIA", label: "Ãšltimo aÃ±o (365 dÃ­as)" },
+    "1d": { days: 1, grano: "HORA", label: "Último día (24 h)" },
+    "1w": { days: 7, grano: "DIA", label: "Última semana (7 días)" },
+    "2w": { days: 14, grano: "DIA", label: "Últimas 2 semanas (14 días)" },
+    "1m": { days: 30, grano: "DIA", label: "Último mes (30 días)" },
+    "3m": { days: 90, grano: "DIA", label: "Últimos 3 meses (90 días)" },
+    "1y": { days: 365, grano: "DIA", label: "Último año (365 días)" },
   };
 
   const PALETTE = ["#3df0a8", "#3de4ff", "#b48cff", "#5b8cff", "#ffd23f", "#ffb066"];
@@ -182,7 +182,7 @@
 
   function scopeLabel() {
     const site = selectedSite();
-    return `${site ? site.name : "Todos los sitios"} Â· ${PERIODS[state.period].label}`;
+    return `${site ? site.name : "Todos los sitios"} · ${PERIODS[state.period].label}`;
   }
 
   function downloadFile(content, filename, type) {
@@ -230,7 +230,7 @@
 
     state.token = token;
     setLoading(true);
-    setStatus("Consultando trÃ¡fico y publicacionesâ€¦", "info");
+    setStatus("Consultando tráfico y publicaciones…", "info");
 
     const period = PERIODS[state.period];
     const metricsPromise = adminApi
@@ -272,12 +272,12 @@
 
     if (state.metricsError) {
       setStatus(
-        `No se pudieron consultar las mÃ©tricas: ${state.metricsError.message || "servicio no disponible"}. Se muestran las vistas del CMS.`,
+        `No se pudieron consultar las métricas: ${state.metricsError.message || "servicio no disponible"}. Se muestran las vistas del CMS.`,
         "error"
       );
     } else if (state.metrics && state.metrics.disponible === false) {
       setStatus(
-        `MÃ©tricas no disponibles: ${state.metrics.error || "el colector no respondiÃ³"}. Se muestran las vistas del CMS.`,
+        `Métricas no disponibles: ${state.metrics.error || "el colector no respondió"}. Se muestran las vistas del CMS.`,
         "error"
       );
     } else {
@@ -335,34 +335,34 @@
     const kpis = $("#dash-kpis");
     if (kpis) {
       kpis.replaceChildren(
-        kpi("Pageviews", numberFmt.format(totalPv), "TrÃ¡fico total del sitio"),
-        kpi("Visitantes Ãºnicos", numberFmt.format(totalUnique), "Lectores distintos"),
+        kpi("Pageviews", numberFmt.format(totalPv), "Tráfico total del sitio"),
+        kpi("Visitantes únicos", numberFmt.format(totalUnique), "Lectores distintos"),
         kpi("Sesiones", numberFmt.format(totalSessions), "Sesiones registradas"),
         kpi(
           "Lectura promedio",
-          reading ? `${reading.toFixed(1)} min` : "â€”",
-          `${state.posts.length} artÃ­culos publicados`
+          reading ? `${reading.toFixed(1)} min` : "—",
+          `${state.posts.length} artículos publicados`
         )
       );
     }
 
     const summaryScope = $("#dash-summary-scope");
-    if (summaryScope) summaryScope.textContent = `${state.sites.length} sitios Â· ${state.posts.length} entradas`;
+    if (summaryScope) summaryScope.textContent = `${state.sites.length} sitios · ${state.posts.length} entradas`;
 
     const focusName = $("#dash-focus-name");
     const focusHost = $("#dash-focus-host");
     const focusKpis = $("#dash-focus-kpis");
-    if (focusName) focusName.textContent = focus ? focus.name : "Sin trÃ¡fico";
+    if (focusName) focusName.textContent = focus ? focus.name : "Sin tráfico";
     if (focusHost) focusHost.textContent = focus ? (focus.hosts || [])[0] || "" : "";
 
     if (focusKpis) {
       focusKpis.replaceChildren(
         kpi("Pageviews", numberFmt.format(focus?.pageviews || 0), "En el periodo"),
-        kpi("Visitantes", numberFmt.format(focus?.unique || 0), "Estimado por proporciÃ³n"),
+        kpi("Visitantes", numberFmt.format(focus?.unique || 0), "Estimado por proporción"),
         kpi(
-          "ProporciÃ³n",
+          "Proporción",
           `${pct(focus?.pageviews || 0, totalPv).toFixed(1)}%`,
-          "Del trÃ¡fico total"
+          "Del tráfico total"
         ),
         kpi(
           "Entradas",
@@ -484,7 +484,7 @@
       wrap.classList.toggle("is-donut", state.pieStyle === "donut");
       legend.replaceChildren();
       const li = document.createElement("li");
-      li.textContent = "Sin trÃ¡fico en el periodo.";
+      li.textContent = "Sin tráfico en el periodo.";
       legend.append(li);
       return;
     }
@@ -501,7 +501,7 @@
 
     wrap.style.setProperty("--pie", `conic-gradient(${segments.join(", ")})`);
     wrap.classList.toggle("is-donut", state.pieStyle === "donut");
-    wrap.setAttribute("aria-label", `DistribuciÃ³n de trÃ¡fico: ${rows.length} segmentos`);
+    wrap.setAttribute("aria-label", `Distribución de tráfico: ${rows.length} segmentos`);
 
     legend.replaceChildren();
     rows.forEach((row, index) => {
@@ -512,7 +512,7 @@
       const name = document.createElement("span");
       name.textContent = row.name;
       const value = document.createElement("strong");
-      value.textContent = `${numberFmt.format(row.value)} Â· ${pct(row.value, total).toFixed(1)}%`;
+      value.textContent = `${numberFmt.format(row.value)} · ${pct(row.value, total).toFixed(1)}%`;
       li.append(dot, name, value);
       legend.append(li);
     });
@@ -535,14 +535,14 @@
 
     const sub = $("#dash-ranking-sub");
     if (sub) {
-      sub.textContent = `${scopeLabel()} Â· ${rows.length} de ${state.posts.length} entradas`;
+      sub.textContent = `${scopeLabel()} · ${rows.length} de ${state.posts.length} entradas`;
     }
 
     if (!rows.length) {
       const tr = document.createElement("tr");
       const td = document.createElement("td");
       td.colSpan = 7;
-      td.append(empty("No hay artÃ­culos que coincidan con la bÃºsqueda."));
+      td.append(empty("No hay artículos que coincidan con la búsqueda."));
       tr.append(td);
       body.append(tr);
       return;
@@ -574,7 +574,7 @@
         chip.textContent = tag;
         tagsCell.append(chip, document.createTextNode(" "));
       });
-      if (!post.tags?.length) tagsCell.textContent = "â€”";
+      if (!post.tags?.length) tagsCell.textContent = "—";
 
       const viewsCell = document.createElement("td");
       const viewsWrap = document.createElement("span");
@@ -594,14 +594,14 @@
       const delta = average > 0 ? ((viewsValue - average) / average) * 100 : 0;
       trendCell.className = delta >= 0 ? "dash__trend is-pos" : "dash__trend is-neg";
       trendCell.textContent = `${delta >= 0 ? "+" : ""}${delta.toFixed(0)}%`;
-      trendCell.title = "Vistas frente al promedio de los artÃ­culos mostrados";
+      trendCell.title = "Vistas frente al promedio de los artículos mostrados";
 
       const readingCell = document.createElement("td");
       readingCell.textContent = `${post.reading_time_min || 0} min`;
 
       const dateCell = document.createElement("td");
       const date = post.published_at ? new Date(post.published_at) : null;
-      dateCell.textContent = date && !Number.isNaN(date.getTime()) ? dateFmt.format(date) : "â€”";
+      dateCell.textContent = date && !Number.isNaN(date.getTime()) ? dateFmt.format(date) : "—";
 
       tr.append(rank, titleCell, tagsCell, viewsCell, trendCell, readingCell, dateCell);
       body.append(tr);
@@ -760,8 +760,8 @@
   renderSiteSelector();
   renderPeriods();
 
-  // Si la consola ya estÃ¡ conectada y el usuario abre el dashboard desde el hash,
-  // el evento de pestaÃ±a se encarga; tambiÃ©n dejamos una carga diferida.
+  // Si la consola ya está conectada y el usuario abre el dashboard desde el hash,
+  // el evento de pestaña se encarga; también dejamos una carga diferida.
   if (currentToken() && !panel.hidden) {
     loadDashboard();
   }
