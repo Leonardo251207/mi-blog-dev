@@ -9,7 +9,7 @@ layout, imagen y CTA) y un interruptor `active`.
 """
 from typing import Annotated
 
-from fastapi import APIRouter, Path, Request, Response
+from fastapi import APIRouter, File, Path, Request, Response, UploadFile
 
 from .. import schemas
 from ..caching import cached_json
@@ -25,6 +25,19 @@ _COMMON = {401: _ERR, 403: _ERR, 429: _ERR}
 AdId = Annotated[str, Path(pattern=UUID7_PATTERN, description="UUIDv7 de la publicidad")]
 SiteId = Annotated[str, Path(min_length=3, max_length=100, pattern=SLUG_PATTERN,
                              description="Slug del sitio")]
+MediaId = Annotated[str, Path(min_length=10, max_length=64, description="ID del archivo")]
+MAX_MEDIA_BYTES = 25 * 1024 * 1024
+ALLOWED_MEDIA_TYPES = {
+    "video/mp4",
+    "video/webm",
+    "video/ogg",
+    "video/quicktime",
+    "video/x-m4v",
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/gif",
+}
 
 
 def _draft_out(content: schemas.LandingContent, landing) -> schemas.LandingDraftOut:
@@ -33,6 +46,74 @@ def _draft_out(content: schemas.LandingContent, landing) -> schemas.LandingDraft
         updated_at=landing.updated_at if landing is not None else utcnow(),
         published_at=landing.published_at if landing is not None else None,
         has_published=bool(landing is not None and landing.published is not None),
+    )
+
+
+# ================================== MEDIA ===================================
+@router.post("/media", status_code=201, response_model=schemas.MediaOut,
+             summary="Subir video o imagen para una landing",
+             responses={**_COMMON, 413: _ERR, 422: _ERR})
+async def upload_media(request: Request, service: ContentServiceDep,
+                       principal: ConsolePrincipal,
+                       file: UploadFile = File(...)):
+    content_type = (file.content_type or "").lower()
+    if content_type in {"", "application/octet-stream"}:
+        name = (file.filename or "").lower()
+        content_type = next(
+            (media for ext, media in {
+                ".mp4": "video/mp4",
+                ".webm": "video/webm",
+                ".mov": "video/quicktime",
+                ".m4v": "video/x-m4v",
+                ".jpg": "image/jpeg",
+                ".jpeg": "image/jpeg",
+                ".png": "image/png",
+                ".webp": "image/webp",
+                ".gif": "image/gif",
+            }.items() if name.endswith(ext)),
+            content_type,
+        )
+    if content_type not in ALLOWED_MEDIA_TYPES:
+        raise ApiError(422, "MEDIA_TYPE_NOT_ALLOWED",
+                       "Solo se permiten videos MP4/WebM/MOV o imágenes JPG/PNG/WebP/GIF.",
+                       field="file")
+    data = await file.read(MAX_MEDIA_BYTES + 1)
+    if len(data) > MAX_MEDIA_BYTES:
+        raise ApiError(413, "MEDIA_TOO_LARGE", "El archivo supera el límite de 25 MB.",
+                       field="file")
+    if not data:
+        raise ApiError(422, "MEDIA_EMPTY", "El archivo está vacío.", field="file")
+
+    media_id = service.save_media(file.filename or "media", content_type, data)
+    base = str(request.base_url).rstrip("/")
+    if base.startswith("http://") and "127.0.0.1" not in base and "localhost" not in base:
+        base = "https://" + base[len("http://"):]
+    return schemas.MediaOut(
+        media_id=media_id,
+        url=f"{base}/api/v1/media/{media_id}",
+        content_type=content_type,
+        size=len(data),
+        filename=file.filename or "media",
+    )
+
+
+@router.get("/media/{media_id}", summary="Servir un archivo multimedia",
+            responses={404: _ERR})
+def get_media(media_id: MediaId, service: ContentServiceDep):
+    result = service.get_media(media_id)
+    if result is None:
+        raise ApiError(404, "MEDIA_NOT_FOUND", "El archivo no existe.", field="media_id")
+    filename, content_type, data = result
+    safe_name = "".join(
+        char for char in str(filename) if char.isascii() and char not in {'"', "\\"}
+    ) or "media"
+    return Response(
+        content=data,
+        media_type=content_type,
+        headers={
+            "Cache-Control": "public, max-age=31536000, immutable",
+            "Content-Disposition": f'inline; filename="{safe_name}"',
+        },
     )
 
 

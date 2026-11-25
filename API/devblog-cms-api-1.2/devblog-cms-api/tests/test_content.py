@@ -260,6 +260,42 @@ def test_protected_site_cannot_be_deleted(client):
     assert r.json()["error"]["code"] == "SITE_PROTECTED"
 
 
+def test_media_upload_and_public_fetch(client):
+    r = client.post(
+        "/api/v1/media",
+        headers=CONSOLE,
+        files={"file": ("clip.mp4", b"fake-video-bytes", "video/mp4")},
+    )
+    assert r.status_code == 201
+    body = r.json()
+    assert body["content_type"] == "video/mp4"
+    assert body["size"] == len(b"fake-video-bytes")
+    path = body["url"].split("://", 1)[-1]
+    path = "/" + path.split("/", 1)[1]
+    served = client.get(path)
+    assert served.status_code == 200
+    assert served.content == b"fake-video-bytes"
+    assert served.headers["content-type"].startswith("video/mp4")
+
+
+def test_media_rejects_unsupported_type(client):
+    r = client.post(
+        "/api/v1/media",
+        headers=CONSOLE,
+        files={"file": ("notes.txt", b"texto", "text/plain")},
+    )
+    assert r.status_code == 422
+    assert r.json()["error"]["code"] == "MEDIA_TYPE_NOT_ALLOWED"
+
+
+def test_media_requires_console_token(client):
+    r = client.post(
+        "/api/v1/media",
+        files={"file": ("clip.mp4", b"bytes", "video/mp4")},
+    )
+    assert r.status_code == 401
+
+
 def test_video_url_rejects_javascript(client):
     content = client.get("/api/v1/sites/devblog-project/landing/draft",
                          headers=CONSOLE).json()["content"]

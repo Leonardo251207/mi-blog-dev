@@ -205,6 +205,11 @@ La consola tiene el botón **Generar HTML estático**. En producción llama a
 | `CMS_METRICS_SITE` | `devblog` |
 | `CMS_METRICS_TIMEOUT_S` | `10` (opcional) |
 
+> Los archivos de video/imagen que se suben desde la consola se guardan en
+> MongoDB GridFS (máx. 25 MB por archivo). No necesitan disco persistente en
+> Render. Si publicas landings en dominios propios, agrega cada origen a
+> `CMS_CORS_ORIGINS`.
+
 ### Métricas
 
 | Variable | Valor |

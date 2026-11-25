@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/Generator-Swagger-3df0a8?style=for-the-badge&logo=python&logoColor=0b0f0e" alt="Generator">
 </a>
 <a href="#pruebas">
-  <img src="https://img.shields.io/badge/Tests-78%20passed-0b0f0e?style=for-the-badge&logo=pytest&logoColor=3df0a8" alt="78 tests">
+  <img src="https://img.shields.io/badge/Tests-81%20passed-0b0f0e?style=for-the-badge&logo=pytest&logoColor=3df0a8" alt="81 tests">
 </a>
 
 # DevBlog_
@@ -109,7 +109,7 @@ flowchart LR
 | **Editor enriquecido** | Portada, inserción de bloques Markdown, vista dividida, inspector de publicación, tipografía, SEO e índice, y exportación Markdown/JSON. |
 | **Landing editable** | Vive en `mi-landing-devblog`. La consola edita su contenido (hero, secciones, proyectos, certificaciones y contacto) con borrador y publicación separados. |
 | **Multi-sitio** | Registro de landings administrables: portafolio, landing del proyecto, sitio del blog y landings de clientes, cada una con contenido y tema propios. |
-| **Videos** | Cada landing puede mostrar videos por URL (MP4/WebM, YouTube o Vimeo) con póster, subtítulos y CTA. |
+| **Videos** | Cada landing puede mostrar videos por URL o subiendo un archivo (MP4/WebM/MOV, hasta 25 MB), con póster, subtítulos y CTA. |
 | **Publicidad** | Anuncio configurable desde el CMS: textos, llamada a la acción, imagen, disposición y colores. Solo se muestra si está activo. |
 | **Consola CMS** | Pestañas de Dashboard, Sitios, Blog, Landing y Publicidad, y Métricas; editor enriquecido, videos y generación de HTML estático. |
 | **Métricas** | Beacon ligero, pageviews, sesiones, rutas, hosts, consultas GraphQL y resumen dentro de la consola. |
@@ -124,8 +124,12 @@ de este proyecto:
 - **Dashboard analítico** con selector de sitios, periodos, resumen global,
   sitio destacado, histograma de artículos, distribución de tráfico y ranking
   con búsqueda, límite y CSV.
-- **Sitios administrados**: blog y portafolio vienen preconfigurados; puedes
-  agregar otros dominios desde el dashboard (se guardan en el navegador).
+- **Sitios administrados**: portafolio, landing del proyecto y blog vienen
+  preconfigurados. Desde **Sitios** puedes crear landings de clientes con
+  nombre, slug, dominio y tema; el backend genera y publica su landing base.
+- **Temas por sitio**: presets de color y tipografía que el renderer aplica a
+  cada landing, adaptando la idea de plantillas del panel del profesor sin
+  duplicar el CMS.
 - **Editor tipo CMS**: portada, barra de bloques Markdown, vista dividida,
   inspector de publicación, tipografía, SEO e índice, autoguardado local y
   exportación Markdown/JSON.
@@ -153,10 +157,12 @@ El CMS administra varias propiedades con el mismo editor y el mismo renderer:
 - El renderer genérico está en
   `mi-landing-devblog/sitio.html?site={slug}` y aplica el tema del sitio (acento,
   fondo, superficie, texto y fuentes).
-- Los **videos** se agregan por URL desde la colección **Videos** de la landing.
-  Acepta MP4/WebM directos, YouTube y Vimeo, con póster, subtítulos VTT y CTA.
-- Los videos deben estar alojados en un servicio externo (YouTube, Vimeo, Cloudinary
-  o un CDN). El CMS guarda la URL, no el archivo binario.
+- Los **videos** se agregan por URL o subiendo un archivo desde la colección
+  **Videos** de la landing. Acepta MP4/WebM directos, YouTube y Vimeo, con
+  póster, subtítulos VTT y CTA.
+- Los archivos subidos se guardan en el CMS (MongoDB GridFS en producción,
+  SQLite local) y se sirven desde `/api/v1/media/{id}`. Límite: 25 MB por archivo.
+  Para videos largos o con streaming adaptativo, usa YouTube, Vimeo o un CDN.
 - Para landings en dominios personalizados hay que agregar ese origen a
   `CMS_CORS_ORIGINS` y `CORS_ORIGINS`. Las landings servidas bajo
   `mi-landing-devblog.vercel.app` ya están permitidas.
@@ -193,10 +199,10 @@ La guía completa de puertos, tokens, estructura y pruebas está en
 
 | Suite | Resultado |
 |---|---|
-| CMS (contrato + Mongo + contenido + sitios) | **61 / 61** |
+| CMS (contrato + Mongo + contenido + sitios + media) | **64 / 64** |
 | Métricas | **13 / 13** |
 | Generador estático | **4 / 4** |
-| **Total** | **78 / 78** |
+| **Total** | **81 / 81** |
 
 ```powershell
 cd API\devblog-cms-api-1.2\devblog-cms-api
@@ -228,3 +234,4 @@ Estudiante de Ing. en Tecnologías de la Información e Innovación Digital · M
 <div align="center">
   <sub>Hecho con intención · 2026</sub>
 </div>
+

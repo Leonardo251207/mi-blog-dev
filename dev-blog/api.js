@@ -205,6 +205,24 @@
       `/sites/${encodeURIComponent(siteId)}/landing/publish`,
       { method: "POST", token }
     ),
+    uploadMedia: async (token, file) => {
+      const form = new FormData();
+      form.append("file", file, file.name);
+      const response = await fetch(`${API_BASE_URL}/media`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+        body: form,
+      });
+      const text = await response.text();
+      let payload = null;
+      try { payload = text ? JSON.parse(text) : null; } catch { payload = null; }
+      if (!response.ok) {
+        throw new ApiError(response.status, payload || {
+          error: { code: "HTTP_ERROR", message: `Error HTTP ${response.status}` },
+        });
+      }
+      return payload;
+    },
     listAds: (token) => request("/ads/admin", {
       token,
       cache: "no-store",

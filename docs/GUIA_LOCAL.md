@@ -176,6 +176,11 @@ mi-landing-devblog/
 - La consola usa `/sites/{site_id}/landing/draft` y
   `/sites/{site_id}/landing/publish` para borrador y publicación por sitio.
 - Los sitios base `portfolio` y `devblog` están protegidos contra borrado.
+- `POST /api/v1/media` sube videos/imágenes (máx. 25 MB) y
+  `GET /api/v1/media/{id}` los sirve públicamente. En producción se guardan en
+  MongoDB GridFS; en local, en SQLite.
+- Los videos de una landing aceptan URL directa (MP4/WebM, YouTube, Vimeo) o el
+  archivo subido desde la colección **Videos** del editor.
 
 ### Consola → CMS (landing y publicidad)
 
@@ -246,8 +251,10 @@ DevBlog_:
 ## Persistencia
 
 - **Local**: SQLite en `data/devblog.db` (no se versiona). Guarda posts,
-  sitios, landings por sitio (borrador/publicada), publicidad y metadatos de
-  seed.
+  sitios, landings por sitio (borrador/publicada), publicidad, archivos de
+  media y metadatos de seed.
+- **Media en producción**: MongoDB GridFS; los archivos sobreviven al reinicio
+  de Render.
 - **Producción**: MongoDB Atlas si `CMS_MONGO_URI` está definido.
 - **Métricas**: Mongo Atlas en producción; `STORAGE=memory` si no hay Mongo.
 - **Generador**: disco local/efímero; los artefactos se pueden regenerar.
@@ -262,7 +269,7 @@ CMS_MONGO_DB=devblog_cms
 ## Pruebas
 
 ```powershell
-# CMS: 61 pruebas (contrato, contenido, sitios y repositorio Mongo)
+# CMS: 64 pruebas (contrato, contenido, sitios, media y repositorio Mongo)
 cd API\devblog-cms-api-1.2\devblog-cms-api
 .venv\Scripts\python.exe -m pytest -q
 

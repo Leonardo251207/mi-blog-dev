@@ -44,6 +44,8 @@ class ContentRepository:
     def get_site(self, site_id: str) -> Optional[Site]: ...
     def upsert_site(self, site: Site) -> None: ...
     def delete_site(self, site_id: str) -> bool: ...
+    def save_media(self, filename: str, content_type: str, data: bytes) -> str: ...
+    def get_media(self, media_id: str) -> Optional[tuple[str, str, bytes]]: ...
     def get_landing(self, site_id: str = LANDING_ID) -> Optional[Landing]: ...
     def save_landing_draft(self, site_id: str, content: dict) -> Landing: ...
     def publish_landing(self, site_id: str = LANDING_ID) -> Optional[Landing]: ...
@@ -75,6 +77,14 @@ CREATE TABLE IF NOT EXISTS sites (
     theme       TEXT NOT NULL DEFAULT '{}',
     created_at  TEXT NOT NULL,
     updated_at  TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS media (
+    media_id     TEXT PRIMARY KEY,
+    filename     TEXT NOT NULL,
+    content_type TEXT NOT NULL,
+    data         BLOB NOT NULL,
+    created_at   TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ads (
@@ -316,6 +326,29 @@ class SqliteContentRepository(ContentRepository):
             )
         return result.rowcount > 0
 
+    # ------------------------------------------------------------ media
+    def save_media(self, filename: str, content_type: str, data: bytes) -> str:
+        media_id = uuid7()
+        with self._lock:
+            self._conn.execute(
+                """
+                INSERT INTO media (media_id, filename, content_type, data, created_at)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (media_id, filename, content_type, data, iso(utcnow())),
+            )
+        return media_id
+
+    def get_media(self, media_id: str) -> Optional[tuple[str, str, bytes]]:
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT filename, content_type, data FROM media WHERE media_id = ?",
+                (media_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return row["filename"], row["content_type"], bytes(row["data"])
+
     # ---------------------------------------------------------- landing
     def get_landing(self, site_id: str = LANDING_ID) -> Optional[Landing]:
         with self._lock:
@@ -454,6 +487,9 @@ class MongoContentRepository(ContentRepository):
         self._sites = self._db["sites"]
         self._ads = self._db["ads"]
         self._meta = self._db["site_meta"]
+        from gridfs import GridFSBucket
+
+        self._media_bucket = GridFSBucket(self._db, bucket_name="media")
         self._ensure_indexes()
         self._migrate_legacy_landing()
         self._seed_default_sites()
@@ -613,6 +649,26 @@ class MongoContentRepository(ContentRepository):
     def delete_site(self, site_id: str) -> bool:
         self._landing.delete_one({"_id": site_id})
         return self._sites.delete_one({"_id": site_id}).deleted_count > 0
+
+    # ------------------------------------------------------------ media
+    def save_media(self, filename: str, content_type: str, data: bytes) -> str:
+        media_id = self._media_bucket.upload_from_stream(
+            filename,
+            data,
+            metadata={"content_type": content_type},
+        )
+        return str(media_id)
+
+    def get_media(self, media_id: str) -> Optional[tuple[str, str, bytes]]:
+        try:
+            from bson import ObjectId
+
+            stream = self._media_bucket.open_download_stream(ObjectId(media_id))
+            data = stream.read()
+            metadata = stream.metadata or {}
+            return stream.filename, metadata.get("content_type", "application/octet-stream"), data
+        except Exception:
+            return None
 
     # ---------------------------------------------------------- landing
     def get_landing(self, site_id: str = LANDING_ID) -> Optional[Landing]:

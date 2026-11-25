@@ -124,3 +124,28 @@
 @media (max-width: 720px) {
   .sites-grid { grid-template-columns: 1fr; }
 }
+
+.admin__collection-upload {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line-2);
+}
+
+.admin__collection-upload label {
+  display: grid;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.admin__collection-upload input[type="file"] {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--muted);
+  max-width: 100%;
+}

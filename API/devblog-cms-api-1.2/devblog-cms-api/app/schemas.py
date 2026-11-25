@@ -529,6 +529,14 @@ class PublicSiteLanding(BaseModel):
     ad: Optional[AdOut] = None
 
 
+class MediaOut(BaseModel):
+    media_id: str
+    url: str
+    content_type: str
+    size: int
+    filename: str
+
+
 # ============================== MÉTRICAS ====================================
 class MetricsRow(BaseModel):
     clave: str

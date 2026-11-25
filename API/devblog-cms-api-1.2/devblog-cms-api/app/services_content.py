@@ -76,6 +76,13 @@ class ContentService:
         if not self.repo.delete_site(site_id):
             raise ApiError(404, "SITE_NOT_FOUND", "El sitio no existe.", field="site_id")
 
+    # -------------------------------------------------------------- media
+    def save_media(self, filename: str, content_type: str, data: bytes) -> str:
+        return self.repo.save_media(filename, content_type, data)
+
+    def get_media(self, media_id: str) -> Optional[tuple[str, str, bytes]]:
+        return self.repo.get_media(media_id)
+
     # ------------------------------------------------------------- landing
     def get_public_landing(self, site_id: str = LANDING_ID) -> tuple[LandingContent, list[Ad]]:
         landing = self.repo.get_landing(site_id)

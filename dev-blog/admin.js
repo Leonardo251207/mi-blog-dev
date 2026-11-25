@@ -837,6 +837,60 @@
       row.append(label);
     }
 
+    if (collection === "videos") {
+      const uploadBox = document.createElement("div");
+      uploadBox.className = "admin__collection-upload";
+
+      const videoLabel = document.createElement("label");
+      videoLabel.textContent = "Subir video (MP4/WebM/MOV, máx. 25 MB)";
+      const videoFile = document.createElement("input");
+      videoFile.type = "file";
+      videoFile.accept = "video/*";
+      videoLabel.append(videoFile);
+      videoFile.addEventListener("change", async () => {
+        const file = videoFile.files?.[0];
+        const urlControl = row.querySelector('[data-key="url"]');
+        if (!file || !urlControl) return;
+        try {
+          videoFile.disabled = true;
+          setStatus("Subiendo video al CMS…", "info", landingStatus);
+          const media = await adminApi.uploadMedia(token, file);
+          urlControl.value = media.url;
+          setStatus("Video subido. Ya puedes guardar la landing.", "ok", landingStatus);
+        } catch (error) {
+          handleError(error, landingStatus);
+        } finally {
+          videoFile.disabled = false;
+        }
+      });
+
+      const posterLabel = document.createElement("label");
+      posterLabel.textContent = "Subir póster (JPG/PNG/WebP)";
+      const posterFile = document.createElement("input");
+      posterFile.type = "file";
+      posterFile.accept = "image/*";
+      posterLabel.append(posterFile);
+      posterFile.addEventListener("change", async () => {
+        const file = posterFile.files?.[0];
+        const posterControl = row.querySelector('[data-key="poster"]');
+        if (!file || !posterControl) return;
+        try {
+          posterFile.disabled = true;
+          setStatus("Subiendo póster…", "info", landingStatus);
+          const media = await adminApi.uploadMedia(token, file);
+          posterControl.value = media.url;
+          setStatus("Póster subido.", "ok", landingStatus);
+        } catch (error) {
+          handleError(error, landingStatus);
+        } finally {
+          posterFile.disabled = false;
+        }
+      });
+
+      uploadBox.append(videoLabel, posterLabel);
+      row.append(uploadBox);
+    }
+
     const remove = document.createElement("button");
     remove.type = "button";
     remove.className = "btn btn--ghost danger admin__remove";
