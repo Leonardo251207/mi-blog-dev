@@ -1110,7 +1110,7 @@
 
       actions.append(editLanding, open, edit);
 
-      if (!["portfolio", "devblog"].includes(site.site_id)) {
+      if (!["portfolio", "devblog", "devblog-project"].includes(site.site_id)) {
         const remove = document.createElement("button");
         remove.type = "button";
         remove.className = "btn btn--ghost danger";

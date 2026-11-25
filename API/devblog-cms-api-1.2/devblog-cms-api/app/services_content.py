@@ -10,7 +10,7 @@ from .domain import uuid7, utcnow
 from .errors import ApiError
 from .schemas import AdCreate, LandingContent, SiteCreate, SiteUpdate
 
-PROTECTED_SITES = {"portfolio", "devblog"}
+PROTECTED_SITES = {"portfolio", "devblog", "devblog-project"}
 
 
 class ContentService:
