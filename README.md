@@ -47,7 +47,7 @@ Vercel y GitHub Pages.
 | Repositorio | Contenido |
 |---|---|
 | **mi-blog-dev** (este) | Blog, consola CMS, CMS API, métricas y generador estático. |
-| **[mi-landing-devblog](https://github.com/Leonardo251207/mi-landing-devblog)** | Portafolio: hero, tecnologías, proyectos, certificaciones, blog y contacto. |
+| **[mi-landing-devblog](https://github.com/Leonardo251207/mi-landing-devblog)** | Portafolio y renderer multi-sitio: hero, proyectos, videos, certificaciones, blog y contacto. |
 
 La landing vive en su propio repositorio desplegado en Vercel y GitHub Pages.
 Sigue siendo **editable desde este CMS**: la consola publica el contenido y la
@@ -77,7 +77,7 @@ landing lo consume por API. La publicidad también se administra aquí.
 flowchart LR
   subgraph Cliente
     B["Blog<br/>Vercel / GitHub Pages"]
-    L["Landing editable<br/>repo mi-landing-devblog"]
+    L["Landings multi-sitio<br/>portafolio · proyecto · clientes"]
     A["Consola CMS<br/>blog · landing · publicidad"]
   end
 
@@ -103,7 +103,7 @@ flowchart LR
 
 | Módulo | Qué hace |
 |---|---|
-| **CMS API** | 12 endpoints de blog + 11 de landing, publicidad y métricas. UUIDv7, slug único, cursor firmado, idempotencia, rate limit, ETag/304 y errores uniformes. |
+| **CMS API** | Blog, sitios/landings, publicidad, media y métricas. UUIDv7, slug único, cursor firmado, idempotencia, rate limit, ETag/304 y errores uniformes. |
 | **Blog** | Portada con las últimas entradas, artículo por slug, Markdown seguro, registro de vistas y respaldo estático si la API no responde. |
 | **Dashboard** | Resumen de tráfico, sitios, periodos, artículos más leídos, distribución por host/ruta, ranking con búsqueda y exportación CSV. |
 | **Editor enriquecido** | Portada, inserción de bloques Markdown, vista dividida, inspector de publicación, tipografía, SEO e índice, y exportación Markdown/JSON. |
