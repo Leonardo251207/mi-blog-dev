@@ -276,6 +276,9 @@ def test_media_upload_and_public_fetch(client):
     assert served.status_code == 200
     assert served.content == b"fake-video-bytes"
     assert served.headers["content-type"].startswith("video/mp4")
+    chunk = client.get(path, headers={"Range": "bytes=0-3"})
+    assert chunk.status_code == 206
+    assert chunk.content == b"fake"
 
 
 def test_media_rejects_unsupported_type(client):

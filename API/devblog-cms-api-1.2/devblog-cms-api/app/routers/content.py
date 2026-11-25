@@ -98,8 +98,8 @@ async def upload_media(request: Request, service: ContentServiceDep,
 
 
 @router.get("/media/{media_id}", summary="Servir un archivo multimedia",
-            responses={404: _ERR})
-def get_media(media_id: MediaId, service: ContentServiceDep):
+            responses={404: _ERR, 416: _ERR})
+def get_media(request: Request, media_id: MediaId, service: ContentServiceDep):
     result = service.get_media(media_id)
     if result is None:
         raise ApiError(404, "MEDIA_NOT_FOUND", "El archivo no existe.", field="media_id")
@@ -107,14 +107,32 @@ def get_media(media_id: MediaId, service: ContentServiceDep):
     safe_name = "".join(
         char for char in str(filename) if char.isascii() and char not in {'"', "\\"}
     ) or "media"
-    return Response(
-        content=data,
-        media_type=content_type,
-        headers={
-            "Cache-Control": "public, max-age=31536000, immutable",
-            "Content-Disposition": f'inline; filename="{safe_name}"',
-        },
-    )
+    headers = {
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "Content-Disposition": f'inline; filename="{safe_name}"',
+        "Accept-Ranges": "bytes",
+    }
+
+    range_header = request.headers.get("range", "")
+    if range_header.lower().startswith("bytes="):
+        try:
+            start_raw, end_raw = range_header[6:].split("-", 1)
+            start = int(start_raw) if start_raw else 0
+            end = int(end_raw) if end_raw else len(data) - 1
+            end = min(end, len(data) - 1)
+            if start < 0 or start >= len(data) or end < start:
+                raise ValueError
+            chunk = data[start:end + 1]
+            headers["Content-Range"] = f"bytes {start}-{end}/{len(data)}"
+            headers["Content-Length"] = str(len(chunk))
+            return Response(content=chunk, status_code=206,
+                            media_type=content_type, headers=headers)
+        except ValueError:
+            raise ApiError(416, "MEDIA_RANGE_INVALID", "Rango de bytes inválido.",
+                           field="Range")
+
+    headers["Content-Length"] = str(len(data))
+    return Response(content=data, media_type=content_type, headers=headers)
 
 
 # ================================= SITIOS ===================================
