@@ -93,9 +93,6 @@
   }
 
   const publicApi = {
-    // La portada prioriza mostrar el estado actual (por ejemplo, un artículo
-    // recién publicado). La API sigue enviando ETag/Cache-Control para otros
-    // clientes; aquí se decide no usar la caché del navegador.
     listPosts: (options = {}) => request(`/posts?${pageQuery(options)}`, {
       cache: "no-store",
     }),
@@ -112,9 +109,7 @@
   };
 
   const adminApi = {
-    // Las lecturas de la consola deben ver siempre el estado actual. La API
-    // marca /posts como cacheable para el sitio público; el panel usa
-    // `cache: "no-store"` para saltarse esa caché sin cambiar el contrato.
+    // Lecturas de consola sin caché.
     listDrafts: (token, options = {}) => request(`/drafts?${pageQuery(options)}`, {
       token,
       cache: "no-store",

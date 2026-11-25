@@ -104,8 +104,7 @@
         return;
       }
       grid.replaceChildren(...page.items.map(card));
-    } catch (error) {
-      console.warn("No se pudo cargar el listado desde la API:", error);
+    } catch {
       fallback();
     }
   }

@@ -1,9 +1,5 @@
-/* Reintento de despliegue de GitHub Pages */
 /* ==========================================================
    Dashboard analítico del CMS
-   - Usa el tráfico real del colector (a través del backend).
-   - Usa las vistas reales de cada artículo del CMS.
-   - Adapta el panel del profesor a la estética DevBlog_.
    ========================================================== */
 (() => {
   "use strict";
@@ -83,7 +79,7 @@
       const stored = raw ? JSON.parse(raw) : null;
       if (Array.isArray(stored) && stored.length) return stored;
     } catch {
-      // Ignorar almacenamiento corrupto
+      // Usar valores por defecto
     }
     return DEFAULT_SITES.map((site) => ({ ...site, hosts: [...site.hosts] }));
   }
@@ -92,7 +88,7 @@
     try {
       localStorage.setItem(SITES_KEY, JSON.stringify(state.sites));
     } catch {
-      // Ignorar cuota
+      // Almacenamiento no disponible
     }
   }
 
@@ -760,8 +756,7 @@
   renderSiteSelector();
   renderPeriods();
 
-  // Si la consola ya está conectada y el usuario abre el dashboard desde el hash,
-  // el evento de pestaña se encarga; también dejamos una carga diferida.
+  // Carga diferida si el dashboard ya está visible.
   if (currentToken() && !panel.hidden) {
     loadDashboard();
   }

@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/banner.svg" alt="DevBlog_ — CMS API, blog, métricas y generador estático" width="100%">
+<img src="docs/banner.svg" alt="DevBlog_ — CMS, blog, landings y métricas" width="100%">
 
 <br>
 
@@ -9,9 +9,6 @@
 </a>
 <a href="https://mi-blog-dev.vercel.app/">
   <img src="https://img.shields.io/badge/Blog-Live-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Blog">
-</a>
-<a href="https://leonardo251207.github.io/mi-blog-dev/">
-  <img src="https://img.shields.io/badge/GitHub%20Pages-Live-222222?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Pages">
 </a>
 <a href="https://devblog-cms-leonardo.onrender.com/docs">
   <img src="https://img.shields.io/badge/CMS%20API-Swagger-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="CMS API">
@@ -28,48 +25,31 @@
 
 # DevBlog_
 
-**CMS API-First + blog + landing editable en repo aparte + publicidad + métricas con GraphQL + generador de HTML estático.**
+**CMS API-First + blog + landings multi-sitio + métricas GraphQL + generador estático.**
 
 Proyecto de Aplicaciones Web construido con FastAPI, MongoDB Atlas, Render,
 Vercel y GitHub Pages.
 
-[Demo en Vercel](https://mi-blog-dev.vercel.app/) ·
-[Demo en GitHub Pages](https://leonardo251207.github.io/mi-blog-dev/) ·
-[Guía local](docs/GUIA_LOCAL.md) ·
-[Despliegue](DEPLOY_RENDER.md)
+[Portafolio](https://mi-landing-devblog.vercel.app/) ·
+[Blog](https://mi-blog-dev.vercel.app/) ·
+[Consola CMS](https://mi-blog-dev.vercel.app/admin.html) ·
+[API](https://devblog-cms-leonardo.onrender.com/docs)
 
 </div>
 
 ---
 
-## Dos repositorios, un ecosistema
-
-| Repositorio | Contenido |
-|---|---|
-| **mi-blog-dev** (este) | Blog, consola CMS, CMS API, métricas y generador estático. |
-| **[mi-landing-devblog](https://github.com/Leonardo251207/mi-landing-devblog)** | Portafolio y renderer multi-sitio: hero, proyectos, videos, certificaciones, blog y contacto. |
-
-La landing vive en su propio repositorio desplegado en Vercel y GitHub Pages.
-Sigue siendo **editable desde este CMS**: la consola publica el contenido y la
-landing lo consume por API. La publicidad también se administra aquí.
-
 ## Demo en vivo
 
 | Recurso | URL |
 |---|---|
-| Portafolio (Vercel) | <https://mi-landing-devblog.vercel.app/> |
+| Portafolio | <https://mi-landing-devblog.vercel.app/> |
 | Landing del proyecto | <https://mi-landing-devblog.vercel.app/sitio.html?site=devblog-project> |
-| Portafolio (GitHub Pages) | <https://leonardo251207.github.io/mi-landing-devblog/> |
-| Blog en Vercel | <https://mi-blog-dev.vercel.app/> |
-| Blog en GitHub Pages | <https://leonardo251207.github.io/mi-blog-dev/> |
+| Blog | <https://mi-blog-dev.vercel.app/> |
 | Consola CMS | <https://mi-blog-dev.vercel.app/admin.html> |
 | CMS API / Swagger | <https://devblog-cms-leonardo.onrender.com/docs> |
 | Métricas / GraphiQL | <https://devblog-metrics-leonardo.onrender.com/v1/query> |
 | Generador / Swagger | <https://devblog-generator-leonardo.onrender.com/docs> |
-
-> La consola pide el `CMS_CONSOLE_TOKEN` generado en Render. Los servicios
-> gratuitos de Render se duermen sin tráfico: la primera petición puede tardar
-> 30–60 s.
 
 ## Arquitectura
 
@@ -78,7 +58,7 @@ flowchart LR
   subgraph Cliente
     B["Blog<br/>Vercel / GitHub Pages"]
     L["Landings multi-sitio<br/>portafolio · proyecto · clientes"]
-    A["Consola CMS<br/>blog · landing · publicidad"]
+    A["Consola CMS<br/>blog · sitios · landing"]
   end
 
   subgraph Render
@@ -91,7 +71,7 @@ flowchart LR
 
   B -->|REST /api/v1| C
   B -->|beacon /v1/collect| M
-  L -->|landing /api/v1| C
+  L -->|sites /api/v1| C
   L -->|beacon /v1/collect| M
   A -->|CRUD /api/v1| C
   A -->|POST /api/v1/pages| G
@@ -99,101 +79,49 @@ flowchart LR
   M --> D
 ```
 
-## Lo que incluye
+## Módulos
 
-| Módulo | Qué hace |
+| Módulo | Capacidades |
 |---|---|
-| **CMS API** | Blog, sitios/landings, publicidad, media y métricas. UUIDv7, slug único, cursor firmado, idempotencia, rate limit, ETag/304 y errores uniformes. |
-| **Blog** | Portada con las últimas entradas, artículo por slug, Markdown seguro, registro de vistas y respaldo estático si la API no responde. |
-| **Dashboard** | Resumen de tráfico, sitios, periodos, artículos más leídos, distribución por host/ruta, ranking con búsqueda y exportación CSV. |
-| **Editor enriquecido** | Portada, inserción de bloques Markdown, vista dividida, inspector de publicación, tipografía, SEO e índice, y exportación Markdown/JSON. |
-| **Landing editable** | Vive en `mi-landing-devblog`. La consola edita su contenido (hero, secciones, proyectos, certificaciones y contacto) con borrador y publicación separados. |
-| **Multi-sitio** | Registro de landings administrables: portafolio, landing del proyecto, sitio del blog y landings de clientes, cada una con contenido y tema propios. |
-| **Videos** | Cada landing puede mostrar videos por URL o subiendo un archivo (MP4/WebM/MOV, hasta 25 MB), con póster, subtítulos y CTA. |
-| **Publicidad** | Anuncio configurable desde el CMS: textos, llamada a la acción, imagen, disposición y colores. Solo se muestra si está activo. |
-| **Consola CMS** | Pestañas de Dashboard, Sitios, Blog, Landing y Publicidad, y Métricas; editor enriquecido, videos y generación de HTML estático. |
-| **Métricas** | Beacon ligero, pageviews, sesiones, rutas, hosts, consultas GraphQL y resumen dentro de la consola. |
-| **Generador** | Convierte una instantánea del artículo en un artefacto HTML con checksum SHA-256. |
-| **Documentación** | Contrato v1.2, Anexo D de implementación y guías de despliegue. |
+| **CMS API** | Posts y borradores, sitios, landings, publicidad, media y métricas. UUIDv7, slugs, cursores, idempotencia, rate limit, ETag/304 y errores uniformes. |
+| **Blog** | Portada dinámica, artículo por slug, Markdown seguro, vistas y respaldo estático. |
+| **Multi-sitio** | Portafolio, landing del proyecto, blog y landings de clientes con contenido, tema y publicación independientes. |
+| **Videos** | URL o archivo subido (MP4/WebM/MOV, 25 MB), póster, subtítulos VTT, YouTube/Vimeo y CTA. |
+| **Consola CMS** | Dashboard, sitios, editor con portada/SEO/tipografía/índice, publicidad, métricas y exportación Markdown/JSON. |
+| **Métricas** | Beacon, pageviews, sesiones, visitantes únicos, rutas, hosts y consultas GraphQL. |
+| **Generador** | HTML estático a partir de una instantánea del artículo, con checksum SHA-256. |
 
-## Panel adaptado del profesor
+## API principal
 
-La consola integra las funciones del panel `cms-view` con la identidad y la API
-de este proyecto:
-
-- **Dashboard analítico** con selector de sitios, periodos, resumen global,
-  sitio destacado, histograma de artículos, distribución de tráfico y ranking
-  con búsqueda, límite y CSV.
-- **Sitios administrados**: portafolio, landing del proyecto y blog vienen
-  preconfigurados. Desde **Sitios** puedes crear landings de clientes con
-  nombre, slug, dominio y tema; el backend genera y publica su landing base.
-- **Temas por sitio**: presets de color y tipografía que el renderer aplica a
-  cada landing, adaptando la idea de plantillas del panel del profesor sin
-  duplicar el CMS.
-- **Editor tipo CMS**: portada, barra de bloques Markdown, vista dividida,
-  inspector de publicación, tipografía, SEO e índice, autoguardado local y
-  exportación Markdown/JSON.
-- **Datos reales**: el tráfico sale del colector (a través del backend) y las
-  vistas por artículo salen del CMS. La “retención” del panel original se
-  adaptó a **tiempo promedio de lectura**, porque el contrato de métricas no
-  expone retención por usuario.
-- Los campos editoriales que el contrato actual no guarda (portada, SEO,
-  tipografía, estado “en revisión”) se conservan en `localStorage`. El CMS
-  sigue guardando título, slug, etiquetas y Markdown.
-
-## Multi-sitio y video
-
-El CMS administra varias propiedades con el mismo editor y el mismo renderer:
-
-| Sitio | Uso |
+| Área | Endpoints |
 |---|---|
-| `portfolio` | Landing profesional de Leonardo. |
-| `devblog-project` | Landing del proyecto DevBlog_ (caso de estudio + video). |
-| `devblog` | Sitio del blog; su hero se controla desde el CMS. |
-| `cliente-*` | Landings nuevas creadas desde **Sitios**. |
+| Blog | `GET /api/v1/posts`, `GET /api/v1/posts/slug/{slug}`, `POST /api/v1/posts/{id}/views` |
+| CMS | `GET/POST /api/v1/drafts`, `GET/PUT/DELETE /api/v1/drafts/{id}`, `POST /api/v1/drafts/{id}/publish` |
+| Sitios | `GET /api/v1/sites`, `GET /api/v1/sites/{site_id}/landing`, `PUT /api/v1/sites/{site_id}/landing/draft` |
+| Landing | `GET /api/v1/landing`, `GET /api/v1/ads`, `GET /api/v1/metrics/overview` |
+| Media | `POST /api/v1/media`, `GET /api/v1/media/{media_id}` |
+| Generador | `POST /api/v1/pages` en el servicio de generación |
 
-- **Crear una landing nueva** requiere nombre, slug, tipo, dominio y tema. El backend
-  genera automáticamente una landing base y la publica; no hay que reconstruir el CMS.
-- El renderer genérico está en
-  `mi-landing-devblog/sitio.html?site={slug}` y aplica el tema del sitio (acento,
-  fondo, superficie, texto y fuentes).
-- Los **videos** se agregan por URL o subiendo un archivo desde la colección
-  **Videos** de la landing. Acepta MP4/WebM directos, YouTube y Vimeo, con
-  póster, subtítulos VTT y CTA.
-- Los archivos subidos se guardan en el CMS (MongoDB GridFS en producción,
-  SQLite local) y se sirven desde `/api/v1/media/{id}`. Límite: 25 MB por archivo.
-  Para videos largos o con streaming adaptativo, usa YouTube, Vimeo o un CDN.
-- Para landings en dominios personalizados hay que agregar ese origen a
-  `CMS_CORS_ORIGINS` y `CORS_ORIGINS`. Las landings servidas bajo
-  `mi-landing-devblog.vercel.app` ya están permitidas.
+## Estructura
+
+```text
+mi-blog-dev/
+├── API/devblog-cms-api-1.2/devblog-cms-api/   # CMS FastAPI
+├── dev-blog/                                  # Blog, consola y assets del CMS
+├── pendiente/
+│   ├── metrics-navigation-main/               # Colector de métricas + GraphQL
+│   └── static-sites-generator-main/           # Generador estático
+├── docs/banner.svg
+├── render.yaml
+├── setup.ps1
+├── start-all.ps1
+└── README.md
+```
 
 ## Stack
 
 `Python 3.12` · `FastAPI` · `Pydantic` · `MongoDB Atlas` / `SQLite` ·
 `JavaScript vanilla` · `Render` · `Vercel` · `GitHub Pages` · `GitHub Actions`
-
-## Empieza en local
-
-```powershell
-git clone https://github.com/Leonardo251207/mi-blog-dev.git
-cd mi-blog-dev
-.\setup.ps1
-.\start-all.ps1
-```
-
-Abre <http://127.0.0.1:5500/> y la consola en
-<http://127.0.0.1:5500/admin.html> con `console-dev-token`.
-
-> Si PowerShell bloquea scripts:
-> `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
-
-La landing es independiente: clona
-[`mi-landing-devblog`](https://github.com/Leonardo251207/mi-landing-devblog) y
-sirve la raíz con `python -m http.server 5599`.
-
-La guía completa de puertos, tokens, estructura y pruebas está en
-[`docs/GUIA_LOCAL.md`](docs/GUIA_LOCAL.md). Para publicarlo en internet:
-[`DEPLOY_RENDER.md`](DEPLOY_RENDER.md).
 
 ## Pruebas
 
@@ -204,22 +132,6 @@ La guía completa de puertos, tokens, estructura y pruebas está en
 | Generador estático | **4 / 4** |
 | **Total** | **81 / 81** |
 
-```powershell
-cd API\devblog-cms-api-1.2\devblog-cms-api
-.venv\Scripts\python.exe -m pytest -q
-```
-
-## Documentación
-
-- [Guía local y de integración](docs/GUIA_LOCAL.md)
-- [Análisis de Figma Make + prompt de diseño](docs/PROMPT_FIGMA_MAKE.md)
-- [Despliegue en Render + MongoDB Atlas](DEPLOY_RENDER.md)
-- [Servicios del ecosistema](pendiente/README_DESPLIEGUE.md)
-- [README del CMS](API/devblog-cms-api-1.2/devblog-cms-api/README.md)
-- [Contrato + Anexo D (PDF)](API/Especificacion_API_CMS_DevBlog_v1.2_implementacion.pdf)
-- [Contrato + Anexo D (DOCX)](API/Especificacion_API_CMS_DevBlog_v1.2_implementacion.docx)
-- [`render.yaml`](render.yaml)
-
 ## Autor
 
 **Leonardo Nucamendi Ruiz**  
@@ -227,11 +139,10 @@ Estudiante de Ing. en Tecnologías de la Información e Innovación Digital · M
 
 [GitHub](https://github.com/Leonardo251207) ·
 [LinkedIn](https://www.linkedin.com/in/leonardo-nucamendi-703b48441/) ·
-[DevBlog_](https://mi-blog-dev.vercel.app/)
+[Portafolio](https://mi-landing-devblog.vercel.app/)
 
 ---
 
 <div align="center">
   <sub>Hecho con intención · 2026</sub>
 </div>
-

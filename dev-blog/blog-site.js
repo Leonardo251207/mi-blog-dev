@@ -145,7 +145,5 @@
       if (lead && hero.tagline) lead.textContent = hero.tagline;
       renderVideos(data?.content?.videos || [], data?.content || {});
     })
-    .catch((error) => {
-      console.warn("No se pudo cargar el hero del blog desde el CMS:", error);
-    });
+    .catch(() => {});
 })();

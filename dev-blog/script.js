@@ -1,5 +1,5 @@
 /* ==========================================================
-   DevBlog_ — Interacciones y simulación
+   DevBlog_ — Interacciones del sitio
    ========================================================== */
 (() => {
   "use strict";

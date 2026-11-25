@@ -145,9 +145,7 @@
 
       if (!viewRegistered) {
         viewRegistered = true;
-        API.publicApi.registerView(post.post_id).catch((error) => {
-          console.warn("No se pudo registrar la vista:", error);
-        });
+        API.publicApi.registerView(post.post_id).catch(() => {});
       }
     } catch (error) {
       if (error && error.status === 404) {
@@ -157,7 +155,6 @@
         bylineEl.textContent = "";
         showState("Este artículo no existe o fue eliminado.", { error: true });
       } else {
-        console.error(error);
         setStatus("ERROR DE CONEXIÓN");
         setTitle("No se pudo cargar el artículo");
         bylineEl.textContent = "";

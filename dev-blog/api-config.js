@@ -2,7 +2,6 @@
    Configuración del cliente de la API.
    - En local usa los servicios de 127.0.0.1.
    - En GitHub Pages/Vercel usa los servicios públicos de Render.
-   Cambia los nombres de Render si tu blueprint usa otros.
    ========================================================== */
 (() => {
   "use strict";

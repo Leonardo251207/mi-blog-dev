@@ -7,10 +7,7 @@
   "use strict";
 
   const API = window.DevBlogAPI;
-  if (!API) {
-    console.error("No se cargó api.js");
-    return;
-  }
+  if (!API) return;
   const { adminApi, ApiError } = API;
 
   const $ = (selector) => document.querySelector(selector);
@@ -102,9 +99,8 @@
     mode = next;
     const editable = next === "new" || next === "draft";
 
-    // El fieldset NO se deshabilita: si se deshabilita, también se bloquean
-    // los botones de acción (por ejemplo, "Eliminar publicación"). Se
-    // deshabilitan solo los campos de texto.
+    // Se deshabilitan los campos de texto, no el fieldset, para conservar
+    // disponibles los botones de acción.
     editorFields.disabled = false;
     titleInput.disabled = !editable;
     slugInput.disabled = !editable;
@@ -162,7 +158,6 @@
   }
 
   function handleError(error, target = statusEl) {
-    console.error(error);
     let message;
     if (error instanceof ApiError) {
       message = `${error.code}: ${error.message}`;
@@ -444,7 +439,6 @@
         "ok"
       );
     } catch (error) {
-      console.error(error);
       setStatus(`No se pudo generar el HTML: ${error.message}`, "error");
     } finally {
       if (mode === "draft" || mode === "post") generateStaticBtn.disabled = false;
@@ -656,7 +650,7 @@
   });
 
   // ================================================================
-  //  Pestañas: Blog · Landing y publicidad · Métricas
+  //  Pestañas de la consola
   // ================================================================
   const TAB_PANELS = {
     dashboard: $("#panel-dashboard"),
@@ -1632,7 +1626,7 @@
   }
 
   // ================================================================
-  //  Escuchas de las nuevas secciones
+  //  Eventos de las secciones
   // ================================================================
   $$(".admin__tab").forEach((tab) => {
     tab.addEventListener("click", () => activateTab(tab.dataset.tab));

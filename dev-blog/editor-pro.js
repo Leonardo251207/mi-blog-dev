@@ -82,7 +82,7 @@
     try {
       localStorage.setItem(META_KEY, JSON.stringify(store));
     } catch {
-      // Ignorar cuota
+      // Almacenamiento no disponible
     }
   }
 
@@ -124,7 +124,6 @@
       ...(stored || {}),
       typography: { ...base.typography, ...(stored?.typography || {}) },
     };
-    // Un artículo publicado siempre se muestra como publicado.
     if (state.mode === "post") state.meta.status = "published";
     fillMetaFields();
   }
@@ -739,7 +738,6 @@
     });
   }
 
-  // La vista previa la controla este módulo, no el botón antiguo.
   bind();
   clear();
 
