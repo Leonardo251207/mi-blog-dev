@@ -88,12 +88,12 @@
               </p>
             </div>
             <div class="dash__actions">
-              <label class="dash__field" for="dash-site">Sitio
+              <label class="dash__field" for="dash-site">Host de analítica
                 <select id="dash-site">
                   <option value="all">Todos los sitios</option>
                 </select>
               </label>
-              <button class="btn btn--ghost" id="dash-add-site" type="button">+ Sitio</button>
+              <button class="btn btn--ghost" id="dash-add-site" type="button">+ Host</button>
               <button class="btn btn--ghost" id="dash-refresh" type="button" title="Actualizar dashboard">↻</button>
               <button class="btn btn--solid" id="dash-export" type="button">Exportar CSV</button>
             </div>
@@ -768,10 +768,11 @@
     <div id="site-modal" class="admin__modal" hidden>
       <div class="admin__modal-card" role="dialog" aria-modal="true" aria-labelledby="site-modal-title">
         <p class="mono-label"><b>CMS</b> Nuevo sitio</p>
-        <h2 id="site-modal-title">Agregar sitio al dashboard</h2>
+        <h2 id="site-modal-title">Agregar host de analítica</h2>
         <p class="admin__lead">
-          El sitio se guarda en este navegador y filtra el tráfico por su dominio.
-          Usa el host exacto que reporta el colector de métricas.
+          El host se guarda en este navegador y filtra el tráfico del dashboard.
+          Usa el dominio exacto que reporta el colector de métricas. Para crear
+          una landing nueva, usa la pestaña <strong>Sitios</strong>.
         </p>
         <form id="site-form" autocomplete="off">
           <label for="site-name">Nombre
