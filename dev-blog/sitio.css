@@ -1,0 +1,299 @@
+/* ==========================================================
+   Renderer multi-sitio de DevBlog_
+   Reutiliza el sistema visual de styles.css y añade videos.
+   ========================================================== */
+
+.site-page {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+}
+
+.site-state {
+  width: min(var(--max), 100% - 2 * var(--gutter));
+  margin: clamp(80px, 12vw, 160px) auto;
+  padding: 28px;
+  border: 1px solid var(--line-2);
+  background: var(--bg-soft);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.site-hero {
+  position: relative;
+  isolation: isolate;
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.site-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(61, 240, 168, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(61, 240, 168, 0.045) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 75% at 30% 45%, #000 15%, transparent 75%);
+  mask-image: radial-gradient(ellipse 80% 75% at 30% 45%, #000 15%, transparent 75%);
+}
+
+.site-hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
+  align-items: center;
+  gap: clamp(28px, 6vw, 80px);
+  padding-block: clamp(64px, 10vw, 120px);
+}
+
+.site-hero h1 {
+  margin-top: 18px;
+  font-size: clamp(2.8rem, 7vw, 5.6rem);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+}
+
+.site-hero h1 span { color: var(--green); }
+
+.site-hero__role {
+  margin-top: 28px;
+  font-size: clamp(0.9rem, 1.6vw, 1rem);
+  font-weight: 600;
+}
+
+.site-hero__role em { font-style: normal; color: var(--green); }
+
+.site-hero__tagline {
+  margin-top: 14px;
+  max-width: 48em;
+  font-size: clamp(1rem, 1.8vw, 1.15rem);
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.site-hero__cta {
+  margin-top: 34px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.site-hero__cta small {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.site-hero__photo {
+  position: relative;
+  justify-self: end;
+  width: min(100%, 340px);
+  padding: 10px;
+  border: 1px solid var(--line-2);
+}
+
+.site-hero__photo img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+
+.site-hero__photo::before,
+.site-hero__photo::after {
+  content: "+";
+  position: absolute;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--green);
+}
+
+.site-hero__photo::before { top: -7px; left: -4px; }
+.site-hero__photo::after { bottom: -7px; right: -4px; }
+
+.site-section[hidden] { display: none; }
+
+.site-art {
+  position: relative;
+  aspect-ratio: 16 / 9.6;
+  border: 1px solid var(--line);
+  background-color: #08100d;
+  overflow: hidden;
+}
+
+.site-art::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(130, 160, 148, 0.24) 1px, transparent 1.4px);
+  background-size: 14px 14px;
+}
+
+.site-art--green::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 55% at 30% 100%, rgba(61, 240, 168, 0.2), transparent 70%);
+}
+
+.site-art--purple::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 45%, rgba(150, 110, 255, 0.22), transparent 60%);
+}
+
+.site-art__lines {
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  top: 28%;
+  display: grid;
+  gap: 10px;
+  z-index: 1;
+}
+
+.site-art__lines i {
+  display: block;
+  height: 2px;
+  background: var(--green);
+  opacity: 0.35;
+}
+
+.site-art__lines i:nth-child(2) { width: 68%; }
+.site-art__lines i:nth-child(3) { width: 48%; }
+
+/* Videos */
+.site-videos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.site-video {
+  border: 1px solid var(--line);
+  background: var(--bg-soft);
+  padding: 8px;
+  min-width: 0;
+}
+
+.site-video__media {
+  position: relative;
+  width: 100%;
+  background: #050807;
+  border: 1px solid var(--line-2);
+  overflow: hidden;
+}
+
+.site-video__media.is-16-9 { aspect-ratio: 16 / 9; }
+.site-video__media.is-9-16 { aspect-ratio: 9 / 16; max-width: 420px; margin-inline: auto; }
+.site-video__media.is-1-1 { aspect-ratio: 1 / 1; max-width: 520px; margin-inline: auto; }
+
+.site-video__media video,
+.site-video__media iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  object-fit: cover;
+}
+
+.site-video__body {
+  padding: 14px 10px 10px;
+}
+
+.site-video__body h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.site-video__body p {
+  margin-top: 8px;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.site-video__body .card__link {
+  display: inline-block;
+  padding-top: 14px;
+}
+
+.site-note-link {
+  margin-top: 24px;
+}
+
+@media (max-width: 900px) {
+  .site-hero__grid,
+  .site-videos {
+    grid-template-columns: 1fr;
+  }
+
+  .site-hero__photo {
+    justify-self: start;
+    width: min(100%, 300px);
+  }
+}
+
+@media (max-width: 620px) {
+  .site-hero h1 { font-size: clamp(2.4rem, 13vw, 4rem); }
+  .site-videos { gap: 12px; }
+}
+
+.site-page h1,
+.site-page h2,
+.site-page h3 {
+  font-family: var(--heading-font, var(--sans));
+}
+
+.site-hero__panel {
+  justify-self: end;
+  width: min(100%, 320px);
+  border: 1px solid var(--line-2);
+  background:
+    linear-gradient(rgba(61, 240, 168, 0.05) 1px, transparent 1px) 0 0 / 22px 22px,
+    linear-gradient(90deg, rgba(61, 240, 168, 0.05) 1px, transparent 1px) 0 0 / 22px 22px,
+    var(--bg-soft);
+  padding: 22px;
+  display: grid;
+  gap: 12px;
+  align-content: center;
+  min-height: 240px;
+}
+
+.site-hero__panel strong {
+  font-size: 1.35rem;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.site-hero__panel p {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.site-hero__panel small {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+  overflow-wrap: anywhere;
+}
+
+/* Radio configurable por tema */
+.card,
+.tech,
+.frame,
+.contact__links,
+.site-video,
+.site-hero__panel {
+  border-radius: var(--radius, 0);
+}
