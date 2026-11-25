@@ -108,9 +108,11 @@ mi-blog-dev/
 ├── dev-blog/                         # Blog estático + consola CMS
 │   ├── index.html                    # Portada del blog (últimas entradas)
 │   ├── articulo.html                 # Artículo dinámico por slug
-│   ├── admin.html                    # Consola: dashboard, blog, landing, publicidad y métricas
+│   ├── admin.html                    # Consola: dashboard, sitios, blog, landing, publicidad y métricas
 │   ├── dashboard.js / dashboard.css  # Dashboard analítico
 │   ├── editor-pro.js / editor-pro.css# Editor enriquecido
+│   ├── blog-site.js                  # Hero del sitio blog desde el CMS
+│   ├── sitio.css                     # Estilos de videos
 │   ├── api.js / api-config.js
 │   ├── metrics.js                    # Beacon de métricas
 │   └── generated/                    # Artefactos HTML del generador
@@ -175,7 +177,8 @@ mi-landing-devblog/
 - `GET /api/v1/sites/{site_id}/landing` devuelve `{site, content, ads}`.
 - La consola usa `/sites/{site_id}/landing/draft` y
   `/sites/{site_id}/landing/publish` para borrador y publicación por sitio.
-- Los sitios base `portfolio` y `devblog` están protegidos contra borrado.
+- Los sitios base `portfolio`, `devblog` y `devblog-project` están protegidos
+  contra borrado; puedes archivarlos o editarlos.
 - `POST /api/v1/media` sube videos/imágenes (máx. 25 MB) y
   `GET /api/v1/media/{id}` los sirve públicamente. En producción se guardan en
   MongoDB GridFS; en local, en SQLite.
