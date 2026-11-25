@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/Generator-Swagger-3df0a8?style=for-the-badge&logo=python&logoColor=0b0f0e" alt="Generator">
 </a>
 <a href="#pruebas">
-  <img src="https://img.shields.io/badge/Tests-74%20passed-0b0f0e?style=for-the-badge&logo=pytest&logoColor=3df0a8" alt="74 tests">
+  <img src="https://img.shields.io/badge/Tests-78%20passed-0b0f0e?style=for-the-badge&logo=pytest&logoColor=3df0a8" alt="78 tests">
 </a>
 
 # DevBlog_
@@ -58,6 +58,7 @@ landing lo consume por API. La publicidad también se administra aquí.
 | Recurso | URL |
 |---|---|
 | Portafolio (Vercel) | <https://mi-landing-devblog.vercel.app/> |
+| Landing del proyecto | <https://mi-landing-devblog.vercel.app/sitio.html?site=devblog-project> |
 | Portafolio (GitHub Pages) | <https://leonardo251207.github.io/mi-landing-devblog/> |
 | Blog en Vercel | <https://mi-blog-dev.vercel.app/> |
 | Blog en GitHub Pages | <https://leonardo251207.github.io/mi-blog-dev/> |
@@ -107,8 +108,10 @@ flowchart LR
 | **Dashboard** | Resumen de tráfico, sitios, periodos, artículos más leídos, distribución por host/ruta, ranking con búsqueda y exportación CSV. |
 | **Editor enriquecido** | Portada, inserción de bloques Markdown, vista dividida, inspector de publicación, tipografía, SEO e índice, y exportación Markdown/JSON. |
 | **Landing editable** | Vive en `mi-landing-devblog`. La consola edita su contenido (hero, secciones, proyectos, certificaciones y contacto) con borrador y publicación separados. |
+| **Multi-sitio** | Registro de landings administrables: portafolio, landing del proyecto, sitio del blog y landings de clientes, cada una con contenido y tema propios. |
+| **Videos** | Cada landing puede mostrar videos por URL (MP4/WebM, YouTube o Vimeo) con póster, subtítulos y CTA. |
 | **Publicidad** | Anuncio configurable desde el CMS: textos, llamada a la acción, imagen, disposición y colores. Solo se muestra si está activo. |
-| **Consola CMS** | Pestañas de Blog, Landing y Publicidad, y Métricas; vista previa Markdown y generación de HTML estático. |
+| **Consola CMS** | Pestañas de Dashboard, Sitios, Blog, Landing y Publicidad, y Métricas; editor enriquecido, videos y generación de HTML estático. |
 | **Métricas** | Beacon ligero, pageviews, sesiones, rutas, hosts, consultas GraphQL y resumen dentro de la consola. |
 | **Generador** | Convierte una instantánea del artículo en un artefacto HTML con checksum SHA-256. |
 | **Documentación** | Contrato v1.2, Anexo D de implementación y guías de despliegue. |
@@ -133,6 +136,30 @@ de este proyecto:
 - Los campos editoriales que el contrato actual no guarda (portada, SEO,
   tipografía, estado “en revisión”) se conservan en `localStorage`. El CMS
   sigue guardando título, slug, etiquetas y Markdown.
+
+## Multi-sitio y video
+
+El CMS administra varias propiedades con el mismo editor y el mismo renderer:
+
+| Sitio | Uso |
+|---|---|
+| `portfolio` | Landing profesional de Leonardo. |
+| `devblog-project` | Landing del proyecto DevBlog_ (caso de estudio + video). |
+| `devblog` | Sitio del blog; su hero se controla desde el CMS. |
+| `cliente-*` | Landings nuevas creadas desde **Sitios**. |
+
+- **Crear una landing nueva** requiere nombre, slug, tipo, dominio y tema. El backend
+  genera automáticamente una landing base y la publica; no hay que reconstruir el CMS.
+- El renderer genérico está en
+  `mi-landing-devblog/sitio.html?site={slug}` y aplica el tema del sitio (acento,
+  fondo, superficie, texto y fuentes).
+- Los **videos** se agregan por URL desde la colección **Videos** de la landing.
+  Acepta MP4/WebM directos, YouTube y Vimeo, con póster, subtítulos VTT y CTA.
+- Los videos deben estar alojados en un servicio externo (YouTube, Vimeo, Cloudinary
+  o un CDN). El CMS guarda la URL, no el archivo binario.
+- Para landings en dominios personalizados hay que agregar ese origen a
+  `CMS_CORS_ORIGINS` y `CORS_ORIGINS`. Las landings servidas bajo
+  `mi-landing-devblog.vercel.app` ya están permitidas.
 
 ## Stack
 
@@ -166,10 +193,10 @@ La guía completa de puertos, tokens, estructura y pruebas está en
 
 | Suite | Resultado |
 |---|---|
-| CMS (contrato + Mongo + contenido) | **57 / 57** |
+| CMS (contrato + Mongo + contenido + sitios) | **61 / 61** |
 | Métricas | **13 / 13** |
 | Generador estático | **4 / 4** |
-| **Total** | **74 / 74** |
+| **Total** | **78 / 78** |
 
 ```powershell
 cd API\devblog-cms-api-1.2\devblog-cms-api

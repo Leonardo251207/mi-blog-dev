@@ -20,6 +20,19 @@ class Landing:
 
 
 @dataclass
+class Site:
+    site_id: str
+    name: str
+    kind: str
+    domain: str = ""
+    description: str = ""
+    status: str = "active"
+    theme: dict = field(default_factory=dict)
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+@dataclass
 class Ad:
     ad_id: str
     title: str

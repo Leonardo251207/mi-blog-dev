@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="admin.css">
   <link rel="stylesheet" href="dashboard.css?v=20261124">
   <link rel="stylesheet" href="editor-pro.css?v=20261124">
+  <link rel="stylesheet" href="sites.css?v=20261124">
   <script>document.documentElement.classList.add('js')</script>
 </head>
 <body class="admin-page">
@@ -63,6 +64,8 @@
         <div class="admin__tabs" role="tablist" aria-label="Secciones de la consola">
           <button class="admin__tab" id="tab-dashboard" type="button"
                   role="tab" aria-selected="false" aria-controls="panel-dashboard" data-tab="dashboard">Dashboard</button>
+          <button class="admin__tab" id="tab-sites" type="button"
+                  role="tab" aria-selected="false" aria-controls="panel-sites" data-tab="sites">Sitios</button>
           <button class="admin__tab is-active" id="tab-blog" type="button"
                   role="tab" aria-selected="true" aria-controls="panel-blog" data-tab="blog">Blog</button>
           <button class="admin__tab" id="tab-landing" type="button"
@@ -206,6 +209,25 @@
             </div>
           </article>
         </div>
+      </section>
+
+      <!-- ============================== SITIOS =========================== -->
+      <section id="panel-sites" class="admin__panel" role="tabpanel" aria-labelledby="tab-sites" hidden>
+        <div class="admin__toolbar admin__toolbar--inner">
+          <div>
+            <p class="mono-label"><b>01</b> Propiedades administradas</p>
+            <h2>Sitios y landings</h2>
+            <p class="admin__lead">
+              Administra la landing profesional, la landing del proyecto, el sitio del blog y
+              nuevas landings de clientes con la misma consola. Cada sitio tiene su propio
+              contenido, tema y publicación.
+            </p>
+          </div>
+          <button class="btn btn--solid" id="new-site" type="button">+ Nuevo sitio</button>
+        </div>
+
+        <p id="sites-status" class="admin__status" role="status"></p>
+        <div id="sites-grid" class="sites-grid"></div>
       </section>
 
       <!-- ============================= BLOG ============================= -->
@@ -431,6 +453,9 @@
             </p>
           </div>
           <div class="admin__actions admin__actions--inline">
+            <label class="admin__inline-field" for="landing-site">Sitio
+              <select id="landing-site"></select>
+            </label>
             <button class="btn btn--ghost" id="refresh-landing" type="button">Recargar</button>
             <button class="btn btn--ghost" id="publish-landing" type="button">Publicar landing</button>
             <button class="btn btn--solid" id="save-landing" type="button">Guardar borrador</button>
@@ -506,6 +531,12 @@
               <label for="l-sec-notes-title">Título · Notas
                 <input id="l-sec-notes-title" type="text" maxlength="160" data-landing-field="sections.notes.title">
               </label>
+              <label for="l-sec-videos-label">Etiqueta · Videos
+                <input id="l-sec-videos-label" type="text" maxlength="120" data-landing-field="sections.videos.label">
+              </label>
+              <label for="l-sec-videos-title">Título · Videos
+                <input id="l-sec-videos-title" type="text" maxlength="160" data-landing-field="sections.videos.title">
+              </label>
               <label for="l-sec-contact-label">Etiqueta · Contacto
                 <input id="l-sec-contact-label" type="text" maxlength="120" data-landing-field="sections.contact.label">
               </label>
@@ -571,6 +602,18 @@
                 <button class="admin__mini" type="button" id="add-cert" title="Añadir certificación">+</button>
               </div>
               <div id="cert-editor" class="admin__collection-items" data-collection="certifications"></div>
+            </div>
+
+            <div class="admin__collection">
+              <div class="admin__collection-head">
+                <h4>Videos</h4>
+                <button class="admin__mini" type="button" id="add-video" title="Añadir video">+</button>
+              </div>
+              <p class="admin__hint admin__hint--block">
+                Acepta URL de video MP4/WebM o enlaces de YouTube/Vimeo. El renderer muestra
+                el video con controles y póster opcional.
+              </p>
+              <div id="video-editor" class="admin__collection-items" data-collection="videos"></div>
             </div>
           </fieldset>
         </form>
@@ -743,6 +786,92 @@
           <div class="admin__modal-actions">
             <button class="btn btn--ghost" id="site-cancel" type="button">Cancelar</button>
             <button class="btn btn--solid" type="submit">Agregar sitio</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="site-editor-modal" class="admin__modal" hidden>
+      <div class="admin__modal-card admin__modal-card--wide" role="dialog" aria-modal="true" aria-labelledby="site-editor-title">
+        <p class="mono-label"><b>CMS</b> Propiedad</p>
+        <h2 id="site-editor-title">Nuevo sitio</h2>
+        <p class="admin__lead">
+          Cada sitio comparte el mismo editor y renderer. Al crearlo se genera una landing
+          base que puedes personalizar sin reconstruir el CMS.
+        </p>
+        <form id="site-editor-form" autocomplete="off">
+          <div class="admin__row">
+            <label for="site-editor-name">Nombre
+              <input id="site-editor-name" type="text" maxlength="100" required>
+            </label>
+            <label for="site-editor-id">Slug
+              <input id="site-editor-id" type="text" maxlength="100" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" placeholder="cliente-demo" required>
+            </label>
+          </div>
+          <div class="admin__row">
+            <label for="site-editor-kind">Tipo
+              <select id="site-editor-kind">
+                <option value="client">Landing de cliente</option>
+                <option value="project">Landing de proyecto</option>
+                <option value="blog">Sitio de blog</option>
+                <option value="portfolio">Portafolio</option>
+              </select>
+            </label>
+            <label for="site-editor-status">Estado
+              <select id="site-editor-status">
+                <option value="active">Activo</option>
+                <option value="draft">Borrador</option>
+                <option value="archived">Archivado</option>
+              </select>
+            </label>
+          </div>
+          <label for="site-editor-domain">Dominio o URL pública
+            <input id="site-editor-domain" type="text" maxlength="300" placeholder="cliente.com">
+          </label>
+          <label for="site-editor-description">Descripción
+            <textarea id="site-editor-description" rows="2" maxlength="300"></textarea>
+          </label>
+
+          <h3 class="admin__subhead">Tema del sitio</h3>
+          <div class="admin__row">
+            <label for="site-editor-preset">Preset
+              <select id="site-editor-preset">
+                <option value="tech-terminal">Tech terminal</option>
+                <option value="editorial-minimal">Editorial minimal</option>
+                <option value="modern-magazine">Modern magazine</option>
+                <option value="clean-docs">Clean docs</option>
+              </select>
+            </label>
+            <label for="site-editor-accent">Acento
+              <input id="site-editor-accent" type="color" value="#3df0a8">
+            </label>
+          </div>
+          <div class="admin__row admin__row--3">
+            <label for="site-editor-bg">Fondo
+              <input id="site-editor-bg" type="color" value="#050807">
+            </label>
+            <label for="site-editor-surface">Superficie
+              <input id="site-editor-surface" type="color" value="#0b1110">
+            </label>
+            <label for="site-editor-text">Texto
+              <input id="site-editor-text" type="color" value="#eef5f1">
+            </label>
+          </div>
+          <div class="admin__row admin__row--3">
+            <label for="site-editor-heading-font">Fuente títulos
+              <input id="site-editor-heading-font" type="text" maxlength="80" value="Manrope">
+            </label>
+            <label for="site-editor-body-font">Fuente cuerpo
+              <input id="site-editor-body-font" type="text" maxlength="80" value="Manrope">
+            </label>
+            <label for="site-editor-radius">Radio (px)
+              <input id="site-editor-radius" type="number" min="0" max="32" value="0">
+            </label>
+          </div>
+
+          <div class="admin__modal-actions">
+            <button class="btn btn--ghost" id="site-editor-cancel" type="button">Cancelar</button>
+            <button class="btn btn--solid" type="submit">Guardar sitio</button>
           </div>
         </form>
       </div>

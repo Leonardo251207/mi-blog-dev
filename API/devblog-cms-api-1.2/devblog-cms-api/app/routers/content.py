@@ -13,14 +13,18 @@ from fastapi import APIRouter, Path, Request, Response
 
 from .. import schemas
 from ..caching import cached_json
+from ..content_repository import LANDING_ID
 from ..dependencies import (ConsolePrincipal, ContentServiceDep, ReadPrincipal)
-from ..domain import UUID7_PATTERN, utcnow
+from ..domain import SLUG_PATTERN, UUID7_PATTERN, utcnow
+from ..errors import ApiError
 
 router = APIRouter(tags=["Contenido del sitio"])
 
 _ERR = {"model": schemas.ErrorResponse}
 _COMMON = {401: _ERR, 403: _ERR, 429: _ERR}
 AdId = Annotated[str, Path(pattern=UUID7_PATTERN, description="UUIDv7 de la publicidad")]
+SiteId = Annotated[str, Path(min_length=3, max_length=100, pattern=SLUG_PATTERN,
+                             description="Slug del sitio")]
 
 
 def _draft_out(content: schemas.LandingContent, landing) -> schemas.LandingDraftOut:
@@ -30,6 +34,103 @@ def _draft_out(content: schemas.LandingContent, landing) -> schemas.LandingDraft
         published_at=landing.published_at if landing is not None else None,
         has_published=bool(landing is not None and landing.published is not None),
     )
+
+
+# ================================= SITIOS ===================================
+@router.get("/sites", response_model=list[schemas.SiteOut],
+            summary="Sitios públicos activos", responses={**_COMMON})
+def list_public_sites(service: ContentServiceDep, principal: ReadPrincipal):
+    return [
+        schemas.SiteOut.from_site(site)
+        for site in service.list_sites()
+        if site.status == "active"
+    ]
+
+
+@router.get("/sites/admin", response_model=list[schemas.SiteOut],
+            summary="Todos los sitios (consola)", responses={**_COMMON})
+def list_admin_sites(service: ContentServiceDep, principal: ConsolePrincipal):
+    return [schemas.SiteOut.from_site(site) for site in service.list_sites(include_archived=True)]
+
+
+@router.post("/sites", status_code=201, response_model=schemas.SiteOut,
+             summary="Crear sitio", responses={**_COMMON, 409: _ERR, 422: _ERR})
+def create_site(data: schemas.SiteCreate, service: ContentServiceDep,
+                principal: ConsolePrincipal):
+    return schemas.SiteOut.from_site(service.create_site(data))
+
+
+@router.get("/sites/{site_id}", response_model=schemas.SiteOut,
+            summary="Sitio público", responses={**_COMMON, 404: _ERR})
+def get_site(site_id: SiteId, service: ContentServiceDep, principal: ReadPrincipal):
+    site = service.get_site(site_id)
+    if site.status != "active":
+        raise ApiError(404, "SITE_NOT_FOUND", "El sitio no está publicado.", field="site_id")
+    return schemas.SiteOut.from_site(site)
+
+
+@router.put("/sites/{site_id}", response_model=schemas.SiteOut,
+            summary="Actualizar sitio", responses={**_COMMON, 404: _ERR, 422: _ERR})
+def update_site(site_id: SiteId, data: schemas.SiteUpdate,
+                service: ContentServiceDep, principal: ConsolePrincipal):
+    return schemas.SiteOut.from_site(service.update_site(site_id, data))
+
+
+@router.delete("/sites/{site_id}", status_code=204,
+               summary="Eliminar sitio", responses={**_COMMON, 404: _ERR, 409: _ERR})
+def delete_site(site_id: SiteId, service: ContentServiceDep,
+                principal: ConsolePrincipal):
+    service.delete_site(site_id)
+    return Response(status_code=204)
+
+
+@router.get("/sites/{site_id}/landing", response_model=schemas.PublicSiteLanding,
+            response_model_exclude_none=True,
+            summary="Landing publicada de un sitio",
+            responses={**_COMMON, 404: _ERR, 304: {"description": "Not Modified"}})
+def get_site_landing(request: Request, site_id: SiteId,
+                     service: ContentServiceDep, principal: ReadPrincipal):
+    site = service.get_site(site_id)
+    if site.status != "active":
+        raise ApiError(404, "SITE_NOT_FOUND", "El sitio no está publicado.", field="site_id")
+    content, ads = service.get_public_landing(site_id)
+    ads_out = [schemas.AdOut.from_ad(ad) for ad in ads]
+    return cached_json(request, schemas.PublicSiteLanding(
+        site=schemas.SiteOut.from_site(site),
+        content=content,
+        ads=ads_out,
+        ad=ads_out[0] if ads_out else None,
+    ))
+
+
+@router.get("/sites/{site_id}/landing/draft", response_model=schemas.LandingDraftOut,
+            summary="Borrador de la landing del sitio (consola)",
+            responses={**_COMMON, 404: _ERR})
+def get_site_landing_draft(site_id: SiteId, service: ContentServiceDep,
+                           principal: ConsolePrincipal):
+    service.get_site(site_id)
+    content, landing = service.get_draft_landing(site_id)
+    return _draft_out(content, landing)
+
+
+@router.put("/sites/{site_id}/landing/draft", response_model=schemas.LandingDraftOut,
+            summary="Guardar borrador de la landing del sitio",
+            responses={**_COMMON, 404: _ERR, 422: _ERR})
+def save_site_landing_draft(site_id: SiteId, data: schemas.LandingContent,
+                            service: ContentServiceDep, principal: ConsolePrincipal):
+    service.get_site(site_id)
+    content, landing = service.save_landing(site_id, data)
+    return _draft_out(content, landing)
+
+
+@router.post("/sites/{site_id}/landing/publish", response_model=schemas.LandingDraftOut,
+             summary="Publicar la landing del sitio",
+             responses={**_COMMON, 404: _ERR})
+def publish_site_landing(site_id: SiteId, service: ContentServiceDep,
+                         principal: ConsolePrincipal):
+    service.get_site(site_id)
+    content, landing = service.publish_landing(site_id)
+    return _draft_out(content, landing)
 
 
 # ================================ LANDING ===================================
@@ -61,7 +162,7 @@ def get_landing_draft(service: ContentServiceDep, principal: ConsolePrincipal):
             responses={**_COMMON, 422: _ERR})
 def save_landing_draft(data: schemas.LandingContent,
                        service: ContentServiceDep, principal: ConsolePrincipal):
-    content, landing = service.save_landing(data)
+    content, landing = service.save_landing(LANDING_ID, data)
     return _draft_out(content, landing)
 
 

@@ -576,10 +576,11 @@
       setMode("idle");
       clearForm();
       await refreshLists();
+      await loadSites();
       activateTab("dashboard");
       loadLanding();
       loadAds();
-      setStatus("Conectado. Revisa el dashboard, elige un borrador o edita la landing.", "ok");
+      setStatus("Conectado. Revisa el dashboard, administra sitios o edita una landing.", "ok");
     } catch (error) {
       sessionStorage.removeItem("devblog_console_token");
       token = "";
@@ -659,6 +660,7 @@
   // ================================================================
   const TAB_PANELS = {
     dashboard: $("#panel-dashboard"),
+    sites: $("#panel-sites"),
     blog: $("#panel-blog"),
     landing: $("#panel-landing"),
     metrics: $("#panel-metrics"),
@@ -679,6 +681,10 @@
       if (!landingContent) loadLanding();
       if (!ads.length) loadAds();
     }
+    if (target === "sites") {
+      if (!sites.length) loadSites();
+      else renderSites();
+    }
     document.dispatchEvent(new CustomEvent("devblog:tab", { detail: { name: target } }));
   }
 
@@ -688,12 +694,18 @@
   const landingForm = $("#landing-form");
   const landingStatus = $("#landing-status");
   const landingMeta = $("#landing-meta");
+  const landingSite = $("#landing-site");
   const saveLandingBtn = $("#save-landing");
   const publishLandingBtn = $("#publish-landing");
   const refreshLandingBtn = $("#refresh-landing");
   const landingFields = $$("[data-landing-field]");
+  const sitesGrid = $("#sites-grid");
+  const sitesStatus = $("#sites-status");
 
   let landingContent = null;
+  let sites = [];
+  let currentSiteId = "portfolio";
+  let editingSiteId = null;
 
   const COLLECTION_CONFIG = {
     technologies: {
@@ -733,6 +745,25 @@
         { key: "url", label: "Enlace", maxLength: 500 },
         { key: "tag", label: "Etiqueta", maxLength: 40 },
         { key: "color", label: "Color CSS", maxLength: 40, default: "var(--green)" },
+      ],
+    },
+    videos: {
+      container: "#video-editor",
+      fields: [
+        { key: "title", label: "Título", maxLength: 120, required: true },
+        { key: "description", label: "Descripción", maxLength: 400 },
+        { key: "url", label: "URL del video (MP4, WebM, YouTube o Vimeo)", maxLength: 1000, required: true },
+        { key: "poster", label: "Póster (URL)", maxLength: 1000 },
+        { key: "captions_url", label: "Subtítulos (VTT)", maxLength: 1000 },
+        { key: "cta_label", label: "Texto del CTA", maxLength: 60 },
+        { key: "cta_url", label: "Enlace del CTA", maxLength: 500 },
+        {
+          key: "aspect",
+          label: "Aspecto",
+          type: "select",
+          options: [["16:9", "16:9"], ["9:16", "9:16"], ["1:1", "1:1"]],
+          default: "16:9",
+        },
       ],
     },
   };
@@ -870,6 +901,7 @@
     renderCollection("technologies", content.technologies || []);
     renderCollection("projects", content.projects || []);
     renderCollection("certifications", content.certifications || []);
+    renderCollection("videos", content.videos || []);
   }
 
   function readLanding() {
@@ -880,6 +912,7 @@
     content.technologies = readCollection("technologies");
     content.projects = readCollection("projects");
     content.certifications = readCollection("certifications");
+    content.videos = readCollection("videos");
     return content;
   }
 
@@ -892,15 +925,280 @@
     }`;
   }
 
+  // ------------------------------------------------------------- sitios
+  const SITE_PRESETS = {
+    "tech-terminal": { accent: "#3df0a8", bg: "#050807", surface: "#0b1110", text: "#eef5f1", heading: "Manrope", body: "Manrope", radius: 0 },
+    "editorial-minimal": { accent: "#3de4ff", bg: "#050807", surface: "#0b1110", text: "#eef5f1", heading: "Manrope", body: "Manrope", radius: 8 },
+    "modern-magazine": { accent: "#b48cff", bg: "#050807", surface: "#0b1110", text: "#eef5f1", heading: "Manrope", body: "Georgia", radius: 12 },
+    "clean-docs": { accent: "#5b8cff", bg: "#050807", surface: "#0b1110", text: "#eef5f1", heading: "Inter", body: "Inter", radius: 6 },
+  };
+
+  function siteKindLabel(kind) {
+    return {
+      portfolio: "Portafolio",
+      project: "Proyecto",
+      blog: "Blog",
+      client: "Cliente",
+    }[kind] || kind;
+  }
+
+  function siteUrl(site) {
+    const domain = String(site?.domain || "").trim();
+    if (!domain) return "";
+    return /^https?:\/\//i.test(domain) ? domain : `https://${domain}`;
+  }
+
+  function populateSiteSelect() {
+    if (!landingSite) return;
+    landingSite.replaceChildren();
+    for (const site of sites) {
+      const option = document.createElement("option");
+      option.value = site.site_id;
+      option.textContent = `${site.name} · ${siteKindLabel(site.kind)}`;
+      landingSite.append(option);
+    }
+    if (!sites.some((site) => site.site_id === currentSiteId)) {
+      currentSiteId = sites[0]?.site_id || "portfolio";
+    }
+    landingSite.value = currentSiteId;
+  }
+
+  function renderSites() {
+    if (!sitesGrid) return;
+    sitesGrid.replaceChildren();
+    if (!sites.length) {
+      sitesGrid.append(emptyParagraph("No hay sitios. Crea el primero con «+ Nuevo sitio»."));
+      return;
+    }
+
+    for (const site of sites) {
+      const card = document.createElement("article");
+      card.className = "site-card";
+      card.style.setProperty("--site-accent", site.theme?.accent || "var(--green)");
+
+      const head = document.createElement("div");
+      head.className = "site-card__head";
+      const titleWrap = document.createElement("div");
+      const h3 = document.createElement("h3");
+      h3.textContent = site.name;
+      const id = document.createElement("span");
+      id.className = "site-card__id";
+      id.textContent = `/${site.site_id}`;
+      titleWrap.append(h3, id);
+      const status = document.createElement("span");
+      status.className = `site-badge site-badge--${site.status}`;
+      status.textContent = site.status === "active" ? "Activo" : site.status === "draft" ? "Borrador" : "Archivado";
+      head.append(titleWrap, status);
+
+      const badges = document.createElement("div");
+      badges.className = "site-card__badges";
+      const kind = document.createElement("span");
+      kind.className = `site-badge site-badge--${site.kind}`;
+      kind.textContent = siteKindLabel(site.kind);
+      const preset = document.createElement("span");
+      preset.className = "site-badge";
+      preset.textContent = site.theme?.preset || "tech-terminal";
+      badges.append(kind, preset);
+
+      const domain = document.createElement("p");
+      domain.className = "site-card__domain";
+      domain.textContent = site.domain || "Sin dominio configurado";
+
+      const description = document.createElement("p");
+      description.className = "site-card__description";
+      description.textContent = site.description || "Sin descripción.";
+
+      const theme = document.createElement("div");
+      theme.className = "site-card__theme";
+      for (const color of [site.theme?.accent, site.theme?.background, site.theme?.surface, site.theme?.text]) {
+        if (!color) continue;
+        const dot = document.createElement("i");
+        dot.style.background = color;
+        theme.append(dot);
+      }
+      const themeText = document.createElement("span");
+      themeText.textContent = `${site.theme?.heading_font || "Manrope"} / ${site.theme?.body_font || "Manrope"}`;
+      theme.append(themeText);
+
+      const actions = document.createElement("div");
+      actions.className = "site-card__actions";
+
+      const editLanding = document.createElement("button");
+      editLanding.type = "button";
+      editLanding.className = "btn btn--solid";
+      editLanding.textContent = "Editar landing";
+      editLanding.addEventListener("click", () => {
+        currentSiteId = site.site_id;
+        populateSiteSelect();
+        landingContent = null;
+        activateTab("landing");
+      });
+
+      const open = document.createElement("a");
+      open.className = "btn btn--ghost";
+      open.textContent = "Abrir ↗";
+      const url = siteUrl(site);
+      if (url) {
+        open.href = url;
+        open.target = "_blank";
+        open.rel = "noopener noreferrer";
+      } else {
+        open.setAttribute("aria-disabled", "true");
+        open.style.pointerEvents = "none";
+        open.style.opacity = "0.45";
+      }
+
+      const edit = document.createElement("button");
+      edit.type = "button";
+      edit.className = "btn btn--ghost";
+      edit.textContent = "Editar sitio";
+      edit.addEventListener("click", () => openSiteEditor(site));
+
+      actions.append(editLanding, open, edit);
+
+      if (!["portfolio", "devblog"].includes(site.site_id)) {
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "btn btn--ghost danger";
+        remove.textContent = "Eliminar";
+        remove.addEventListener("click", async () => {
+          if (!window.confirm(`¿Eliminar el sitio "${site.name}" y su landing?`)) return;
+          try {
+            await adminApi.deleteSite(token, site.site_id);
+            if (currentSiteId === site.site_id) {
+              currentSiteId = "portfolio";
+              landingContent = null;
+            }
+            setStatus(`Sitio "${site.name}" eliminado.`, "ok", sitesStatus);
+            await loadSites();
+          } catch (error) {
+            handleError(error, sitesStatus);
+          }
+        });
+        actions.append(remove);
+      }
+
+      card.append(head, badges, domain, description, theme, actions);
+      sitesGrid.append(card);
+    }
+  }
+
+  async function loadSites() {
+    if (!token) return;
+    try {
+      setStatus("Cargando sitios…", "info", sitesStatus);
+      sites = await adminApi.listSites(token);
+      populateSiteSelect();
+      renderSites();
+      setStatus(`${sites.length} sitios administrables.`, "ok", sitesStatus);
+    } catch (error) {
+      handleError(error, sitesStatus);
+    }
+  }
+
+  function applySitePreset() {
+    const preset = $("#site-editor-preset")?.value || "tech-terminal";
+    const value = SITE_PRESETS[preset] || SITE_PRESETS["tech-terminal"];
+    $("#site-editor-accent").value = value.accent;
+    $("#site-editor-bg").value = value.bg;
+    $("#site-editor-surface").value = value.surface;
+    $("#site-editor-text").value = value.text;
+    $("#site-editor-heading-font").value = value.heading;
+    $("#site-editor-body-font").value = value.body;
+    $("#site-editor-radius").value = String(value.radius);
+  }
+
+  function openSiteEditor(site = null) {
+    editingSiteId = site?.site_id || null;
+    $("#site-editor-title").textContent = site ? "Editar sitio" : "Nuevo sitio";
+    $("#site-editor-id").value = site?.site_id || "";
+    $("#site-editor-id").disabled = Boolean(site);
+    $("#site-editor-name").value = site?.name || "";
+    $("#site-editor-kind").value = site?.kind || "client";
+    $("#site-editor-status").value = site?.status || "active";
+    $("#site-editor-domain").value = site?.domain || "";
+    $("#site-editor-description").value = site?.description || "";
+    const theme = site?.theme || {};
+    $("#site-editor-preset").value = theme.preset || "tech-terminal";
+    $("#site-editor-accent").value = theme.accent || "#3df0a8";
+    $("#site-editor-bg").value = theme.background || "#050807";
+    $("#site-editor-surface").value = theme.surface || "#0b1110";
+    $("#site-editor-text").value = theme.text || "#eef5f1";
+    $("#site-editor-heading-font").value = theme.heading_font || "Manrope";
+    $("#site-editor-body-font").value = theme.body_font || "Manrope";
+    $("#site-editor-radius").value = String(theme.radius ?? 0);
+    const modal = $("#site-editor-modal");
+    modal.hidden = false;
+    setTimeout(() => $("#site-editor-name")?.focus(), 40);
+  }
+
+  function closeSiteEditor() {
+    const modal = $("#site-editor-modal");
+    if (modal) modal.hidden = true;
+    editingSiteId = null;
+  }
+
+  function readSiteForm() {
+    return {
+      name: $("#site-editor-name").value.trim(),
+      kind: $("#site-editor-kind").value,
+      domain: $("#site-editor-domain").value.trim(),
+      description: $("#site-editor-description").value.trim(),
+      status: $("#site-editor-status").value,
+      theme: {
+        preset: $("#site-editor-preset").value,
+        accent: $("#site-editor-accent").value,
+        background: $("#site-editor-bg").value,
+        surface: $("#site-editor-surface").value,
+        text: $("#site-editor-text").value,
+        muted: "#8c9c95",
+        heading_font: $("#site-editor-heading-font").value.trim() || "Manrope",
+        body_font: $("#site-editor-body-font").value.trim() || "Manrope",
+        radius: Number($("#site-editor-radius").value) || 0,
+      },
+    };
+  }
+
+  async function submitSiteEditor(event) {
+    event.preventDefault();
+    if (!token) return;
+    const payload = readSiteForm();
+    if (!payload.name) {
+      setStatus("El sitio necesita un nombre.", "error", sitesStatus);
+      return;
+    }
+    try {
+      if (editingSiteId) {
+        await adminApi.updateSite(token, editingSiteId, payload);
+        setStatus(`Sitio "${payload.name}" actualizado.`, "ok", sitesStatus);
+      } else {
+        const siteId = $("#site-editor-id").value.trim();
+        if (!siteId) {
+          setStatus("El slug del sitio es obligatorio.", "error", sitesStatus);
+          return;
+        }
+        const created = await adminApi.createSite(token, { site_id: siteId, ...payload });
+        currentSiteId = created.site_id;
+        landingContent = null;
+        setStatus(`Sitio "${payload.name}" creado con su landing base.`, "ok", sitesStatus);
+      }
+      closeSiteEditor();
+      await loadSites();
+    } catch (error) {
+      handleError(error, sitesStatus);
+    }
+  }
+
+  // ------------------------------------------------------------- landing
   async function loadLanding() {
     if (!token) return;
     try {
-      setStatus("Cargando landing…", "info", landingStatus);
-      const data = await adminApi.getLandingDraft(token);
+      setStatus(`Cargando landing de ${currentSiteId}…`, "info", landingStatus);
+      const data = await adminApi.getSiteLandingDraft(token, currentSiteId);
       landingContent = data.content || {};
       fillLanding(landingContent);
       updateLandingMeta(data);
-      setStatus("Borrador de la landing cargado.", "ok", landingStatus);
+      setStatus(`Borrador de ${currentSiteId} cargado.`, "ok", landingStatus);
     } catch (error) {
       handleError(error, landingStatus);
     }
@@ -911,11 +1209,11 @@
     try {
       saveLandingBtn.disabled = true;
       setStatus("Guardando borrador…", "info", landingStatus);
-      const data = await adminApi.saveLandingDraft(token, readLanding());
+      const data = await adminApi.saveSiteLandingDraft(token, currentSiteId, readLanding());
       landingContent = data.content || {};
       updateLandingMeta(data);
       setStatus(
-        "Borrador guardado. El sitio público no cambia hasta que pulses «Publicar landing».",
+        `Borrador de ${currentSiteId} guardado. El sitio público no cambia hasta publicar.`,
         "ok",
         landingStatus
       );
@@ -928,18 +1226,16 @@
 
   async function publishLanding() {
     if (!token) return;
-    if (!window.confirm("¿Guardar y publicar la landing? El sitio público mostrará el contenido actual.")) {
-      return;
-    }
+    if (!window.confirm(`¿Guardar y publicar la landing de ${currentSiteId}?`)) return;
     try {
       publishLandingBtn.disabled = true;
       setStatus("Guardando y publicando la landing…", "info", landingStatus);
-      await adminApi.saveLandingDraft(token, readLanding());
-      const data = await adminApi.publishLanding(token);
+      await adminApi.saveSiteLandingDraft(token, currentSiteId, readLanding());
+      const data = await adminApi.publishSiteLanding(token, currentSiteId);
       landingContent = data.content || landingContent;
       fillLanding(landingContent);
       updateLandingMeta(data);
-      setStatus("Landing publicada. Recarga el sitio de la landing para verla.", "ok", landingStatus);
+      setStatus(`Landing de ${currentSiteId} publicada.`, "ok", landingStatus);
     } catch (error) {
       handleError(error, landingStatus);
     } finally {
@@ -1299,6 +1595,24 @@
   $("#add-tech").addEventListener("click", () => addCollectionRow("technologies"));
   $("#add-project").addEventListener("click", () => addCollectionRow("projects"));
   $("#add-cert").addEventListener("click", () => addCollectionRow("certifications"));
+  $("#add-video").addEventListener("click", () => addCollectionRow("videos"));
+
+  landingSite.addEventListener("change", () => {
+    currentSiteId = landingSite.value || "portfolio";
+    landingContent = null;
+    loadLanding();
+  });
+
+  $("#new-site").addEventListener("click", () => openSiteEditor());
+  $("#site-editor-cancel").addEventListener("click", closeSiteEditor);
+  $("#site-editor-form").addEventListener("submit", submitSiteEditor);
+  $("#site-editor-preset").addEventListener("change", applySitePreset);
+  $("#site-editor-modal").addEventListener("click", (event) => {
+    if (event.target === event.currentTarget) closeSiteEditor();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !$("#site-editor-modal").hidden) closeSiteEditor();
+  });
 
   newAdBtn.addEventListener("click", newAd);
   refreshAdsBtn.addEventListener("click", loadAds);

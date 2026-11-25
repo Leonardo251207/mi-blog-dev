@@ -1,0 +1,126 @@
+/* ==========================================================
+   Sitios administrables (multi-landing)
+   ========================================================== */
+
+.sites-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.site-card {
+  position: relative;
+  border: 1px solid var(--line);
+  background: var(--bg-soft);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.site-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--site-accent, var(--green));
+}
+
+.site-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.site-card h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.site-card__id {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+}
+
+.site-card__badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.site-badge {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 6px;
+  border: 1px solid var(--line-2);
+  color: var(--muted);
+}
+
+.site-badge--active { color: var(--green); border-color: #1f7a56; }
+.site-badge--draft { color: var(--yellow); border-color: #7a6a1f; }
+.site-badge--archived { color: var(--dim); }
+.site-badge--portfolio { color: var(--green); }
+.site-badge--project { color: var(--cyan); }
+.site-badge--blog { color: var(--purple); }
+.site-badge--client { color: var(--orange); }
+
+.site-card__domain {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.site-card__description {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--muted);
+  flex: 1;
+}
+
+.site-card__theme {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 8px;
+  color: var(--dim);
+}
+
+.site-card__theme i {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+}
+
+.site-card__actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.site-card__actions .btn {
+  flex: 1 1 auto;
+  font-size: 9px;
+  justify-content: center;
+}
+
+@media (max-width: 1080px) {
+  .sites-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 720px) {
+  .sites-grid { grid-template-columns: 1fr; }
+}

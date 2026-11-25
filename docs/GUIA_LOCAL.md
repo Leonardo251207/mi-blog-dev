@@ -133,8 +133,11 @@ El repo de la landing tiene su propia estructura:
 
 ```text
 mi-landing-devblog/
-├── index.html            # Landing editable (data-landing, publicidad)
-├── landing.js            # Aplica el contenido publicado y la publicidad
+├── index.html            # Landing profesional editable
+├── sitio.html            # Renderer genérico multi-sitio + videos
+├── landing.js            # Aplica la landing del portafolio
+├── sitio.js              # Carga cualquier sitio por ?site=slug
+├── sitio.css             # Estilos de videos y renderer
 ├── notes.js              # Últimas notas del blog
 ├── api.js / api-config.js
 ├── metrics.js
@@ -154,10 +157,25 @@ mi-landing-devblog/
 
 ### Landing → CMS
 
-- La landing del repo aparte pide `GET /api/v1/landing` y `landing.js` aplica el
-  contenido publicado y la publicidad activa sobre `index.html`.
-- Si la API no responde (o el origen no está en CORS), la landing conserva su
+- El portafolio pide `GET /api/v1/landing` y `landing.js` aplica el contenido
+  publicado y la publicidad activa sobre `index.html`.
+- Las demás landings usan `sitio.html?site={slug}` y
+  `GET /api/v1/sites/{slug}/landing`. El renderer aplica el tema del sitio y
+  pinta hero, tecnologías, proyectos, videos, certificaciones y contacto.
+- Si la API no responde (o el origen no está en CORS), el portafolio conserva su
   HTML estático y sigue navegable.
+
+### Sitios → CMS (multi-landing)
+
+- `GET /api/v1/sites` lista los sitios públicos activos.
+- `GET /api/v1/sites/admin` lista todos (consola).
+- `POST /api/v1/sites` crea un sitio y genera su landing base publicada.
+- `PUT /api/v1/sites/{site_id}` y `DELETE /api/v1/sites/{site_id}` administran
+  la propiedad.
+- `GET /api/v1/sites/{site_id}/landing` devuelve `{site, content, ads}`.
+- La consola usa `/sites/{site_id}/landing/draft` y
+  `/sites/{site_id}/landing/publish` para borrador y publicación por sitio.
+- Los sitios base `portfolio` y `devblog` están protegidos contra borrado.
 
 ### Consola → CMS (landing y publicidad)
 
@@ -228,7 +246,8 @@ DevBlog_:
 ## Persistencia
 
 - **Local**: SQLite en `data/devblog.db` (no se versiona). Guarda posts,
-  landing (borrador/publicada), publicidad y metadatos de seed.
+  sitios, landings por sitio (borrador/publicada), publicidad y metadatos de
+  seed.
 - **Producción**: MongoDB Atlas si `CMS_MONGO_URI` está definido.
 - **Métricas**: Mongo Atlas en producción; `STORAGE=memory` si no hay Mongo.
 - **Generador**: disco local/efímero; los artefactos se pueden regenerar.
@@ -243,7 +262,7 @@ CMS_MONGO_DB=devblog_cms
 ## Pruebas
 
 ```powershell
-# CMS: 57 pruebas (contrato, contenido y repositorio Mongo)
+# CMS: 61 pruebas (contrato, contenido, sitios y repositorio Mongo)
 cd API\devblog-cms-api-1.2\devblog-cms-api
 .venv\Scripts\python.exe -m pytest -q
 
@@ -285,7 +304,8 @@ El slug ya existe en un borrador o publicación.
 **Error de CORS en producción.**
 Agrega el origen exacto del blog **y de la landing** a `CMS_CORS_ORIGINS` y
 `CORS_ORIGINS`, y redespliega. La landing necesita, además de su URL de Vercel,
-el origen de GitHub Pages (`https://leonardo251207.github.io`).
+el origen de GitHub Pages (`https://leonardo251207.github.io`). Si publicas una
+landing de cliente en un dominio propio, agrega también ese dominio.
 
 **Guardé la landing pero el sitio sigue igual.**
 El cambio queda como borrador. Pulsa **Publicar landing**. La lectura pública

@@ -104,6 +104,11 @@
       method: "POST",
     }),
     getLanding: () => request("/landing", { cache: "no-store" }),
+    listSites: () => request("/sites", { cache: "no-store" }),
+    getSiteLanding: (siteId) => request(
+      `/sites/${encodeURIComponent(siteId)}/landing`,
+      { cache: "no-store" }
+    ),
   };
 
   const adminApi = {
@@ -169,6 +174,37 @@
       method: "POST",
       token,
     }),
+    // ---- sitios (multi-landing) ----
+    listSites: (token) => request("/sites/admin", {
+      token,
+      cache: "no-store",
+    }),
+    createSite: (token, data) => request("/sites", {
+      method: "POST",
+      token,
+      body: data,
+    }),
+    updateSite: (token, siteId, data) => request(`/sites/${encodeURIComponent(siteId)}`, {
+      method: "PUT",
+      token,
+      body: data,
+    }),
+    deleteSite: (token, siteId) => request(`/sites/${encodeURIComponent(siteId)}`, {
+      method: "DELETE",
+      token,
+    }),
+    getSiteLandingDraft: (token, siteId) => request(
+      `/sites/${encodeURIComponent(siteId)}/landing/draft`,
+      { token, cache: "no-store" }
+    ),
+    saveSiteLandingDraft: (token, siteId, content) => request(
+      `/sites/${encodeURIComponent(siteId)}/landing/draft`,
+      { method: "PUT", token, body: content }
+    ),
+    publishSiteLanding: (token, siteId) => request(
+      `/sites/${encodeURIComponent(siteId)}/landing/publish`,
+      { method: "POST", token }
+    ),
     listAds: (token) => request("/ads/admin", {
       token,
       cache: "no-store",

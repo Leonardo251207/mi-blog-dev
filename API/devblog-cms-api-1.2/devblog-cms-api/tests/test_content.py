@@ -184,3 +184,90 @@ def test_metrics_overview_normalizes_graphql_payload(client, monkeypatch):
 def test_metrics_overview_requires_console_token(client):
     assert client.get("/api/v1/metrics/overview").status_code == 401
     assert client.get("/api/v1/metrics/overview", headers=PUBLIC).status_code == 403
+
+
+# ================================= SITIOS ===================================
+def test_default_sites_and_project_landing(client):
+    sites = client.get("/api/v1/sites", headers=PUBLIC)
+    assert sites.status_code == 200
+    ids = {site["site_id"] for site in sites.json()}
+    assert {"portfolio", "devblog-project", "devblog"} <= ids
+
+    project = client.get("/api/v1/sites/devblog-project/landing", headers=PUBLIC)
+    assert project.status_code == 200
+    body = project.json()
+    assert body["site"]["site_id"] == "devblog-project"
+    assert body["content"]["videos"][0]["title"] == "Recorrido del CMS"
+    assert body["content"]["sections"]["videos"]["title"]
+
+
+def test_create_client_site_with_video_and_delete(client):
+    payload = {
+        "site_id": "cliente-demo",
+        "name": "Cliente Demo",
+        "kind": "client",
+        "domain": "ejemplo.com",
+        "description": "Landing de prueba",
+        "theme": {
+            "preset": "modern-magazine",
+            "accent": "#ff8a3d",
+            "background": "#050807",
+            "surface": "#0b1110",
+            "text": "#eef5f1",
+            "muted": "#8c9c95",
+            "heading_font": "Manrope",
+            "body_font": "Georgia",
+            "radius": 12,
+        },
+    }
+    created = client.post("/api/v1/sites", headers=CONSOLE, json=payload)
+    assert created.status_code == 201
+    assert created.json()["site_id"] == "cliente-demo"
+
+    draft = client.get("/api/v1/sites/cliente-demo/landing/draft", headers=CONSOLE)
+    assert draft.status_code == 200
+    content = draft.json()["content"]
+    assert content["hero"]["first_name"] == "Tu"
+
+    content["videos"] = [{
+        "title": "Video de bienvenida",
+        "description": "Ejemplo",
+        "url": "https://example.com/video.mp4",
+        "poster": "",
+        "captions_url": "",
+        "cta_label": "",
+        "cta_url": "",
+        "aspect": "16:9",
+    }]
+    saved = client.put("/api/v1/sites/cliente-demo/landing/draft",
+                       headers=CONSOLE, json=content)
+    assert saved.status_code == 200
+    assert client.post("/api/v1/sites/cliente-demo/landing/publish",
+                       headers=CONSOLE).status_code == 200
+
+    public = client.get("/api/v1/sites/cliente-demo/landing", headers=PUBLIC)
+    assert public.status_code == 200
+    assert public.json()["content"]["videos"][0]["url"] == "https://example.com/video.mp4"
+
+    deleted = client.delete("/api/v1/sites/cliente-demo", headers=CONSOLE)
+    assert deleted.status_code == 204
+    assert client.get("/api/v1/sites/cliente-demo/landing", headers=PUBLIC).status_code == 404
+
+
+def test_protected_site_cannot_be_deleted(client):
+    r = client.delete("/api/v1/sites/portfolio", headers=CONSOLE)
+    assert r.status_code == 409
+    assert r.json()["error"]["code"] == "SITE_PROTECTED"
+
+
+def test_video_url_rejects_javascript(client):
+    content = client.get("/api/v1/sites/devblog-project/landing/draft",
+                         headers=CONSOLE).json()["content"]
+    content["videos"] = [{
+        "title": "Malicioso",
+        "url": "javascript:alert(1)",
+        "aspect": "16:9",
+    }]
+    r = client.put("/api/v1/sites/devblog-project/landing/draft",
+                   headers=CONSOLE, json=content)
+    assert r.status_code == 422

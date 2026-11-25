@@ -11,7 +11,7 @@ from pydantic import (BaseModel, ConfigDict, Field, PlainSerializer, StringConst
                       field_validator)
 
 from . import content_defaults, domain
-from .content import Ad
+from .content import Ad, Site
 from .domain import Post, PostStatus
 
 UtcDatetime = Annotated[datetime, PlainSerializer(domain.iso, return_type=str, when_used="json")]
@@ -261,6 +261,7 @@ class LandingSections(BaseModel):
     projects: SectionHeading = Field(default_factory=SectionHeading)
     certifications: SectionHeading = Field(default_factory=SectionHeading)
     notes: SectionHeading = Field(default_factory=SectionHeading)
+    videos: SectionHeading = Field(default_factory=SectionHeading)
     contact: SectionHeading = Field(default_factory=SectionHeading)
 
 
@@ -298,6 +299,28 @@ class CertificationContent(BaseModel):
     @classmethod
     def _url(cls, v: str) -> str:
         return _safe_url(v)
+
+
+class VideoContent(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    title: str = Field(min_length=1, max_length=120)
+    description: str = Field(default="", max_length=400)
+    url: str = Field(min_length=1, max_length=1000)
+    poster: str = Field(default="", max_length=1000)
+    captions_url: str = Field(default="", max_length=1000)
+    cta_label: str = Field(default="", max_length=60)
+    cta_url: str = Field(default="", max_length=500)
+    aspect: Literal["16:9", "9:16", "1:1"] = "16:9"
+
+    @field_validator("url", "captions_url", "cta_url")
+    @classmethod
+    def _urls(cls, v: str) -> str:
+        return _safe_url(v)
+
+    @field_validator("poster")
+    @classmethod
+    def _poster(cls, v: str) -> str:
+        return _safe_url(v, allow_data_image=True)
 
 
 class LandingContact(BaseModel):
@@ -339,6 +362,7 @@ def _default_sections() -> LandingSections:
         projects=SectionHeading(**sections["projects"]),
         certifications=SectionHeading(**sections["certifications"]),
         notes=SectionHeading(**sections["notes"]),
+        videos=SectionHeading(**sections.get("videos", {})),
         contact=SectionHeading(**sections["contact"]),
     )
 
@@ -362,6 +386,7 @@ class LandingContent(BaseModel):
         default_factory=_default_projects, max_length=12)
     certifications: list[CertificationContent] = Field(
         default_factory=_default_certifications, max_length=12)
+    videos: list[VideoContent] = Field(default_factory=list, max_length=12)
     contact: LandingContact = Field(default_factory=_default_contact)
 
 
@@ -372,8 +397,62 @@ class LandingDraftOut(BaseModel):
     has_published: bool = False
 
 
-# ============================ PUBLICIDAD ====================================
+# ============================== SITIOS ======================================
 Color = Annotated[str, StringConstraints(pattern=r"^#[0-9a-fA-F]{6}$")]
+
+
+class SiteTheme(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    preset: str = Field(default="tech-terminal", max_length=40)
+    accent: Color = "#3df0a8"
+    background: Color = "#050807"
+    surface: Color = "#0b1110"
+    text: Color = "#eef5f1"
+    muted: Color = "#8c9c95"
+    heading_font: str = Field(default="Manrope", max_length=80)
+    body_font: str = Field(default="Manrope", max_length=80)
+    radius: int = Field(default=0, ge=0, le=32)
+
+
+class SiteBase(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    name: str = Field(min_length=2, max_length=100)
+    kind: Literal["portfolio", "project", "blog", "client"] = "client"
+    domain: str = Field(default="", max_length=300)
+    description: str = Field(default="", max_length=300)
+    status: Literal["active", "draft", "archived"] = "active"
+    theme: SiteTheme = Field(default_factory=SiteTheme)
+
+
+class SiteCreate(SiteBase):
+    site_id: Slug
+
+
+class SiteUpdate(SiteBase):
+    pass
+
+
+class SiteOut(SiteBase):
+    site_id: str
+    created_at: UtcDatetime | None = None
+    updated_at: UtcDatetime | None = None
+
+    @classmethod
+    def from_site(cls, site: Site) -> "SiteOut":
+        return cls(
+            site_id=site.site_id,
+            name=site.name,
+            kind=site.kind,  # type: ignore[arg-type]
+            domain=site.domain,
+            description=site.description,
+            status=site.status,  # type: ignore[arg-type]
+            theme=SiteTheme(**site.theme),
+            created_at=site.created_at,
+            updated_at=site.updated_at,
+        )
+
+
+# ============================ PUBLICIDAD ====================================
 
 
 class AdTheme(BaseModel):
@@ -438,6 +517,13 @@ class AdOut(AdBase):
 
 
 class PublicLanding(BaseModel):
+    content: LandingContent
+    ads: list[AdOut] = []
+    ad: Optional[AdOut] = None
+
+
+class PublicSiteLanding(BaseModel):
+    site: SiteOut
     content: LandingContent
     ads: list[AdOut] = []
     ad: Optional[AdOut] = None

@@ -20,11 +20,17 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
-from .content import Ad, Landing
-from .content_defaults import DEFAULT_ADS, DEFAULT_LANDING_CONTENT
+from .content import Ad, Landing, Site
+from .content_defaults import (
+    DEFAULT_ADS,
+    DEFAULT_LANDING_CONTENT,
+    DEFAULT_SITES,
+    landing_default_for,
+)
 from .domain import iso, parse_iso, utcnow, uuid7
 
-LANDING_ID = "principal"
+LANDING_ID = "portfolio"
+LEGACY_LANDING_ID = "principal"
 
 
 class ContentRepositoryError(Exception):
@@ -34,9 +40,13 @@ class ContentRepositoryError(Exception):
 class ContentRepository:
     """Interfaz común para landing y publicidad."""
 
-    def get_landing(self) -> Optional[Landing]: ...
-    def save_landing_draft(self, content: dict) -> Landing: ...
-    def publish_landing(self) -> Optional[Landing]: ...
+    def list_sites(self) -> list[Site]: ...
+    def get_site(self, site_id: str) -> Optional[Site]: ...
+    def upsert_site(self, site: Site) -> None: ...
+    def delete_site(self, site_id: str) -> bool: ...
+    def get_landing(self, site_id: str = LANDING_ID) -> Optional[Landing]: ...
+    def save_landing_draft(self, site_id: str, content: dict) -> Landing: ...
+    def publish_landing(self, site_id: str = LANDING_ID) -> Optional[Landing]: ...
     def list_ads(self, only_active: bool = False) -> list[Ad]: ...
     def get_ad(self, ad_id: str) -> Optional[Ad]: ...
     def upsert_ad(self, ad: Ad) -> None: ...
@@ -53,6 +63,18 @@ CREATE TABLE IF NOT EXISTS landing (
     published_content TEXT,
     updated_at        TEXT NOT NULL,
     published_at      TEXT
+);
+
+CREATE TABLE IF NOT EXISTS sites (
+    site_id     TEXT PRIMARY KEY,
+    name        TEXT NOT NULL,
+    kind        TEXT NOT NULL,
+    domain      TEXT NOT NULL DEFAULT '',
+    description TEXT NOT NULL DEFAULT '',
+    status      TEXT NOT NULL DEFAULT 'active',
+    theme       TEXT NOT NULL DEFAULT '{}',
+    created_at  TEXT NOT NULL,
+    updated_at  TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ads (
@@ -99,7 +121,9 @@ class SqliteContentRepository(ContentRepository):
         if path != ":memory:":
             self._conn.execute("PRAGMA journal_mode = WAL")
         self._conn.executescript(_SCHEMA)
-        self._seed_default_landing()
+        self._migrate_legacy_landing()
+        self._seed_default_sites()
+        self._seed_default_landings()
         self._seed_default_ads()
 
     # ------------------------------------------------------------- mapeo
@@ -133,18 +157,77 @@ class SqliteContentRepository(ContentRepository):
             updated_at=parse_iso(row["updated_at"]),
         )
 
-    def _seed_default_landing(self) -> None:
-        now = utcnow()
-        defaults = json.dumps(DEFAULT_LANDING_CONTENT, ensure_ascii=False)
+    @staticmethod
+    def _site(row: sqlite3.Row) -> Site:
+        return Site(
+            site_id=row["site_id"],
+            name=row["name"],
+            kind=row["kind"],
+            domain=row["domain"],
+            description=row["description"],
+            status=row["status"],
+            theme=json.loads(row["theme"] or "{}"),
+            created_at=parse_iso(row["created_at"]),
+            updated_at=parse_iso(row["updated_at"]),
+        )
+
+    def _migrate_legacy_landing(self) -> None:
+        """Migra la landing única `principal` al sitio `portfolio`."""
         with self._lock:
-            self._conn.execute(
-                """
-                INSERT OR IGNORE INTO landing
-                    (landing_id, draft_content, published_content, updated_at, published_at)
-                VALUES (?, ?, ?, ?, ?)
-                """,
-                (LANDING_ID, defaults, defaults, iso(now), iso(now)),
-            )
+            legacy = self._conn.execute(
+                "SELECT 1 FROM landing WHERE landing_id = ?", (LEGACY_LANDING_ID,)
+            ).fetchone()
+            current = self._conn.execute(
+                "SELECT 1 FROM landing WHERE landing_id = ?", (LANDING_ID,)
+            ).fetchone()
+            if legacy is not None and current is None:
+                self._conn.execute(
+                    """
+                    INSERT INTO landing
+                        (landing_id, draft_content, published_content, updated_at, published_at)
+                    SELECT ?, draft_content, published_content, updated_at, published_at
+                    FROM landing WHERE landing_id = ?
+                    """,
+                    (LANDING_ID, LEGACY_LANDING_ID),
+                )
+
+    def _seed_default_sites(self) -> None:
+        now = utcnow()
+        with self._lock:
+            for item in DEFAULT_SITES:
+                self._conn.execute(
+                    """
+                    INSERT OR IGNORE INTO sites
+                        (site_id, name, kind, domain, description, status, theme, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        item["site_id"],
+                        item["name"],
+                        item["kind"],
+                        item.get("domain", ""),
+                        item.get("description", ""),
+                        item.get("status", "active"),
+                        json.dumps(item.get("theme", {}), ensure_ascii=False),
+                        iso(now),
+                        iso(now),
+                    ),
+                )
+
+    def _seed_default_landings(self) -> None:
+        now = utcnow()
+        with self._lock:
+            for item in DEFAULT_SITES:
+                content = landing_default_for(item["site_id"], item["kind"])
+                payload = json.dumps(content, ensure_ascii=False)
+                self._conn.execute(
+                    """
+                    INSERT OR IGNORE INTO landing
+                        (landing_id, draft_content, published_content, updated_at, published_at)
+                    VALUES (?, ?, ?, ?, ?)
+                    """,
+                    (item["site_id"], payload, payload, iso(now), iso(now)),
+                )
 
     def _seed_default_ads(self) -> None:
         """Crea la publicidad de ejemplo una sola vez.
@@ -179,15 +262,69 @@ class SqliteContentRepository(ContentRepository):
                 (iso(now),),
             )
 
-    # ---------------------------------------------------------- landing
-    def get_landing(self) -> Optional[Landing]:
+    # ------------------------------------------------------------ sitios
+    def list_sites(self) -> list[Site]:
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT * FROM sites ORDER BY created_at ASC, site_id ASC"
+            ).fetchall()
+        return [self._site(row) for row in rows]
+
+    def get_site(self, site_id: str) -> Optional[Site]:
         with self._lock:
             row = self._conn.execute(
-                "SELECT * FROM landing WHERE landing_id = ?", (LANDING_ID,)
+                "SELECT * FROM sites WHERE site_id = ?", (site_id,)
+            ).fetchone()
+        return self._site(row) if row else None
+
+    def upsert_site(self, site: Site) -> None:
+        now = site.updated_at or utcnow()
+        created = site.created_at or now
+        with self._lock:
+            self._conn.execute(
+                """
+                INSERT INTO sites
+                    (site_id, name, kind, domain, description, status, theme, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(site_id) DO UPDATE SET
+                    name = excluded.name,
+                    kind = excluded.kind,
+                    domain = excluded.domain,
+                    description = excluded.description,
+                    status = excluded.status,
+                    theme = excluded.theme,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    site.site_id,
+                    site.name,
+                    site.kind,
+                    site.domain,
+                    site.description,
+                    site.status,
+                    json.dumps(site.theme or {}, ensure_ascii=False),
+                    iso(created),
+                    iso(now),
+                ),
+            )
+
+    def delete_site(self, site_id: str) -> bool:
+        with self._lock:
+            self._conn.execute("DELETE FROM landing WHERE landing_id = ?", (site_id,))
+            result = self._conn.execute(
+                "DELETE FROM sites WHERE site_id = ?", (site_id,)
+            )
+        return result.rowcount > 0
+
+    # ---------------------------------------------------------- landing
+    def get_landing(self, site_id: str = LANDING_ID) -> Optional[Landing]:
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT * FROM landing WHERE landing_id = ?", (site_id,)
             ).fetchone()
         return self._landing(row)
 
-    def save_landing_draft(self, content: dict) -> Landing:
+    def save_landing_draft(self, site_id: str, content: dict) -> Landing:
         now = utcnow()
         payload = json.dumps(content, ensure_ascii=False)
         with self._lock:
@@ -200,16 +337,16 @@ class SqliteContentRepository(ContentRepository):
                     draft_content = excluded.draft_content,
                     updated_at = excluded.updated_at
                 """,
-                (LANDING_ID, payload, iso(now)),
+                (site_id, payload, iso(now)),
             )
             row = self._conn.execute(
-                "SELECT * FROM landing WHERE landing_id = ?", (LANDING_ID,)
+                "SELECT * FROM landing WHERE landing_id = ?", (site_id,)
             ).fetchone()
         landing = self._landing(row)
         assert landing is not None
         return landing
 
-    def publish_landing(self) -> Optional[Landing]:
+    def publish_landing(self, site_id: str = LANDING_ID) -> Optional[Landing]:
         now = utcnow()
         with self._lock:
             self._conn.execute(
@@ -219,9 +356,9 @@ class SqliteContentRepository(ContentRepository):
                     published_at = ?
                 WHERE landing_id = ?
                 """,
-                (iso(now), LANDING_ID),
+                (iso(now), site_id),
             )
-        return self.get_landing()
+        return self.get_landing(site_id)
 
     # -------------------------------------------------------------- ads
     def list_ads(self, only_active: bool = False) -> list[Ad]:
@@ -314,10 +451,13 @@ class MongoContentRepository(ContentRepository):
         self._client = client
         self._db = client[db_name]
         self._landing = self._db["landing"]
+        self._sites = self._db["sites"]
         self._ads = self._db["ads"]
         self._meta = self._db["site_meta"]
         self._ensure_indexes()
-        self._seed_default_landing()
+        self._migrate_legacy_landing()
+        self._seed_default_sites()
+        self._seed_default_landings()
         self._seed_default_ads()
 
     def _ensure_indexes(self) -> None:
@@ -326,19 +466,52 @@ class MongoContentRepository(ContentRepository):
             name="idx_active_created",
         )
 
-    def _seed_default_landing(self) -> None:
-        self._landing.update_one(
-            {"_id": LANDING_ID},
-            {
-                "$setOnInsert": {
-                    "draft_content": copy.deepcopy(DEFAULT_LANDING_CONTENT),
-                    "published_content": copy.deepcopy(DEFAULT_LANDING_CONTENT),
-                    "updated_at": iso(utcnow()),
-                    "published_at": iso(utcnow()),
-                }
-            },
-            upsert=True,
-        )
+    def _migrate_legacy_landing(self) -> None:
+        if self._landing.find_one({"_id": LANDING_ID}) is not None:
+            return
+        legacy = self._landing.find_one({"_id": LEGACY_LANDING_ID})
+        if legacy is None:
+            return
+        migrated = copy.deepcopy(legacy)
+        migrated["_id"] = LANDING_ID
+        self._landing.insert_one(migrated)
+
+    def _seed_default_sites(self) -> None:
+        now = iso(utcnow())
+        for item in DEFAULT_SITES:
+            self._sites.update_one(
+                {"_id": item["site_id"]},
+                {
+                    "$setOnInsert": {
+                        "name": item["name"],
+                        "kind": item["kind"],
+                        "domain": item.get("domain", ""),
+                        "description": item.get("description", ""),
+                        "status": item.get("status", "active"),
+                        "theme": copy.deepcopy(item.get("theme", {})),
+                        "created_at": now,
+                        "updated_at": now,
+                    }
+                },
+                upsert=True,
+            )
+
+    def _seed_default_landings(self) -> None:
+        now = iso(utcnow())
+        for item in DEFAULT_SITES:
+            content = landing_default_for(item["site_id"], item["kind"])
+            self._landing.update_one(
+                {"_id": item["site_id"]},
+                {
+                    "$setOnInsert": {
+                        "draft_content": copy.deepcopy(content),
+                        "published_content": copy.deepcopy(content),
+                        "updated_at": now,
+                        "published_at": now,
+                    }
+                },
+                upsert=True,
+            )
 
     def _seed_default_ads(self) -> None:
         now = utcnow()
@@ -394,13 +567,61 @@ class MongoContentRepository(ContentRepository):
             updated_at=parse_iso(doc["updated_at"]) if doc.get("updated_at") else None,
         )
 
-    def get_landing(self) -> Optional[Landing]:
-        return self._landing_doc(self._landing.find_one({"_id": LANDING_ID}))
+    @staticmethod
+    def _site_doc(doc: dict) -> Site:
+        return Site(
+            site_id=doc["_id"],
+            name=doc.get("name", ""),
+            kind=doc.get("kind", "client"),
+            domain=doc.get("domain", ""),
+            description=doc.get("description", ""),
+            status=doc.get("status", "active"),
+            theme=copy.deepcopy(doc.get("theme") or {}),
+            created_at=parse_iso(doc["created_at"]) if doc.get("created_at") else None,
+            updated_at=parse_iso(doc["updated_at"]) if doc.get("updated_at") else None,
+        )
 
-    def save_landing_draft(self, content: dict) -> Landing:
+    # ------------------------------------------------------------ sitios
+    def list_sites(self) -> list[Site]:
+        docs = self._sites.find().sort([("created_at", 1), ("_id", 1)])
+        return [self._site_doc(doc) for doc in docs]
+
+    def get_site(self, site_id: str) -> Optional[Site]:
+        doc = self._sites.find_one({"_id": site_id})
+        return self._site_doc(doc) if doc else None
+
+    def upsert_site(self, site: Site) -> None:
+        now = site.updated_at or utcnow()
+        created = site.created_at or now
+        self._sites.update_one(
+            {"_id": site.site_id},
+            {
+                "$set": {
+                    "name": site.name,
+                    "kind": site.kind,
+                    "domain": site.domain,
+                    "description": site.description,
+                    "status": site.status,
+                    "theme": copy.deepcopy(site.theme or {}),
+                    "updated_at": iso(now),
+                },
+                "$setOnInsert": {"created_at": iso(created)},
+            },
+            upsert=True,
+        )
+
+    def delete_site(self, site_id: str) -> bool:
+        self._landing.delete_one({"_id": site_id})
+        return self._sites.delete_one({"_id": site_id}).deleted_count > 0
+
+    # ---------------------------------------------------------- landing
+    def get_landing(self, site_id: str = LANDING_ID) -> Optional[Landing]:
+        return self._landing_doc(self._landing.find_one({"_id": site_id}))
+
+    def save_landing_draft(self, site_id: str, content: dict) -> Landing:
         now = iso(utcnow())
         self._landing.update_one(
-            {"_id": LANDING_ID},
+            {"_id": site_id},
             {
                 "$set": {
                     "draft_content": copy.deepcopy(content),
@@ -410,16 +631,16 @@ class MongoContentRepository(ContentRepository):
             },
             upsert=True,
         )
-        landing = self.get_landing()
+        landing = self.get_landing(site_id)
         assert landing is not None
         return landing
 
-    def publish_landing(self) -> Optional[Landing]:
-        doc = self._landing.find_one({"_id": LANDING_ID})
+    def publish_landing(self, site_id: str = LANDING_ID) -> Optional[Landing]:
+        doc = self._landing.find_one({"_id": site_id})
         if doc is None:
             return None
         self._landing.update_one(
-            {"_id": LANDING_ID},
+            {"_id": site_id},
             {
                 "$set": {
                     "published_content": copy.deepcopy(doc.get("draft_content") or {}),
@@ -427,7 +648,7 @@ class MongoContentRepository(ContentRepository):
                 }
             },
         )
-        return self.get_landing()
+        return self.get_landing(site_id)
 
     def list_ads(self, only_active: bool = False) -> list[Ad]:
         query = {"active": True} if only_active else {}
